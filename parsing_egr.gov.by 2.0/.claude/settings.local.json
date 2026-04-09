@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/bin/pip install:*)",
+      "Bash(.venv/bin/python -c \"\nfrom analyzer.config import OPENROUTER_API_KEY, DEFAULT_MODEL, DEFAULT_INPUT\nfrom analyzer.models import CompanyRecord, LLMAnalysis, AnalyzedRecord\nfrom analyzer.csv_handler import read_companies\nfrom analyzer.scorer import heuristic_score, resolve_level\nfrom analyzer.cache import AnalysisCache\nprint\\('Все импорты OK'\\)\nprint\\(f'API key: {OPENROUTER_API_KEY[:20]}...'\\)\nprint\\(f'Default model: {DEFAULT_MODEL}'\\)\nkey_len = len\\(OPENROUTER_API_KEY\\)\nprint\\(f'API key length: {key_len}'\\)\n\")",
+      "Bash(.venv/bin/python -c \"\nfrom analyzer.csv_handler import read_companies\nfrom pathlib import Path\ncompanies = read_companies\\(Path\\('egr_leads.csv'\\)\\)\nprint\\(f'Прочитано компаний: {len\\(companies\\)}'\\)\nprint\\('Первая:'\\)\nimport pprint\npprint.pprint\\(companies[0]\\)\nprint\\('...'\\)\npprint.pprint\\(companies[3]\\)\n\")",
+      "Bash(.venv/bin/python -c \"\nfrom analyzer.scorer import heuristic_score, resolve_level\n\ntests = [\n    \\('ООО \\\\\"ГОЧАМИР\\\\\"', 'company'\\),\n    \\('ООО \\\\\"Бьюти Перемен\\\\\"', 'company'\\),\n    \\('ООО \\\\\"Белпромхим\\\\\"', 'company'\\),\n    \\('ООО \\\\\"Айти Солюшнс\\\\\"', 'company'\\),\n    \\('Иванов Иван Иванович', 'person'\\),\n    \\('ООО \\\\\"Продукт Лайн\\\\\"', 'company'\\),\n]\nfor name, etype in tests:\n    score, reason = heuristic_score\\(name, etype\\)\n    level = resolve_level\\(score\\)\n    print\\(f'{name}: score={score} \\({level}\\) — {reason}'\\)\n\")",
+      "Bash(.venv/bin/python -c \"\nfrom analyzer.scorer import heuristic_score, resolve_level\n\ntests = [\n    \\('ООО \\\\\"ГОЧАМИР\\\\\"', 'company'\\),\n    \\('ООО \\\\\"Бьюти Перемен\\\\\"', 'company'\\),\n    \\('ООО \\\\\"Белпромхим\\\\\"', 'company'\\),\n    \\('ООО \\\\\"Айти Солюшнс\\\\\"', 'company'\\),\n    \\('Иванов Иван Иванович', 'person'\\),\n    \\('ООО \\\\\"Продукт Лайн\\\\\"', 'company'\\),\n    \\('ООО \\\\\"БелАгроТорг\\\\\"', 'company'\\),\n    \\('ООО \\\\\"Медиасервис\\\\\"', 'company'\\),\n    \\('ООО \\\\\"ЮрЦентр\\\\\"', 'company'\\),\n    \\('УП \\\\\"Белпродукт\\\\\"', 'company'\\),\n]\nfor name, etype in tests:\n    score, reason = heuristic_score\\(name, etype\\)\n    level = resolve_level\\(score\\)\n    print\\(f'{score:3d} \\({level:6s}\\) {name} — {reason}'\\)\n\")",
+      "Bash(.venv/bin/python -c \"\nfrom analyzer.search_provider import search_company\nprint\\('Тестируем поиск...'\\)\nresults = search_company\\('Бьюти Перемен', '291845295', max_results=3\\)\nprint\\(f'Найдено: {len\\(results\\)} результатов'\\)\nfor r in results:\n    print\\(f'  [{r[\\\\\"title\\\\\"][:50]}]'\\)\n    print\\(f'   {r[\\\\\"url\\\\\"]}'\\)\n    print\\(f'   {r[\\\\\"snippet\\\\\"][:100]}'\\)\n\" 2>&1)",
+      "Bash(.venv/bin/python -c \"\nfrom analyzer.search_provider import search_company\nprint\\('Тестируем поиск...'\\)\nresults = search_company\\('ООО Бьюти Перемен', '291845295', max_results=3\\)\nprint\\(f'Найдено: {len\\(results\\)} результатов'\\)\nfor r in results:\n    print\\(f'  [{r[\\\\\"title\\\\\"][:60]}]'\\)\n    print\\(f'   {r[\\\\\"url\\\\\"]}'\\)\n\" 2>&1)",
+      "Bash(.venv/bin/python analyze.py --limit 3 --verbose 2>&1)",
+      "Bash(.venv/bin/python -c \"\nimport csv\nwith open\\('analyzed_leads.csv', encoding='utf-8-sig'\\) as f:\n    reader = csv.DictReader\\(f\\)\n    rows = list\\(reader\\)\nprint\\(f'Записей в CSV: {len\\(rows\\)}'\\)\nfor r in rows:\n    print\\(f'  {r[\\\\\"label_relevance_score\\\\\"]:>3} \\({r[\\\\\"label_relevance_level\\\\\"]:6}\\) {r[\\\\\"display_name\\\\\"][:40]} | {r[\\\\\"business_category\\\\\"][:30]}'\\)\n    print\\(f'       status={r[\\\\\"analysis_status\\\\\"]} | conf={r[\\\\\"confidence_score\\\\\"]}'\\)\n\" 2>&1)",
+      "Bash(.venv/bin/python analyze.py --help)",
+      "Bash(source .venv/bin/activate)",
+      "Bash(python -c \":*)",
+      "Bash(source /Users/vana/Documents/parsing_egr.gov.by/.venv/bin/activate)",
+      "Bash(python main.py --help)",
+      "Bash(python main.py scout --help)",
+      "Bash(python main.py scout --source news --limit 3)",
+      "Bash(pip show:*)",
+      "Bash(python -c \"from ddgs import DDGS; print\\(''ddgs import OK''\\)\")",
+      "Bash(python main.py daily-brief)",
+      "Bash(ls /Users/vana/Documents/parsing_egr.gov.by/*.py)",
+      "Bash(ls /Users/vana/Documents/parsing_egr.gov.by/.env*)"
+    ]
+  }
+}

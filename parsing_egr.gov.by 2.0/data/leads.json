@@ -1,0 +1,162 @@
+{
+  "generated_at": "2026-04-08T16:00:16.785140+00:00",
+  "summary": {
+    "total_leads": 1,
+    "hot_count": 1,
+    "warm_count": 0,
+    "cold_count": 0,
+    "call_today": 1
+  },
+  "leads": [
+    {
+      "id": "0461baa8ea9ece24",
+      "company_name": "Контрактное производство БАД в 2026 году",
+      "normalized_name": "Контрактное производство БАД",
+      "source_name": "news_search",
+      "source_type": "news",
+      "source_url": "https://www.kp.ru/money/biznes/kontraktnoe-proizvodstvo-bad/",
+      "source_quality": 0.4,
+      "detected_signal": "new_product",
+      "signal_description": "Найдено в новостях (Komsomolskaya Pravda, 2024-11-06T21:00:00+00:00): Контрактное производство БАД в 2026 году",
+      "region": "",
+      "country": "BY",
+      "legal_form": "",
+      "website": "",
+      "description": "Контрактное производство БАД в 2026 году. Рынок биологически активных добавок в России стремительно развивается, и даже в условиях высокой конкуренции есть незанятые ниши ...",
+      "business_category": "pharma",
+      "product_category": "БАДы (биологически активные добавки)",
+      "evidence": [
+        {
+          "url": "https://tsrpackersandmovers.com/2023/06/09/enjoy-deluxe-discover-the-most-glamorous-electric-massagers/",
+          "title": "Enjoy Deluxe: Discover the Most Glamorous Electric Massagers",
+          "snippet": "Jun 9, 2023·... 2026 году и многое другое. Познавательный портал где вы найдете ... Закажите контрактное производство или СТМ на https://morgan-mills ...",
+          "source_type": "unknown",
+          "quality": 0.3
+        },
+        {
+          "url": "https://fouadalbadin.net/2020/06/best-practices-for-animated-progress-indicators/",
+          "title": "Best Practices for Animated Progress Indicators - Fouad Albadin",
+          "snippet": "Jun 22, 2020·... производства. Мы предлагаем обучение и переподготовку по 2850 ... Это – уникальная, популярная линейка ценных и эффективных БАДов, которые ...",
+          "source_type": "unknown",
+          "quality": 0.3
+        },
+        {
+          "url": "https://www.instagram.com/katya_hryakova/",
+          "title": "ХРЯКОВА КАТЯ (@katya_hryakova) • Instagram photos and videos",
+          "snippet": "До 200 SKU продуктов к 2026 году Расширение географии бизнеса, открытие:Узбекистана,Таджикистана,Монголии,Молдавии,Грузии,Азербайджана, Турции и ...",
+          "source_type": "unknown",
+          "quality": 0.3
+        },
+        {
+          "url": "https://www.instagram.com/kazvitamins/",
+          "title": "KAZ Vitamins | International Distributor (@kazvitamins) - Instagram",
+          "snippet": "KazVitamins представляет бренд Michael's Health — эксперта на рынке здоровья с 1984 года. Почему Michael's Health станет ценным дополнением вашего ассортимента?",
+          "source_type": "unknown",
+          "quality": 0.3
+        },
+        {
+          "url": "https://www.instagram.com/little_pretty_cup/",
+          "title": "(@little_pretty_cup) • Instagram photos and videos",
+          "snippet": "- самый крупный бренд компании ВТФ (лидера в области контрактного производства БАД в России), предлагающий широкий ассортимент продуктов для здоровья ...Missing:Контрактное| Show results with:Контрактное",
+          "source_type": "unknown",
+          "quality": 0.3
+        },
+        {
+          "url": "https://fliphtml5.com/lbsh/lutt/Крылья_Родины_№_3-4_2022/",
+          "title": "Крылья Родины № 3-4 2022 - Flipbook by Part66Prep | FlipHTML5",
+          "snippet": "Mar 4, 2022·Был подписан контракт на производство стратеги ческих ракетоносцев Ту-160. ... 2026 годы, направ ленной на развитие авиадвигателестроения. Одной ...",
+          "source_type": "unknown",
+          "quality": 0.3
+        },
+        {
+          "url": "https://www.instagram.com/pro_alinaa/",
+          "title": "Алина Прокопенко (@pro_alinaa) • Instagram photos and videos",
+          "snippet": "Mar 3, 2026·Только за 2024 год моя сеть приросла в доходе на 23% , чем в 2023 году. Показывала и показываю свои доходы лишь с одной целью - ДА, ТАК МОЖНО!Missing:Контрактное| Show results with:Контрактное",
+          "source_type": "unknown",
+          "quality": 0.3
+        },
+        {
+          "url": "https://stm-endorphin.ru/articles/format-vkhoda-v-kategoriyu-bad-odin-sku-mini-lineyka-ili-testovyy-nabor",
+          "title": "ФорматзапускаБАД: один SKU, мини-линейка или тестовый...",
+          "snippet": "01 апреля,2026КонтрактныйзапускСТМ-БАД“под ключ”: как выстроен проект, какие этапы проходитпродукти как мы контролируем версии без хаоса.20 января,2026Как использоватьконтрактноепроизводствоБАДовдля тестированияновыхпродуктовна рынке.",
+          "source_type": "unknown",
+          "quality": 0.3
+        },
+        {
+          "url": "https://www.kp.ru/money/biznes/kontraktnoe-proizvodstvo-kosmetiki/",
+          "title": "Контрактноепроизводствокосметикив2026году: что такое...",
+          "snippet": "Контрактноепроизводствокосметики. Полезная информация. Этапызапускапроизводства.КонтрактноепроизводствоБАДвРоссии. Какие документы потребуются и какую формудобавоквыбрать.",
+          "source_type": "unknown",
+          "quality": 0.3
+        },
+        {
+          "url": "https://www.postavshhiki.ru/novosti-kompanij/12-uchastie-v-meropriyatiyakh/35508-prinyali-uchastie-v-vystavke-nutricon-russia-2026",
+          "title": "Приняли участие в выставке \"NutriCon.Russia2026\"",
+          "snippet": "Компания «Гутен Морген» сообщает об успешном участии в NutriCon.Russia2026— крупнейшей профессиональной выставке индустрии здорового питания! Что мы представили на стенде: • Эксклюзивную презентацию возможностейконтрактногопроизводстваБАДов...",
+          "source_type": "unknown",
+          "quality": 0.3
+        }
+      ],
+      "company_summary": "Предположительно, компания планирует запуск контрактного производства БАД к 2026 году. Судя по косвенным данным, может быть связана с расширением ассортимента БАД и выходом на новые рынки.",
+      "business_model_guess": "B2B производство БАД под заказ (контрактное производство)",
+      "why_labels": "Для маркировки БАДов, включая front-label/back-label для банок, флаконов, пакетов, а также SKU-этикетки. Объемы зависят от количества SKU и масштаба производства.",
+      "why_now": "Анонс планов по контрактному производству БАД к 2026 году. Возможно, сейчас идет активная фаза подготовки к запуску производства, включая выбор поставщиков упаковки и этикеток.",
+      "sales_brief": "Компания, планирующая контрактное производство БАД к 2026 году. Сигнал - анонс нового производства. Перспективны, так как БАДы требуют обязательной маркировки. Звонить с предложением тестовых тиражей этикеток для новых продуктов.",
+      "outreach_angle": "Интересуетесь ли вы поиском поставщиков этикеток для вашей будущей продукции БАД?",
+      "suggested_pitch": "Мы - Flex and Roll Pro, производим этикетки для фармацевтической продукции. Увидели новость о вашем планируемом запуске контрактного производства БАД и хотели бы предложить вам наши услуги.",
+      "evidence_quality_notes": "Данные получены из новостной статьи и косвенных упоминаний в других источниках. Не хватает конкретной информации о компании, ее текущей деятельности и контактных данных. Много предположений.",
+      "assumptions": [
+        "Компания действительно планирует запуск контрактного производства БАД.",
+        "Компания находится в активной фазе подготовки к запуску производства.",
+        "Компания заинтересована в поиске поставщиков упаковки и этикеток."
+      ],
+      "scoring_breakdown": {
+        "product_packaging_fit": {
+          "score": 90.0,
+          "weight": 0.3,
+          "weighted_contribution": 27.0,
+          "explanation": "БАДы относятся к фармацевтической продукции, требующей обязательной упаковки и маркировки."
+        },
+        "labeling_need": {
+          "score": 80.0,
+          "weight": 0.25,
+          "weighted_contribution": 20.0,
+          "explanation": "БАДы требуют обязательной маркировки с указанием состава, дозировки и другой информации."
+        },
+        "newness_signal": {
+          "score": 80.0,
+          "weight": 0.2,
+          "weighted_contribution": 16.0,
+          "explanation": "Анонс планов по запуску нового производства к 2026 году."
+        },
+        "urgency_signal": {
+          "score": 50.0,
+          "weight": 0.15,
+          "weighted_contribution": 7.5,
+          "explanation": "Подготовка к запуску производства, возможно, идет активный поиск поставщиков."
+        },
+        "data_quality": {
+          "score": 30.0,
+          "weight": 0.05,
+          "weighted_contribution": 1.5,
+          "explanation": "Мало конкретных данных о компании, много предположений."
+        },
+        "sales_readiness": {
+          "score": 30.0,
+          "weight": 0.05,
+          "weighted_contribution": 1.5,
+          "explanation": "Недостаточно данных для осмысленного звонка прямо сейчас, требуется дополнительная информация."
+        },
+        "final_score": 73.5,
+        "priority_tier": "hot"
+      },
+      "final_score": 73.5,
+      "priority_tier": "hot",
+      "confidence_score": 40.0,
+      "created_at": "2026-04-08T15:59:36.025971+00:00",
+      "updated_at": "2026-04-08T15:59:53.410167+00:00",
+      "analysis_status": "ok",
+      "analysis_model": "google/gemini-2.0-flash-001"
+    }
+  ]
+}
