@@ -27,6 +27,7 @@ HEADERS = {
     "Connection": "close",
 }
 TIMEOUT = 60
+MAX_RETRIES = 2
 
 # Legal form abbreviations for cleaner names
 _LEGAL_FORMS = {
@@ -85,6 +86,13 @@ def _format_date(value: str) -> str:
     return value.replace("-", ".")
 
 
+def _iter_date_range(start_date: date, end_date: date) -> Iterator[date]:
+    current = start_date
+    while current <= end_date:
+        yield current
+        current += timedelta(days=1)
+
+
 class EGRSource(BaseSource):
     """
     Fetches company registrations from the Belarusian EGR registry.
@@ -119,40 +127,56 @@ class EGRSource(BaseSource):
         if start_date is None:
             start_date = end_date - timedelta(days=self.days_back)
 
-        logger.info(f"[EGR] Fetching {start_date} → {end_date}")
+        logger.info(f"[EGR] Fetching {start_date} → {end_date} (day-by-day)")
 
-        try:
-            raw = self._fetch(start_date, end_date)
-        except Exception as e:
-            logger.error(f"[EGR] API error: {e}")
-            return
-
-        logger.info(f"[EGR] Got {len(raw)} raw records")
-
-        for item in raw:
+        seen_ids: set[str] = set()
+        for current_date in _iter_date_range(start_date, end_date):
             try:
-                lead = self._to_lead(item)
-                if lead:
-                    yield lead
+                raw = self._fetch(current_date, current_date)
+                logger.info(f"[EGR] {current_date}: got {len(raw)} raw records")
             except Exception as e:
-                logger.warning(f"[EGR] Normalize failed: {e} — {item}")
+                logger.error(f"[EGR] API error for {current_date}: {e}")
+                continue
+
+            for item in raw:
+                try:
+                    lead = self._to_lead(item)
+                    if lead and lead.id not in seen_ids:
+                        seen_ids.add(lead.id)
+                        yield lead
+                except Exception as e:
+                    logger.warning(f"[EGR] Normalize failed: {e} — {item}")
+
+            if current_date < end_date:
+                time.sleep(1.0)
 
     def _fetch(self, start_date: date, end_date: date) -> list[dict]:
         url = f"{EGR_API_URL}/{start_date.strftime('%d.%m.%Y')}/{end_date.strftime('%d.%m.%Y')}"
-        resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
-        resp.raise_for_status()
-        text = resp.text.strip()
-        if not text:
-            return []
-        try:
-            data = json.loads(text)
-            if isinstance(data, list):
-                return [x for x in data if isinstance(x, dict)]
-            if isinstance(data, dict):
-                return [data]
-        except json.JSONDecodeError:
-            pass
-        return _extract_json_objects(text)
+        last_exc: Exception | None = None
+
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+                resp.raise_for_status()
+                text = resp.text.strip()
+                if not text:
+                    return []
+                try:
+                    data = json.loads(text)
+                    if isinstance(data, list):
+                        return [x for x in data if isinstance(x, dict)]
+                    if isinstance(data, dict):
+                        return [data]
+                except json.JSONDecodeError:
+                    pass
+                return _extract_json_objects(text)
+            except Exception as e:
+                last_exc = e
+                logger.warning(f"[EGR] Attempt {attempt}/{MAX_RETRIES} failed for {url}: {e}")
+                if attempt < MAX_RETRIES:
+                    time.sleep(5)
+
+        raise last_exc if last_exc else RuntimeError("Unknown EGR fetch error")
 
     def _to_lead(self, item: dict) -> Lead | None:
         status_obj = item.get("nsi00219") or {}

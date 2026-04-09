@@ -31,6 +31,12 @@ DAYS_BACK = int(os.getenv("LEAD_DAYS_BACK", "3"))
 CACHE_TTL_SECONDS = int(os.getenv("LEAD_CACHE_TTL", "3600"))  # 1 hour
 
 DATA_DIR = Path(os.getenv("LEAD_DATA_DIR", "/tmp/leads_data"))
+SNAPSHOT_FILE = Path(
+    os.getenv(
+        "LEAD_SNAPSHOT_FILE",
+        str(Path(__file__).resolve().parent.parent.parent / "parsing" / "data" / "leads.json"),
+    )
+)
 
 # ── Keyword heuristic for pre-filtering ──────────────────────────────────────
 
@@ -177,6 +183,57 @@ class LeadGeneratorService:
         except Exception as e:
             logger.error("Failed to save cache: %s", e)
 
+    def _load_snapshot_results(self) -> list[LeadResult]:
+        """Load precomputed leads from disk when live EGR fetching is unavailable."""
+        if not SNAPSHOT_FILE.exists():
+            logger.warning("Lead snapshot file not found: %s", SNAPSHOT_FILE)
+            return []
+
+        try:
+            payload = json.loads(SNAPSHOT_FILE.read_text(encoding="utf-8"))
+        except Exception as e:
+            logger.warning("Failed to read lead snapshot %s: %s", SNAPSHOT_FILE, e)
+            return []
+
+        raw_leads = payload.get("leads", []) if isinstance(payload, dict) else []
+        results: list[LeadResult] = []
+
+        for item in raw_leads:
+            score = float(item.get("final_score") or 0.0)
+            confidence = float(item.get("confidence_score") or 0.0)
+            breakdown = item.get("scoring_breakdown") or {}
+
+            why_parts = [
+                item.get("why_labels", "").strip(),
+                item.get("why_now", "").strip(),
+            ]
+            why_recommended = " | ".join(part for part in why_parts if part) or "Новая компания в релевантной отрасли"
+
+            results.append(LeadResult(
+                id=item.get("id", ""),
+                company_name=item.get("company_name", ""),
+                normalized_name=item.get("normalized_name") or item.get("company_name", ""),
+                registration_date=(item.get("raw_data") or {}).get("reg_date"),
+                industry=item.get("business_category") or "unknown",
+                product_category=item.get("product_category") or "",
+                why_recommended=why_recommended,
+                score=score,
+                confidence_score=confidence,
+                priority_tier=item.get("priority_tier") or "cold",
+                source_url=item.get("source_url") or "",
+                source_name=item.get("source_name") or "snapshot",
+                company_summary=item.get("company_summary") or "",
+                outreach_angle=item.get("outreach_angle") or "",
+                suggested_pitch=item.get("suggested_pitch") or "",
+                sales_brief=item.get("sales_brief") or "",
+                scoring_breakdown=breakdown,
+                created_at=item.get("created_at") or datetime.now(timezone.utc).isoformat(),
+            ))
+
+        results.sort(key=lambda lead: lead.score, reverse=True)
+        logger.info("Loaded %d leads from snapshot %s", len(results), SNAPSHOT_FILE)
+        return results
+
     def get_top_leads(self) -> dict:
         """Return cached top leads."""
         return {
@@ -227,7 +284,12 @@ class LeadGeneratorService:
         try:
             leads = self._execute_pipeline()
             with self._lock:
-                self._cache.leads = [l.to_dict() for l in leads]
+                if leads:
+                    self._cache.leads = [l.to_dict() for l in leads]
+                    self._cache.error_message = ""
+                else:
+                    logger.warning("Pipeline produced no leads; preserving previous cache")
+                    self._cache.error_message = "Live source returned no leads; previous or snapshot data preserved."
                 self._cache.generated_at = datetime.now(timezone.utc).isoformat()
                 self._cache.pipeline_status = "done"
                 self._save_cache()
@@ -258,10 +320,18 @@ class LeadGeneratorService:
 
         # Stage 1: Fetch candidates
         logger.info("Stage 1: Fetching EGR candidates (days_back=%d)", DAYS_BACK)
-        source = EGRSource()
-        all_candidates = list(source.fetch_candidates(days_back=DAYS_BACK))
+        source = EGRSource(days_back=DAYS_BACK)
+        all_candidates = list(source.fetch_candidates())
         logger.info("Fetched %d raw candidates from EGR", len(all_candidates))
         total_candidates = len(all_candidates)
+
+        if not all_candidates:
+            logger.warning("EGR returned no candidates; falling back to snapshot data")
+            snapshot_results = self._load_snapshot_results()
+            with self._lock:
+                self._cache.total_candidates = len(snapshot_results)
+                self._cache.total_scored = len(snapshot_results)
+            return snapshot_results
 
         # Pre-filter with heuristic scoring
         scored_candidates = []
