@@ -36,24 +36,24 @@ export function SidePanel({ open, onClose, title, children, width = 'md' }: Side
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div
-        className="absolute inset-0 bg-brand-900/20"
+        className="absolute inset-0 bg-black/20 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
         className={clsx(
-          'relative bg-surface-card shadow-panel h-full flex flex-col border-l border-edge',
+          'relative bg-surface-card shadow-panel h-full flex flex-col',
           widthStyles[width],
           'animate-slide-in-right'
         )}
       >
         {title && (
-          <div className="flex items-center justify-between px-5 py-4 border-b border-edge flex-shrink-0">
-            <h2 className="font-display font-semibold text-ink text-sm">{title}</h2>
+          <div className="flex items-center justify-between px-6 py-5 border-b border-edge flex-shrink-0">
+            <h2 className="font-display text-ink text-sm">{title}</h2>
             <button
               onClick={onClose}
-              className="text-ink-muted hover:text-ink p-1 rounded-md hover:bg-surface-hover transition-colors"
+              className="text-ink-muted hover:text-ink p-1.5 rounded-xl hover:bg-surface-hover transition-colors"
             >
-              <X size={15} />
+              <X size={16} />
             </button>
           </div>
         )}

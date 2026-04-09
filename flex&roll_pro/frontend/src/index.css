@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Unbounded font ──────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Unbounded';
+  src: url('./assets/fonts/Unbounded-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   *, *::before, *::after {
     box-sizing: border-box;
@@ -14,9 +23,9 @@
   }
 
   body {
-    font-family: 'DM Sans', system-ui, sans-serif;
-    background-color: #f7f6fa;
-    color: #1a1528;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #e8edf2;
+    color: #0f172a;
   }
 
   ::-webkit-scrollbar {
@@ -29,17 +38,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: #e8e4f0;
+    background-color: #cbd5e1;
     border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #b8b3cc;
-    border-radius: 9999px;
-  }
-
-  aside ::-webkit-scrollbar-thumb {
-    background: #2a1a40;
+    background-color: #94a3b8;
   }
 }
 

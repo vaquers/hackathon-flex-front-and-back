@@ -56,16 +56,16 @@ export function RisksPage() {
   }))
 
   return (
-    <div className="p-6 space-y-5 animate-fade-in">
+    <div className="space-y-5 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display font-semibold text-ink text-[20px] leading-tight">Риски</h1>
-          <p className="text-sm text-ink-muted mt-0.5">Зависшие сделки и клиенты в зоне риска</p>
+          <h1 className="font-display text-ink text-xl leading-tight">Риски</h1>
+          <p className="text-sm text-ink-muted mt-1">Зависшие сделки и клиенты в зоне риска</p>
         </div>
         {risks && risks.length > 0 && (
-          <div className="flex items-center gap-1.5 text-sm">
-            <AlertTriangle size={13} className="text-risk-high" />
+          <div className="flex items-center gap-2 text-sm">
+            <AlertTriangle size={14} className="text-risk-high" />
             <span className="font-semibold text-risk-high">{risks.length}</span>
             <span className="text-ink-muted">активных рисков</span>
           </div>
@@ -73,13 +73,13 @@ export function RisksPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-2.5 flex-wrap">
+      <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-1.5 text-xs text-ink-muted">
           <Filter size={12} />
           <span>Фильтры:</span>
         </div>
         <select
-          className="text-sm border border-edge rounded-lg px-3 py-1.5 text-ink bg-surface-card focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-edge-focus"
+          className="text-sm border border-edge rounded-xl px-3 py-2 text-ink bg-surface-card focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
           value={managerId}
           onChange={(e) => setManagerId(e.target.value)}
         >
@@ -89,10 +89,10 @@ export function RisksPage() {
         </select>
         <button
           className={clsx(
-            'text-sm px-3 py-1.5 rounded-lg border transition-colors',
+            'text-sm px-3 py-2 rounded-xl transition-colors',
             vipOnly
-              ? 'bg-[#f2edfd] border-[#d0c4f4] text-[#4a34a8] font-medium'
-              : 'border-edge text-ink-secondary bg-surface-card hover:bg-surface-hover'
+              ? 'bg-blue-50 text-accent font-medium'
+              : 'border border-edge text-ink-secondary bg-surface-card hover:bg-surface-hover'
           )}
           onClick={() => setVipOnly(!vipOnly)}
         >
@@ -101,8 +101,8 @@ export function RisksPage() {
       </div>
 
       {/* Table card */}
-      <div className="bg-surface-card rounded-xl border border-edge shadow-card overflow-hidden">
-        <div className="px-5 pt-4 border-b border-edge-soft">
+      <div className="bg-surface-card rounded-2xl shadow-card overflow-hidden">
+        <div className="px-6 pt-4 border-b border-edge">
           <Tabs
             tabs={tabsWithCount.map((t) => ({ id: t.id, label: t.label, count: t.count }))}
             activeTab={activeTab}
@@ -110,7 +110,7 @@ export function RisksPage() {
           />
         </div>
 
-        <div className="p-4">
+        <div className="p-5">
           {isLoading && <SkeletonTable rows={6} />}
           {isError && <ErrorState onRetry={() => refetch()} />}
           {!isLoading && !isError && risks && risks.length === 0 && (
@@ -126,13 +126,13 @@ export function RisksPage() {
                 <thead>
                   <tr className="border-b border-edge">
                     {['Клиент', 'Менеджер', 'Стадия', 'Без движения', 'Причина риска', 'Риск', 'Настроение', 'AI Действие', ''].map((h) => (
-                      <th key={h} className="text-left text-[11px] font-medium text-ink-muted uppercase tracking-wide pb-2.5 pr-4 whitespace-nowrap">
+                      <th key={h} className="text-left text-[11px] font-medium text-ink-muted uppercase tracking-wide pb-3 pr-4 whitespace-nowrap">
                         {h}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-edge-soft">
+                <tbody className="divide-y divide-edge">
                   {risks.map((risk) => (
                     <RiskRow
                       key={risk.id}
@@ -148,7 +148,7 @@ export function RisksPage() {
         </div>
       </div>
 
-      {/* Side Panel Preview */}
+      {/* Side Panel */}
       <SidePanel
         open={!!selectedRisk}
         onClose={() => setSelectedRisk(null)}
@@ -156,14 +156,14 @@ export function RisksPage() {
         width="md"
       >
         {selectedRisk && (
-          <div className="p-5 space-y-4">
+          <div className="p-6 space-y-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex items-center gap-2 mb-2">
                   {selectedRisk.isVip && <VipBadge />}
                   <RiskBadge level={selectedRisk.riskLevel} score={selectedRisk.riskScore} />
                 </div>
-                <h3 className="font-display font-semibold text-ink text-lg">{selectedRisk.clientName}</h3>
+                <h3 className="font-display text-ink text-lg">{selectedRisk.clientName}</h3>
                 <p className="text-sm text-ink-muted">{selectedRisk.managerName} · {selectedRisk.dealStageLabel}</p>
               </div>
               <div className="text-right flex-shrink-0">
@@ -172,15 +172,15 @@ export function RisksPage() {
               </div>
             </div>
 
-            <div className="bg-[#fdf1f4] border border-[#f0bcc8] rounded-lg p-3">
+            <div className="bg-red-50 rounded-2xl p-4">
               <p className="text-xs font-semibold text-risk-high mb-1">Причина риска</p>
-              <p className="text-sm text-[#7a1230]">{selectedRisk.riskReason}</p>
+              <p className="text-sm text-red-800">{selectedRisk.riskReason}</p>
             </div>
 
-            <div className="bg-accent-faint border border-accent-subtle rounded-lg p-3">
-              <div className="flex items-center gap-1.5 mb-1">
-                <Zap size={11} className="text-accent" />
-                <p className="text-xs font-semibold text-accent-text">AI рекомендация</p>
+            <div className="bg-blue-50 rounded-2xl p-4">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Zap size={12} className="text-accent" />
+                <p className="text-xs font-semibold text-accent">AI рекомендация</p>
               </div>
               <p className="text-sm text-ink">{selectedRisk.aiNextAction}</p>
             </div>
@@ -216,19 +216,19 @@ function RiskRow({
 }) {
   return (
     <tr className="hover:bg-surface-hover transition-colors group">
-      <td className="py-3 pr-4">
+      <td className="py-3.5 pr-4">
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="font-medium text-ink text-sm">{risk.clientName}</span>
           {risk.isVip && <VipBadge />}
         </div>
       </td>
-      <td className="py-3 pr-4">
+      <td className="py-3.5 pr-4">
         <span className="text-sm text-ink-secondary">{risk.managerName}</span>
       </td>
-      <td className="py-3 pr-4">
+      <td className="py-3.5 pr-4">
         <Badge variant="stage">{risk.dealStageLabel}</Badge>
       </td>
-      <td className="py-3 pr-4">
+      <td className="py-3.5 pr-4">
         <span className={clsx(
           'text-sm font-medium',
           risk.daysSinceActivity >= 14 ? 'text-risk-high'
@@ -238,22 +238,22 @@ function RiskRow({
           {formatDaysAgo(risk.daysSinceActivity)}
         </span>
       </td>
-      <td className="py-3 pr-4 max-w-[200px]">
+      <td className="py-3.5 pr-4 max-w-[200px]">
         <p className="text-xs text-ink-secondary line-clamp-2">{risk.riskReason}</p>
       </td>
-      <td className="py-3 pr-4">
+      <td className="py-3.5 pr-4">
         <RiskBadge level={risk.riskLevel} score={risk.riskScore} />
       </td>
-      <td className="py-3 pr-4">
+      <td className="py-3.5 pr-4">
         <SentimentBadge sentiment={risk.sentiment} />
       </td>
-      <td className="py-3 pr-4 max-w-[200px]">
+      <td className="py-3.5 pr-4 max-w-[200px]">
         <div className="flex items-start gap-1">
           <Zap size={10} className="text-accent flex-shrink-0 mt-0.5" />
           <p className="text-xs text-ink-muted line-clamp-2">{risk.aiNextAction}</p>
         </div>
       </td>
-      <td className="py-3">
+      <td className="py-3.5">
         <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button size="sm" variant="ghost" onClick={onPreview}>Превью</Button>
           <Button size="sm" variant="outline" onClick={onOpen} icon={<ExternalLink size={12} />}>

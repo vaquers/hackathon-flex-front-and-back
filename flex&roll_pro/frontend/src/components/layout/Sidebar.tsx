@@ -1,26 +1,33 @@
 import { NavLink } from 'react-router-dom'
 import { clsx } from 'clsx'
-import { LayoutDashboard, AlertTriangle, Search, Sparkles, BarChart3, Zap } from 'lucide-react'
+
+import calendarIcon from '@/assets/symbols/calendar.day.timeline.left.svg'
+import flagIcon from '@/assets/symbols/flag.svg'
+import searchIcon from '@/assets/symbols/magnifyingglass.svg'
+import personIcon from '@/assets/symbols/person.crop.rectangle.stack.svg'
+import chartIcon from '@/assets/symbols/chart.bar.svg'
 
 const navItems = [
-  { to: '/', label: 'Сегодня', icon: LayoutDashboard, exact: true },
-  { to: '/risks', label: 'Риски', icon: AlertTriangle },
-  { to: '/search', label: 'Поиск', icon: Search },
-  { to: '/leads', label: 'Лиды', icon: Sparkles },
-  { to: '/analytics', label: 'Аналитика', icon: BarChart3 },
+  { to: '/', label: 'Сегодня', icon: calendarIcon, exact: true },
+  { to: '/risks', label: 'Риски', icon: flagIcon },
+  { to: '/search', label: 'Поиск', icon: searchIcon },
+  { to: '/leads', label: 'Лиды', icon: personIcon },
+  { to: '/analytics', label: 'Аналитика', icon: chartIcon },
 ]
 
 export function Sidebar() {
   return (
-    <aside className="w-52 flex-shrink-0 bg-sidebar-bg flex flex-col h-full border-r border-sidebar-border">
+    <aside className="w-56 flex-shrink-0 bg-sidebar-bg flex flex-col h-full border-r border-sidebar-border">
       {/* Logo */}
-      <div className="px-4 py-[18px] border-b border-sidebar-border">
+      <div className="px-5 py-5 border-b border-sidebar-border">
         <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-md bg-accent flex items-center justify-center flex-shrink-0">
-            <Zap size={11} className="text-white" />
+          <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center flex-shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
           </div>
           <div>
-            <p className="font-display font-semibold text-sidebar-text-active text-[13px] leading-tight tracking-tight">
+            <p className="font-display text-sidebar-text-active text-[13px] leading-tight tracking-tight">
               Flex&Roll
             </p>
             <p className="text-[10px] text-sidebar-text leading-tight mt-0.5">AI Workspace</p>
@@ -29,7 +36,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 py-3 space-y-px">
+      <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -37,36 +44,23 @@ export function Sidebar() {
             end={item.exact}
             className={({ isActive }) =>
               clsx(
-                'flex items-center gap-2.5 px-3 py-[7px] rounded-md text-[13px] font-medium transition-all duration-150 relative',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150',
                 isActive
-                  ? 'bg-sidebar-active text-sidebar-text-active'
+                  ? 'bg-sidebar-active text-accent'
                   : 'text-sidebar-text hover:bg-sidebar-hover hover:text-sidebar-text-active'
               )
             }
           >
-            {({ isActive }) => (
-              <>
-                {isActive && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-sidebar-accent rounded-r-full" />
-                )}
-                <item.icon
-                  size={14}
-                  className={clsx(
-                    'flex-shrink-0',
-                    isActive ? 'text-sidebar-text-active' : 'text-sidebar-text'
-                  )}
-                />
-                <span>{item.label}</span>
-              </>
-            )}
+            <img src={item.icon} alt="" className="w-[18px] h-[18px]" style={{ filter: 'invert(1) brightness(0.4)' }} />
+            <span>{item.label}</span>
           </NavLink>
         ))}
       </nav>
 
       {/* Footer */}
-      <div className="px-4 py-4 border-t border-sidebar-border">
+      <div className="px-5 py-4 border-t border-sidebar-border">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-brand-800 flex items-center justify-center text-[10px] font-bold text-brand-200 flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-[11px] font-bold text-accent flex-shrink-0">
             ДС
           </div>
           <div className="min-w-0">
@@ -75,10 +69,6 @@ export function Sidebar() {
             </p>
             <p className="text-[10px] text-sidebar-text mt-0.5">Менеджер</p>
           </div>
-        </div>
-        <div className="mt-3 flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
-          <span className="text-[10px] text-sidebar-text">Mock режим</span>
         </div>
       </div>
     </aside>

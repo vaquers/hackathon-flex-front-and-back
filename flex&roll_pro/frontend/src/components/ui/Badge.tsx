@@ -9,23 +9,22 @@ interface BadgeProps {
   className?: string
 }
 
-// Desaturated, refined semantic colors
 const variantStyles: Record<string, string> = {
-  default:              'bg-surface-hover text-ink-secondary border border-edge',
-  'risk-low':           'bg-[#f0f9f4] text-risk-low border border-[#c0e4d2]',
-  'risk-medium':        'bg-[#fdf7ed] text-risk-medium border border-[#f0d39e]',
-  'risk-high':          'bg-[#fdf1f4] text-risk-high border border-[#f0bcc8]',
-  'risk-critical':      'bg-[#f9e8ed] text-risk-critical border border-[#e8a2b5] font-semibold',
-  vip:                  'bg-[#f2edfd] text-[#4a34a8] border border-[#d0c4f4]',
-  'sentiment-positive': 'bg-[#f0f9f4] text-risk-low border border-[#c0e4d2]',
-  'sentiment-neutral':  'bg-surface-hover text-ink-muted border border-edge',
-  'sentiment-negative': 'bg-[#fdf1f4] text-risk-high border border-[#f0bcc8]',
-  'sentiment-mixed':    'bg-[#fdf7ed] text-risk-medium border border-[#f0d39e]',
-  stage:                'bg-accent-faint text-accent-text border border-accent-subtle',
-  'urgency-low':        'bg-surface-hover text-ink-muted border border-edge',
-  'urgency-medium':     'bg-[#fdf7ed] text-risk-medium border border-[#f0d39e]',
-  'urgency-high':       'bg-[#fff6ed] text-[#9a4e0a] border border-[#f5d3aa]',
-  'urgency-critical':   'bg-[#f9e8ed] text-risk-critical border border-[#e8a2b5] font-semibold',
+  default:              'bg-slate-100 text-ink-secondary',
+  'risk-low':           'bg-emerald-50 text-risk-low',
+  'risk-medium':        'bg-amber-50 text-risk-medium',
+  'risk-high':          'bg-red-50 text-risk-high',
+  'risk-critical':      'bg-red-100 text-risk-critical font-semibold',
+  vip:                  'bg-blue-50 text-accent',
+  'sentiment-positive': 'bg-emerald-50 text-risk-low',
+  'sentiment-neutral':  'bg-slate-100 text-ink-muted',
+  'sentiment-negative': 'bg-red-50 text-risk-high',
+  'sentiment-mixed':    'bg-amber-50 text-risk-medium',
+  stage:                'bg-blue-50 text-accent-text',
+  'urgency-low':        'bg-slate-100 text-ink-muted',
+  'urgency-medium':     'bg-amber-50 text-risk-medium',
+  'urgency-high':       'bg-orange-50 text-orange-700',
+  'urgency-critical':   'bg-red-100 text-risk-critical font-semibold',
   outline:              'bg-transparent text-ink-secondary border border-edge',
 }
 
@@ -39,7 +38,7 @@ const dotColors: Record<string, string> = {
   'sentiment-negative': 'bg-risk-high',
   'sentiment-mixed':    'bg-risk-medium',
   'urgency-critical':   'bg-risk-critical',
-  'urgency-high':       'bg-[#9a4e0a]',
+  'urgency-high':       'bg-orange-700',
   default:              'bg-ink-faint',
 }
 
@@ -47,7 +46,7 @@ export function Badge({ children, variant = 'default', size = 'sm', dot, classNa
   return (
     <span
       className={clsx(
-        'inline-flex items-center gap-1 rounded-full font-medium',
+        'inline-flex items-center gap-1.5 rounded-lg font-medium',
         size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs',
         variantStyles[variant],
         className
@@ -65,8 +64,6 @@ export function Badge({ children, variant = 'default', size = 'sm', dot, classNa
     </span>
   )
 }
-
-// ─── Convenience helpers ─────────────────────────────────────────────────────
 
 export function RiskBadge({ level, score }: { level: RiskLevel; score?: number }) {
   const labels: Record<RiskLevel, string> = {

@@ -11,16 +11,16 @@ interface CardProps {
 export function Card({ children, className, hover, onClick, padding = 'md' }: CardProps) {
   const paddingStyles = {
     none: '',
-    sm:   'p-3',
+    sm:   'p-4',
     md:   'p-5',
     lg:   'p-6',
   }
   return (
     <div
       className={clsx(
-        'bg-surface-card rounded-xl border border-edge shadow-card',
+        'bg-surface-card rounded-2xl shadow-card',
         paddingStyles[padding],
-        hover && 'hover:border-ink-faint transition-colors duration-150 cursor-pointer',
+        hover && 'hover:shadow-card-hover transition-shadow duration-200 cursor-pointer',
         onClick && 'cursor-pointer',
         className
       )}
@@ -41,7 +41,7 @@ export function CardHeader({ children, className }: { children: React.ReactNode;
 
 export function CardTitle({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <h3 className={clsx('font-display font-semibold text-ink text-sm', className)}>
+    <h3 className={clsx('font-display text-ink text-sm', className)}>
       {children}
     </h3>
   )
@@ -65,35 +65,35 @@ export function StatCard({
   onClick?: () => void
 }) {
   const iconBg: Record<string, string> = {
-    default: 'bg-surface-hover text-ink-muted',
-    red:     'bg-[#fdf1f4] text-risk-high',
-    amber:   'bg-[#fdf7ed] text-risk-medium',
-    emerald: 'bg-[#f0f9f4] text-risk-low',
-    violet:  'bg-[#f2edfd] text-[#4a34a8]',
-    sky:     'bg-accent-faint text-accent',
+    default: 'bg-slate-100 text-ink-muted',
+    red:     'bg-red-50 text-risk-high',
+    amber:   'bg-amber-50 text-risk-medium',
+    emerald: 'bg-emerald-50 text-risk-low',
+    violet:  'bg-blue-50 text-accent',
+    sky:     'bg-blue-50 text-accent',
   }
 
   return (
     <div
       className={clsx(
-        'bg-surface-card rounded-xl border border-edge shadow-card p-4',
-        onClick && 'hover:border-ink-faint transition-colors duration-150 cursor-pointer'
+        'bg-surface-card rounded-2xl shadow-card p-5',
+        onClick && 'hover:shadow-card-hover transition-shadow duration-200 cursor-pointer'
       )}
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-ink-muted font-medium mb-1.5 truncate">{label}</p>
-          <p className="text-[22px] font-display font-bold text-ink leading-none">{value}</p>
-          {subvalue && <p className="text-xs text-ink-muted mt-1.5">{subvalue}</p>}
+          <p className="text-xs text-ink-muted font-medium mb-2 truncate">{label}</p>
+          <p className="text-[28px] font-display text-ink leading-none">{value}</p>
+          {subvalue && <p className="text-xs text-ink-muted mt-2">{subvalue}</p>}
           {trend && (
-            <p className={clsx('text-xs mt-1.5 font-medium', trend.positive ? 'text-risk-low' : 'text-risk-high')}>
+            <p className={clsx('text-xs mt-2 font-medium', trend.positive ? 'text-risk-low' : 'text-risk-high')}>
               {trend.positive ? '↑' : '↓'} {Math.abs(trend.value)}%
             </p>
           )}
         </div>
         {icon && (
-          <div className={clsx('w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 [&>svg]:w-4 [&>svg]:h-4', iconBg[color])}>
+          <div className={clsx('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 [&>svg]:w-5 [&>svg]:h-5', iconBg[color])}>
             {icon}
           </div>
         )}

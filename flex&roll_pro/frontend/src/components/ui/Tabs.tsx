@@ -24,17 +24,17 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
             'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors duration-150 -mb-px flex items-center gap-1.5',
             activeTab === tab.id
               ? 'border-accent text-accent'
-              : 'border-transparent text-ink-muted hover:text-ink-secondary hover:border-edge'
+              : 'border-transparent text-ink-muted hover:text-ink-secondary hover:border-slate-300'
           )}
         >
           {tab.label}
           {tab.count !== undefined && (
             <span
               className={clsx(
-                'text-xs rounded-full px-1.5 py-0.5 font-medium',
+                'text-xs rounded-lg px-1.5 py-0.5 font-medium',
                 activeTab === tab.id
-                  ? 'bg-accent-faint text-accent-text'
-                  : 'bg-surface-hover text-ink-muted'
+                  ? 'bg-blue-50 text-accent'
+                  : 'bg-slate-100 text-ink-muted'
               )}
             >
               {tab.count}

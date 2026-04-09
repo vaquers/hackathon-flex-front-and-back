@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
-  ArrowLeft, Phone, Mail, Star, Zap, FileText,
+  ArrowLeft, Phone, Mail, Zap, FileText,
   Phone as PhoneIcon, Mail as MailIcon, MessageSquare, StickyNote, GitBranch,
   CheckCircle, AlertCircle,
 } from 'lucide-react'
@@ -28,7 +28,7 @@ export function ClientPage() {
 
   if (clientQ.isLoading) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="space-y-4">
         <Skeleton className="h-7 w-64" />
         <div className="grid grid-cols-3 gap-4">
           <Skeleton className="h-36 col-span-2" />
@@ -39,7 +39,7 @@ export function ClientPage() {
   }
 
   if (clientQ.isError) {
-    return <div className="p-6"><ErrorState message="Клиент не найден" onRetry={() => clientQ.refetch()} /></div>
+    return <ErrorState message="Клиент не найден" onRetry={() => clientQ.refetch()} />
   }
 
   const client     = clientQ.data!
@@ -49,19 +49,19 @@ export function ClientPage() {
   const docs       = docsQ.data ?? []
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in -m-6">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-surface-card border-b border-edge px-6 py-3">
+      <div className="sticky top-0 z-10 bg-surface-card border-b border-edge px-6 py-3.5">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="text-ink-muted hover:text-ink p-1 rounded-md hover:bg-surface-hover transition-colors flex-shrink-0"
+            className="text-ink-muted hover:text-ink p-1.5 rounded-xl hover:bg-surface-hover transition-colors flex-shrink-0"
           >
-            <ArrowLeft size={15} />
+            <ArrowLeft size={16} />
           </button>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="font-display font-semibold text-ink text-[17px] truncate">{client.company}</h1>
+              <h1 className="font-display text-ink text-[17px] truncate">{client.company}</h1>
               {client.isVip && <VipBadge />}
               <RiskBadge level={client.riskLevel} score={client.riskScore} />
               <SentimentBadge sentiment={client.sentiment} />
@@ -83,16 +83,15 @@ export function ClientPage() {
 
       {/* Main Content */}
       <div className="p-6 grid grid-cols-1 xl:grid-cols-3 gap-5">
-        {/* Left / Main column */}
         <div className="xl:col-span-2 space-y-4">
 
           {/* AI Client Summary */}
           <Card>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-5 h-5 rounded bg-accent-faint flex items-center justify-center flex-shrink-0">
-                <Zap size={10} className="text-accent" />
+              <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <Zap size={11} className="text-accent" />
               </div>
-              <h2 className="font-display font-semibold text-ink text-sm">AI Client Summary</h2>
+              <h2 className="font-display text-ink text-sm">AI Client Summary</h2>
               {summaryQ.isLoading && <Skeleton className="h-3 w-20 ml-auto" />}
               {summary && (
                 <span className="text-xs text-ink-muted ml-auto">{formatDate(summary.generatedAt)}</span>
@@ -123,7 +122,7 @@ export function ClientPage() {
                   <div>
                     <p className="text-[11px] text-ink-muted font-medium uppercase tracking-wide mb-1.5">Риск ухода</p>
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1 bg-edge rounded-full overflow-hidden">
+                      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                         <div
                           className={clsx(
                             'h-full rounded-full',
@@ -151,8 +150,8 @@ export function ClientPage() {
           {nextAction && (
             <Card>
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-[#fdf7ed] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Zap size={13} className="text-risk-medium" />
+                <div className="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Zap size={14} className="text-risk-medium" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -174,13 +173,13 @@ export function ClientPage() {
 
           {/* Communications Timeline */}
           <Card padding="none">
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge-soft">
-              <h2 className="font-display font-semibold text-ink text-sm">Лента коммуникаций</h2>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
+              <h2 className="font-display text-ink text-sm">Лента коммуникаций</h2>
               <span className="text-xs text-ink-muted">{comms.length} событий</span>
             </div>
-            <div className="divide-y divide-edge-soft">
+            <div className="divide-y divide-edge">
               {comms.map((event) => (
-                <CommEventRow key={event.id} event={event} clientId={client.id} />
+                <CommEventRow key={event.id} event={event} />
               ))}
             </div>
           </Card>
@@ -188,7 +187,6 @@ export function ClientPage() {
 
         {/* Right sidebar */}
         <div className="space-y-4">
-          {/* Client Info */}
           <Card>
             <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Информация</p>
             <div className="space-y-2.5">
@@ -202,23 +200,21 @@ export function ClientPage() {
             </div>
           </Card>
 
-          {/* Call Quality */}
-          <CallQualityCard clientId={client.id} comms={comms} />
+          <CallQualityCard comms={comms} />
 
-          {/* Related Documents */}
           <Card>
             <div className="flex items-center gap-2 mb-3">
-              <FileText size={12} className="text-ink-muted" />
+              <FileText size={13} className="text-ink-muted" />
               <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest">Документы</p>
             </div>
             {docs.length === 0 ? (
-              <p className="text-xs text-ink-muted text-center py-3">Нет связанных документов</p>
+              <p className="text-xs text-ink-muted text-center py-4">Нет связанных документов</p>
             ) : (
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {docs.map((doc) => (
                   <div
                     key={doc.id}
-                    className="flex items-start gap-2 p-2 rounded-lg hover:bg-surface-hover cursor-pointer transition-colors"
+                    className="flex items-start gap-2 p-2.5 rounded-xl hover:bg-surface-hover cursor-pointer transition-colors"
                   >
                     <Badge variant="stage" size="sm">{doc.typeLabel}</Badge>
                     <div className="flex-1 min-w-0">
@@ -237,8 +233,6 @@ export function ClientPage() {
   )
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline gap-2">
@@ -248,7 +242,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-function CommEventRow({ event, clientId }: { event: CommunicationEvent; clientId: string }) {
+function CommEventRow({ event }: { event: CommunicationEvent }) {
   const icons: Record<string, React.ReactNode> = {
     call:          <PhoneIcon size={12} />,
     email:         <MailIcon size={12} />,
@@ -258,18 +252,18 @@ function CommEventRow({ event, clientId }: { event: CommunicationEvent; clientId
   }
 
   const iconColors: Record<string, string> = {
-    call:          'bg-accent-faint text-accent',
-    email:         'bg-[#f2edfd] text-[#4a34a8]',
-    messenger:     'bg-[#f0f9f4] text-risk-low',
-    note:          'bg-[#fdf7ed] text-risk-medium',
-    status_change: 'bg-surface-hover text-ink-secondary',
+    call:          'bg-blue-50 text-accent',
+    email:         'bg-violet-50 text-violet-600',
+    messenger:     'bg-emerald-50 text-risk-low',
+    note:          'bg-amber-50 text-risk-medium',
+    status_change: 'bg-slate-100 text-ink-secondary',
   }
 
   return (
-    <div className={clsx('flex items-start gap-3 px-5 py-3.5', event.isImportant && 'bg-[#fdf7ed]/60')}>
+    <div className={clsx('flex items-start gap-3 px-6 py-4', event.isImportant && 'bg-amber-50/40')}>
       <div className={clsx(
-        'w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5',
-        iconColors[event.type] ?? 'bg-surface-hover text-ink-secondary'
+        'w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5',
+        iconColors[event.type] ?? 'bg-slate-100 text-ink-secondary'
       )}>
         {icons[event.type]}
       </div>
@@ -296,7 +290,7 @@ function CommEventRow({ event, clientId }: { event: CommunicationEvent; clientId
           )}
         </div>
         {event.attachments && event.attachments.length > 0 && (
-          <div className="flex gap-2 mt-1.5">
+          <div className="flex gap-2 mt-2">
             {event.attachments.map((att, i) => (
               <a key={i} href={att.url} className="text-xs text-accent hover:underline flex items-center gap-1">
                 <FileText size={10} />{att.name}
@@ -309,7 +303,7 @@ function CommEventRow({ event, clientId }: { event: CommunicationEvent; clientId
   )
 }
 
-function CallQualityCard({ clientId, comms }: { clientId: string; comms: CommunicationEvent[] }) {
+function CallQualityCard({ comms }: { comms: CommunicationEvent[] }) {
   const lastCall = comms.find((c) => c.type === 'call')
 
   const qualityQ = useQuery({
@@ -324,8 +318,8 @@ function CallQualityCard({ clientId, comms }: { clientId: string; comms: Communi
   return (
     <Card>
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-5 h-5 rounded bg-accent-faint flex items-center justify-center flex-shrink-0">
-          <Zap size={10} className="text-accent" />
+        <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+          <Zap size={11} className="text-accent" />
         </div>
         <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest flex-1">AI Оценка звонка</p>
         {quality && <ScoreCircle score={quality.overallScore} size="sm" />}
@@ -339,7 +333,7 @@ function CallQualityCard({ clientId, comms }: { clientId: string; comms: Communi
           <ScoreBar score={quality.objectionHandlingScore}    label="Работа с возражениями" />
           <ScoreBar score={quality.nextStepFixedScore}        label="Фиксация следующего шага" />
 
-          <div className="pt-2.5 border-t border-edge-soft space-y-1.5">
+          <div className="pt-3 border-t border-edge space-y-1.5">
             <p className="text-xs font-semibold text-risk-low flex items-center gap-1">
               <CheckCircle size={11} />Хорошо
             </p>

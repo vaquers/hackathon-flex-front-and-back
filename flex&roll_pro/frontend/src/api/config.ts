@@ -3,9 +3,9 @@
 // Switch to false to connect the real FastAPI backend.
 
 export const API_CONFIG = {
-  // Switch to false when backend is ready:
-  useMock: import.meta.env.VITE_USE_MOCK !== 'false',
+  // Real backend by default; set VITE_USE_MOCK=true to use mock data
+  useMock: import.meta.env.VITE_USE_MOCK === 'true',
   baseURL: import.meta.env.VITE_API_URL ?? '/api/v1',
-  timeout: 10_000,
-  mockDelayMs: 400, // Simulates network latency in mock mode
+  timeout: 15_000,
+  mockDelayMs: 400,
 }

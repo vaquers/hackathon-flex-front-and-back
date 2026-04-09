@@ -4,81 +4,87 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        display: ['Manrope', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Unbounded', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // ── Brand (deep purple) ──────────────────────────────
+        // ── Brand ────────────────────────────────────────────
         brand: {
-          25:  '#faf9fd',
-          50:  '#f2eefb',
-          100: '#e5dcf8',
-          200: '#cabef1',
-          300: '#a896e4',
-          400: '#836dd4',
-          500: '#6047c2',
-          600: '#4a34a8',
-          700: '#37268a',
-          800: '#251868',
-          900: '#170c26',
+          50:  '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a5f',
         },
-        // ── Accent (interactive violet) ──────────────────────
+        // ── Accent (bright blue CTA) ─────────────────────────
         accent: {
-          DEFAULT: '#5d3fe8',
-          hover:   '#4f34d6',
-          faint:   '#f0ecfd',
-          subtle:  '#e5defa',
-          text:    '#4232c0',
+          DEFAULT: '#2563eb',
+          hover:   '#1d4ed8',
+          light:   '#eff6ff',
+          subtle:  '#dbeafe',
+          text:    '#1e40af',
         },
         // ── Surface / backgrounds ────────────────────────────
         surface: {
-          bg:     '#f7f6fa',
+          bg:     '#e8edf2',
           card:   '#ffffff',
-          hover:  '#f3f1f8',
-          active: '#ece8f5',
+          hover:  '#f1f5f9',
+          active: '#e2e8f0',
+          inner:  '#f8fafc',
         },
         // ── Ink / text ───────────────────────────────────────
         ink: {
-          DEFAULT:   '#1a1528',
-          secondary: '#4f4a66',
-          muted:     '#8c87a6',
-          faint:     '#b8b3cc',
+          DEFAULT:   '#0f172a',
+          secondary: '#475569',
+          muted:     '#94a3b8',
+          faint:     '#cbd5e1',
         },
         // ── Borders / dividers ───────────────────────────────
         edge: {
-          DEFAULT: '#e8e4f0',
-          soft:    '#f0eef7',
-          focus:   '#8b7adf',
+          DEFAULT: '#e2e8f0',
+          soft:    '#f1f5f9',
+          focus:   '#93c5fd',
         },
-        // ── Sidebar (dark theme) ─────────────────────────────
+        // ── Sidebar (light theme matching reference) ─────────
         sidebar: {
-          bg:            '#170c26',
-          border:        '#2a1a40',
-          hover:         '#21153a',
-          active:        '#2d1f4d',
-          accent:        '#7c5cbf',
-          text:          '#8b7aaa',
-          'text-active': '#e5defa',
+          bg:            '#ffffff',
+          border:        '#e2e8f0',
+          hover:         '#f1f5f9',
+          active:        '#eff6ff',
+          accent:        '#2563eb',
+          text:          '#64748b',
+          'text-active': '#0f172a',
         },
-        // ── Semantic (desaturated) ───────────────────────────
+        // ── Semantic ─────────────────────────────────────────
         risk: {
-          low:      '#246e52',
-          medium:   '#875209',
-          high:     '#a82e4c',
-          critical: '#7a1230',
+          low:      '#16a34a',
+          medium:   '#d97706',
+          high:     '#dc2626',
+          critical: '#991b1b',
         },
         sentiment: {
-          positive: '#246e52',
-          neutral:  '#6b6780',
-          negative: '#a82e4c',
-          mixed:    '#875209',
+          positive: '#16a34a',
+          neutral:  '#64748b',
+          negative: '#dc2626',
+          mixed:    '#d97706',
         },
       },
+      borderRadius: {
+        'xl':  '16px',
+        '2xl': '20px',
+        '3xl': '24px',
+      },
       boxShadow: {
-        card:       '0 1px 2px 0 rgba(23, 12, 38, 0.05)',
-        'card-hover': '0 2px 8px 0 rgba(23, 12, 38, 0.09)',
-        panel:      '0 24px 64px -12px rgba(23, 12, 38, 0.24)',
-        focus:      '0 0 0 2px rgba(93, 63, 232, 0.22)',
+        card:         '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03)',
+        'card-hover': '0 4px 12px 0 rgba(0, 0, 0, 0.08)',
+        panel:        '0 24px 48px -12px rgba(0, 0, 0, 0.18)',
+        focus:        '0 0 0 3px rgba(37, 99, 235, 0.2)',
+        'inner-card': '0 0 0 1px rgba(0, 0, 0, 0.04)',
       },
       animation: {
         'fade-in':        'fadeIn 0.2s ease-out',

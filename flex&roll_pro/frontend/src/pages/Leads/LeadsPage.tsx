@@ -13,9 +13,9 @@ import { clsx } from 'clsx'
 import type { GeneratedLead, TopLeadsResponse } from '@/types'
 
 const TIER_CONFIG = {
-  hot:  { label: 'HOT',  color: 'bg-red-100 text-red-700 border-red-200', icon: Flame },
-  warm: { label: 'WARM', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: Target },
-  cold: { label: 'COLD', color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Clock },
+  hot:  { label: 'HOT',  color: 'bg-red-50 text-red-600', icon: Flame },
+  warm: { label: 'WARM', color: 'bg-amber-50 text-amber-600', icon: Target },
+  cold: { label: 'COLD', color: 'bg-blue-50 text-blue-600', icon: Clock },
 } as const
 
 const INDUSTRY_LABELS: Record<string, string> = {
@@ -90,24 +90,24 @@ export function LeadsPage() {
   const hasError = data?.pipeline_status === 'error'
 
   return (
-    <div className="p-6 animate-fade-in max-w-[1200px]">
+    <div className="animate-fade-in max-w-[1000px]">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="font-display font-semibold text-ink text-[20px] leading-tight">
+          <h1 className="font-display text-ink text-xl leading-tight">
             Lead Generator
           </h1>
-          <p className="text-sm text-ink-muted mt-0.5">
+          <p className="text-sm text-ink-muted mt-1">
             Топ-5 компаний для холодного контакта сегодня
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {data?.generated_at && (
-            <div className="flex items-center gap-1.5 text-xs text-ink-muted bg-surface-card border border-edge rounded-lg px-3 py-1.5">
+            <div className="flex items-center gap-1.5 text-xs text-ink-muted bg-surface-card rounded-xl px-3 py-2 shadow-card">
               {data.cache_stale ? (
-                <AlertCircle size={10} className="text-risk-medium" />
+                <AlertCircle size={11} className="text-risk-medium" />
               ) : (
-                <CheckCircle2 size={10} className="text-risk-low" />
+                <CheckCircle2 size={11} className="text-risk-low" />
               )}
               {formatGeneratedAt(data.generated_at)}
             </div>
@@ -115,7 +115,7 @@ export function LeadsPage() {
           <Button
             variant="primary"
             size="sm"
-            icon={<RefreshCw size={12} className={isRunning ? 'animate-spin' : ''} />}
+            icon={<RefreshCw size={13} className={isRunning ? 'animate-spin' : ''} />}
             loading={refreshMutation.isPending}
             onClick={() => refreshMutation.mutate()}
             disabled={isRunning}
@@ -125,33 +125,33 @@ export function LeadsPage() {
         </div>
       </div>
 
-      {/* Pipeline status bar */}
+      {/* Pipeline status */}
       {isRunning && (
-        <div className="bg-accent-faint border border-accent-subtle rounded-xl p-3 mb-5 flex items-center gap-2">
+        <div className="bg-blue-50 rounded-2xl p-4 mb-5 flex items-center gap-3">
           <RefreshCw size={14} className="text-accent animate-spin" />
-          <span className="text-sm text-accent-text">
+          <span className="text-sm text-accent">
             Идёт генерация лидов... Обработано {data?.total_scored ?? 0} из {data?.total_candidates ?? '?'} кандидатов
           </span>
         </div>
       )}
 
       {hasError && data?.error_message && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-5 flex items-center gap-2">
-          <AlertCircle size={14} className="text-red-500" />
-          <span className="text-sm text-red-700">Ошибка: {data.error_message}</span>
+        <div className="bg-red-50 rounded-2xl p-4 mb-5 flex items-center gap-3">
+          <AlertCircle size={14} className="text-risk-high" />
+          <span className="text-sm text-risk-high">Ошибка: {data.error_message}</span>
         </div>
       )}
 
       {/* Stats */}
       {data && data.total_candidates > 0 && (
         <div className="flex gap-3 mb-5 text-xs text-ink-muted">
-          <span className="bg-surface-card border border-edge rounded-lg px-3 py-1.5">
+          <span className="bg-surface-card rounded-xl px-3 py-2 shadow-card">
             Кандидатов: {data.total_candidates}
           </span>
-          <span className="bg-surface-card border border-edge rounded-lg px-3 py-1.5">
+          <span className="bg-surface-card rounded-xl px-3 py-2 shadow-card">
             Оценено: {data.total_scored}
           </span>
-          <span className="bg-surface-card border border-edge rounded-lg px-3 py-1.5">
+          <span className="bg-surface-card rounded-xl px-3 py-2 shadow-card">
             Показано: {leads.length}
           </span>
         </div>
@@ -164,7 +164,7 @@ export function LeadsPage() {
         </div>
       )}
 
-      {/* Error state */}
+      {/* Error */}
       {error && !data && (
         <EmptyState
           icon={<AlertCircle />}
@@ -173,7 +173,7 @@ export function LeadsPage() {
         />
       )}
 
-      {/* Empty state */}
+      {/* Empty */}
       {!isLoading && !error && leads.length === 0 && !isRunning && (
         <EmptyState
           icon={<Sparkles />}
@@ -216,25 +216,23 @@ function LeadCard({
   const TierIcon = tier.icon
 
   return (
-    <div className="bg-surface-card rounded-xl border border-edge shadow-card transition-colors duration-150">
-      <div className="p-4">
+    <div className="bg-surface-card rounded-2xl shadow-card transition-shadow duration-200 hover:shadow-card-hover">
+      <div className="p-5">
         {/* Header row */}
-        <div className="flex items-start gap-3 mb-3">
-          {/* Rank */}
-          <div className="w-7 h-7 rounded-full bg-[#fdf7ed] text-risk-medium text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+        <div className="flex items-start gap-4 mb-3">
+          <div className="w-8 h-8 rounded-xl bg-blue-50 text-accent text-sm font-display flex items-center justify-center flex-shrink-0 mt-0.5">
             {rank}
           </div>
 
-          {/* Company info */}
           <div className="flex-1 min-w-0">
-            <p className="font-display font-semibold text-ink text-[15px] leading-tight">
+            <p className="font-display text-ink text-[15px] leading-tight">
               {lead.company_name}
             </p>
             {lead.normalized_name !== lead.company_name && (
               <p className="text-xs text-ink-muted mt-0.5">{lead.normalized_name}</p>
             )}
-            <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className={clsx('text-[10px] font-bold px-2 py-0.5 rounded border uppercase', tier.color)}>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className={clsx('text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase', tier.color)}>
                 <TierIcon size={9} className="inline mr-0.5 -mt-px" />
                 {tier.label}
               </span>
@@ -243,23 +241,22 @@ function LeadCard({
               </span>
               {lead.product_category && (
                 <>
-                  <span className="text-ink-muted">·</span>
+                  <span className="text-ink-faint">·</span>
                   <span className="text-xs text-ink-muted">{lead.product_category}</span>
                 </>
               )}
               {lead.registration_date && (
                 <>
-                  <span className="text-ink-muted">·</span>
+                  <span className="text-ink-faint">·</span>
                   <span className="text-xs text-ink-muted">Рег. {formatDate(lead.registration_date)}</span>
                 </>
               )}
             </div>
           </div>
 
-          {/* Score */}
           <div className="text-right flex-shrink-0">
             <p className={clsx(
-              'text-[22px] font-display font-bold leading-none',
+              'text-[24px] font-display leading-none',
               lead.score >= 70 ? 'text-risk-low' :
               lead.score >= 45 ? 'text-risk-medium' :
               'text-risk-high'
@@ -271,7 +268,7 @@ function LeadCard({
         </div>
 
         {/* Score bar */}
-        <div className="h-1 bg-edge rounded-full mb-3 overflow-hidden">
+        <div className="h-1.5 bg-slate-100 rounded-full mb-4 overflow-hidden">
           <div
             className={clsx(
               'h-full rounded-full transition-all duration-500',
@@ -283,19 +280,18 @@ function LeadCard({
           />
         </div>
 
-        {/* Summary + why recommended */}
+        {/* Summary */}
         {lead.company_summary && (
-          <p className="text-xs text-ink-secondary leading-relaxed mb-2">{lead.company_summary}</p>
+          <p className="text-xs text-ink-secondary leading-relaxed mb-3">{lead.company_summary}</p>
         )}
-        <div className="bg-accent-faint border border-accent-subtle rounded-lg p-2.5 mb-2">
+        <div className="bg-blue-50 rounded-xl p-3 mb-3">
           <div className="flex items-center gap-1 mb-1">
-            <Sparkles size={10} className="text-accent" />
-            <span className="text-xs font-semibold text-accent-text">Почему рекомендуем</span>
+            <Sparkles size={11} className="text-accent" />
+            <span className="text-xs font-semibold text-accent">Почему рекомендуем</span>
           </div>
           <p className="text-xs text-ink-secondary leading-relaxed">{lead.why_recommended}</p>
         </div>
 
-        {/* Outreach angle */}
         {lead.outreach_angle && (
           <div className="text-xs text-ink-secondary mb-1">
             <span className="font-medium text-ink">Угол захода: </span>
@@ -309,10 +305,9 @@ function LeadCard({
           </div>
         )}
 
-        {/* Expanded section */}
+        {/* Expanded */}
         {expanded && (
-          <div className="mt-3 pt-3 border-t border-edge-soft space-y-3 animate-fade-in">
-            {/* Sales brief */}
+          <div className="mt-4 pt-4 border-t border-edge space-y-4 animate-fade-in">
             {lead.sales_brief && (
               <div>
                 <p className="text-xs font-medium text-ink mb-1">Бриф для менеджера</p>
@@ -320,14 +315,13 @@ function LeadCard({
               </div>
             )}
 
-            {/* Scoring breakdown */}
             {lead.scoring_breakdown && (
               <div>
                 <p className="text-xs font-medium text-ink mb-2">
                   <BarChart3 size={11} className="inline mr-1 -mt-px" />
                   Разбор скоринга
                 </p>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {Object.entries(lead.scoring_breakdown).map(([key, factor]) => {
                     if (!factor) return null
                     return (
@@ -338,7 +332,7 @@ function LeadCard({
                           showValue
                         />
                         {factor.explanation && (
-                          <p className="text-[10px] text-ink-muted ml-0 mt-0.5 leading-snug">
+                          <p className="text-[10px] text-ink-muted mt-0.5 leading-snug">
                             {factor.explanation}
                           </p>
                         )}
@@ -349,13 +343,11 @@ function LeadCard({
               </div>
             )}
 
-            {/* Confidence */}
             <div className="flex items-center gap-4 text-xs text-ink-muted">
               <span>Уверенность: <strong className="text-ink">{Math.round(lead.confidence_score)}/100</strong></span>
               <span>Источник: {lead.source_name}</span>
             </div>
 
-            {/* Source link */}
             {lead.source_url && (
               <a
                 href={lead.source_url}
@@ -371,10 +363,10 @@ function LeadCard({
         )}
       </div>
 
-      {/* Footer actions */}
-      <div className="px-4 pb-3 flex items-center">
+      {/* Footer */}
+      <div className="px-5 pb-4 flex items-center">
         <button
-          className="ml-auto text-xs text-ink-muted hover:text-ink-secondary flex items-center gap-1 p-1.5 rounded-md hover:bg-surface-hover transition-colors"
+          className="ml-auto text-xs text-ink-muted hover:text-ink flex items-center gap-1 p-2 rounded-xl hover:bg-surface-hover transition-colors"
           onClick={onToggleExpand}
         >
           {expanded ? 'Свернуть' : 'Подробнее'}
