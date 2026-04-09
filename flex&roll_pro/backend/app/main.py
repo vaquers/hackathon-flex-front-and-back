@@ -1,8 +1,12 @@
 import logging
+import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.config import settings
 from app.api.v1 import api_router
 
@@ -62,6 +66,23 @@ async def health():
     }
 
 
-@app.get("/", include_in_schema=False)
-async def root():
-    return {"message": f"{settings.APP_NAME} v{settings.APP_VERSION}", "docs": "/api/docs"}
+# ─── Serve Frontend SPA ──────────────────────────────────────────────────────
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+
+if STATIC_DIR.is_dir():
+    # Serve static assets (JS, CSS, images)
+    app.mount("/assets", StaticFiles(directory=str(STATIC_DIR / "assets")), name="static-assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_spa(request: Request, full_path: str):
+        """Serve frontend SPA — return index.html for all non-API routes."""
+        # Try to serve the exact file first
+        file_path = STATIC_DIR / full_path
+        if full_path and file_path.is_file():
+            return FileResponse(str(file_path))
+        # Otherwise return index.html for client-side routing
+        return FileResponse(str(STATIC_DIR / "index.html"))
+else:
+    @app.get("/", include_in_schema=False)
+    async def root():
+        return {"message": f"{settings.APP_NAME} v{settings.APP_VERSION}", "docs": "/api/docs"}
