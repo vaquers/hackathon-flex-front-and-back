@@ -18,7 +18,7 @@ export function Card({ children, className, hover, onClick, padding = 'md' }: Ca
   return (
     <div
       className={clsx(
-        'bg-surface-card rounded-2xl shadow-card',
+        'glass-panel',
         paddingStyles[padding],
         hover && 'hover:shadow-card-hover transition-shadow duration-200 cursor-pointer',
         onClick && 'cursor-pointer',
@@ -76,24 +76,24 @@ export function StatCard({
   return (
     <div
       className={clsx(
-        'bg-surface-card rounded-2xl shadow-card p-5',
+        'glass-metric p-5',
         onClick && 'hover:shadow-card-hover transition-shadow duration-200 cursor-pointer'
       )}
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-ink-muted font-medium mb-2 truncate">{label}</p>
-          <p className="text-[28px] font-display text-ink leading-none">{value}</p>
-          {subvalue && <p className="text-xs text-ink-muted mt-2">{subvalue}</p>}
+          <p className="text-[11px] text-ink-muted font-medium mb-2 truncate">{label}</p>
+          <p className="text-[28px] font-display text-ink leading-none tracking-metric">{value}</p>
+          {subvalue && <p className="text-[11px] text-ink-muted mt-2">{subvalue}</p>}
           {trend && (
-            <p className={clsx('text-xs mt-2 font-medium', trend.positive ? 'text-risk-low' : 'text-risk-high')}>
+            <p className={clsx('text-[11px] mt-2 font-medium', trend.positive ? 'text-risk-low' : 'text-risk-high')}>
               {trend.positive ? '↑' : '↓'} {Math.abs(trend.value)}%
             </p>
           )}
         </div>
         {icon && (
-          <div className={clsx('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 [&>svg]:w-5 [&>svg]:h-5', iconBg[color])}>
+          <div className={clsx('w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 [&>svg]:w-5 [&>svg]:h-5', iconBg[color])}>
             {icon}
           </div>
         )}

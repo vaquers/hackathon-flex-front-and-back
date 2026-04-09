@@ -15,25 +15,25 @@ interface TabsProps {
 
 export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
   return (
-    <div className={clsx('flex gap-0', className)}>
+    <div className={clsx('flex gap-1', className)}>
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onChange(tab.id)}
           className={clsx(
-            'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors duration-150 -mb-px flex items-center gap-1.5',
+            'px-4 py-2.5 text-[12px] font-medium rounded-xl transition-colors duration-150 flex items-center gap-1.5',
             activeTab === tab.id
-              ? 'border-accent text-accent'
-              : 'border-transparent text-ink-muted hover:text-ink-secondary hover:border-slate-300'
+              ? 'bg-blue-50 text-accent'
+              : 'text-ink-muted hover:text-ink-secondary hover:bg-surface-hover'
           )}
         >
           {tab.label}
           {tab.count !== undefined && (
             <span
               className={clsx(
-                'text-xs rounded-lg px-1.5 py-0.5 font-medium',
+                'text-[10px] rounded-full px-1.5 py-0.5 font-medium min-w-[18px] text-center',
                 activeTab === tab.id
-                  ? 'bg-blue-50 text-accent'
+                  ? 'bg-accent/10 text-accent'
                   : 'bg-slate-100 text-ink-muted'
               )}
             >

@@ -56,12 +56,12 @@ export function RisksPage() {
   }))
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-ink text-xl leading-tight">Риски</h1>
-          <p className="text-sm text-ink-muted mt-1">Зависшие сделки и клиенты в зоне риска</p>
+          <h1 className="font-display text-ink text-lg leading-tight">Риски</h1>
+          <p className="text-xs text-ink-muted mt-0.5">Зависшие сделки и клиенты в зоне риска</p>
         </div>
         {risks && risks.length > 0 && (
           <div className="flex items-center gap-2 text-sm">

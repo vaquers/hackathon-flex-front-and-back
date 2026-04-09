@@ -41,9 +41,10 @@ export function SidePanel({ open, onClose, title, children, width = 'md' }: Side
       />
       <div
         className={clsx(
-          'relative bg-surface-card shadow-panel h-full flex flex-col',
+          'relative glass-panel-soft h-full flex flex-col',
           widthStyles[width],
-          'animate-slide-in-right'
+          'animate-slide-in-right',
+          '!rounded-l-3xl !rounded-r-none'
         )}
       >
         {title && (

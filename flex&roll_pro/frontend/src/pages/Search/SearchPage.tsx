@@ -53,13 +53,13 @@ export function SearchPage() {
   return (
     <div className="animate-fade-in">
       {/* Header */}
-      <div className="mb-5">
-        <h1 className="font-display text-ink text-xl leading-tight">AI Поиск</h1>
-        <p className="text-sm text-ink-muted mt-1">Поиск по расчётам, КП, техдокументам и прошлым заказам</p>
+      <div className="mb-4">
+        <h1 className="font-display text-ink text-lg leading-tight">AI Поиск</h1>
+        <p className="text-xs text-ink-muted mt-0.5">Расчёты, КП, техдокументы и прошлые заказы</p>
       </div>
 
       {/* Search Box */}
-      <div className="bg-surface-card rounded-2xl shadow-card p-5 mb-5">
+      <div className="bg-surface-card rounded-2xl shadow-card p-4 mb-4">
         <div className="flex gap-3 items-center">
           <div className="flex-1 flex items-center gap-2.5 bg-surface-inner border border-edge rounded-xl px-4 py-3">
             <Search size={15} className="text-ink-muted flex-shrink-0" />

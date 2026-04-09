@@ -49,10 +49,10 @@ export function AnalyticsPage() {
   return (
     <div className="animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="font-display text-ink text-xl leading-tight">Аналитика</h1>
-          <p className="text-sm text-ink-muted mt-1">Executive Dashboard · {overview.period}</p>
+          <h1 className="font-display text-ink text-lg leading-tight">Аналитика</h1>
+          <p className="text-xs text-ink-muted mt-0.5">Executive Dashboard · {overview.period}</p>
         </div>
         <div className="flex gap-0.5 bg-surface-card rounded-xl p-1 shadow-card">
           {PERIODS.map((p) => (
@@ -73,7 +73,7 @@ export function AnalyticsPage() {
       </div>
 
       {/* Overview stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 mb-4">
         <OverviewStat label="Выручка"         value={formatRub(overview.totalRevenue)}  color="emerald" />
         <OverviewStat label="Всего сделок"    value={overview.totalDeals.toString()} />
         <OverviewStat label="Закрыто"         value={overview.wonDeals.toString()}       color="emerald" />
@@ -406,9 +406,9 @@ function OverviewStat({ label, value, color }: { label: string; value: string; c
     accent:  'text-accent',
   }
   return (
-    <div className="bg-surface-card rounded-2xl shadow-card p-4 text-center">
-      <p className="text-xs text-ink-muted mb-1 truncate">{label}</p>
-      <p className={clsx('font-display text-[15px]', color ? colorStyles[color] : 'text-ink')}>
+    <div className="bg-surface-card rounded-xl shadow-card p-3 text-center">
+      <p className="text-[10px] text-ink-muted mb-0.5 truncate">{label}</p>
+      <p className={clsx('font-display text-[14px]', color ? colorStyles[color] : 'text-ink')}>
         {value}
       </p>
     </div>

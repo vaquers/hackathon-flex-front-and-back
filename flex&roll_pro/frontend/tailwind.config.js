@@ -4,96 +4,99 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Unbounded', 'system-ui', 'sans-serif'],
         display: ['Unbounded', 'system-ui', 'sans-serif'],
       },
+      letterSpacing: {
+        display: '-0.06em',
+        tight: '-0.04em',
+        body: '-0.03em',
+        metric: '-0.08em',
+      },
       colors: {
-        // ── Brand ────────────────────────────────────────────
-        brand: {
-          50:  '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a5f',
-        },
-        // ── Accent (bright blue CTA) ─────────────────────────
-        accent: {
-          DEFAULT: '#2563eb',
-          hover:   '#1d4ed8',
-          light:   '#eff6ff',
-          subtle:  '#dbeafe',
-          text:    '#1e40af',
-        },
         // ── Surface / backgrounds ────────────────────────────
         surface: {
-          bg:     '#e8edf2',
-          card:   '#ffffff',
-          hover:  '#f1f5f9',
-          active: '#e2e8f0',
-          inner:  '#f8fafc',
+          bg:     'var(--bg)',
+          bg2:    'var(--bg-2)',
+          card:   'var(--surface)',
+          soft:   'var(--surface-soft)',
+          muted:  'var(--surface-muted)',
+          hover:  'rgba(226, 233, 246, 0.48)',
+          inner:  'rgba(226, 233, 246, 0.48)',
         },
-        // ── Ink / text ───────────────────────────────────────
+        // ── Brand / accent ──────────────────────────────────
+        accent: {
+          DEFAULT: 'var(--blue)',
+          hover: '#1d4ed8',
+          light: 'rgba(0, 86, 245, 0.08)',
+          glow: 'rgba(0, 86, 245, 0.25)',
+        },
+        // ── Ink / text ──────────────────────────────────────
         ink: {
-          DEFAULT:   '#0f172a',
-          secondary: '#475569',
-          muted:     '#94a3b8',
-          faint:     '#cbd5e1',
+          DEFAULT: 'var(--text)',
+          soft: 'var(--text-soft)',
+          muted: 'var(--text-muted)',
+          faint: '#cbd5e1',
+          secondary: 'var(--text-muted)',
         },
-        // ── Borders / dividers ───────────────────────────────
+        // ── Borders / strokes ───────────────────────────────
         edge: {
-          DEFAULT: '#e2e8f0',
-          soft:    '#f1f5f9',
-          focus:   '#93c5fd',
+          DEFAULT: 'var(--stroke)',
+          strong: 'var(--stroke-strong)',
         },
-        // ── Sidebar (light theme matching reference) ─────────
-        sidebar: {
-          bg:            '#ffffff',
-          border:        '#e2e8f0',
-          hover:         '#f1f5f9',
-          active:        '#eff6ff',
-          accent:        '#2563eb',
-          text:          '#64748b',
-          'text-active': '#0f172a',
-        },
-        // ── Semantic ─────────────────────────────────────────
+        // ── Semantic ────────────────────────────────────────
         risk: {
-          low:      '#16a34a',
-          medium:   '#d97706',
-          high:     '#dc2626',
+          low:      'var(--green)',
+          medium:   'var(--orange)',
+          high:     'var(--red)',
           critical: '#991b1b',
         },
         sentiment: {
-          positive: '#16a34a',
+          positive: 'var(--green)',
           neutral:  '#64748b',
-          negative: '#dc2626',
-          mixed:    '#d97706',
+          negative: 'var(--red)',
+          mixed:    'var(--orange)',
+        },
+        blue: {
+          50: 'rgba(0, 86, 245, 0.08)',
+        },
+        // keep sidebar refs working
+        sidebar: {
+          bg:            'transparent',
+          border:        'transparent',
+          hover:         'rgba(226, 233, 246, 0.48)',
+          active:        'rgba(0, 86, 245, 0.08)',
+          text:          'var(--text-muted)',
+          'text-active': 'var(--text)',
         },
       },
       borderRadius: {
-        'xl':  '16px',
-        '2xl': '20px',
-        '3xl': '24px',
+        'lg':  '20px',
+        'xl':  '26px',
+        '2xl': '32px',
+        '3xl': '42px',
+        '4xl': '47px',
+        'full': '999px',
       },
       boxShadow: {
-        card:         '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03)',
-        'card-hover': '0 4px 12px 0 rgba(0, 0, 0, 0.08)',
-        panel:        '0 24px 48px -12px rgba(0, 0, 0, 0.18)',
-        focus:        '0 0 0 3px rgba(37, 99, 235, 0.2)',
-        'inner-card': '0 0 0 1px rgba(0, 0, 0, 0.04)',
+        card:         'inset 0 1px 0 rgba(255,255,255,0.96), inset 0 -10px 22px rgba(181,196,226,0.18), 0 18px 40px rgba(129,149,193,0.18)',
+        'card-hover': 'inset 0 1px 0 rgba(255,255,255,0.96), inset 0 -10px 22px rgba(181,196,226,0.18), 0 24px 48px rgba(129,149,193,0.24)',
+        panel:        '0 20px 44px rgba(118,141,188,0.12)',
+        'panel-soft': '0 12px 28px rgba(118,141,188,0.08)',
+        section:      'inset 0 1px 0 rgba(247,250,255,0.45), 0 18px 36px rgba(124,145,187,0.12)',
+        btn:          '0 14px 28px rgba(0,86,245,0.24)',
+        'btn-hover':  '0 18px 32px rgba(0,86,245,0.3)',
+        focus:        '0 0 0 3px rgba(0,86,245,0.2)',
+        sidebar:      'inset 0 1px 0 rgba(255,255,255,0.96), inset 0 -10px 22px rgba(181,196,226,0.18), 0 18px 40px rgba(129,149,193,0.18)',
       },
       animation: {
-        'fade-in':        'fadeIn 0.2s ease-out',
+        'fade-in':        'fadeIn 0.25s ease-out',
         'slide-in-right': 'slideInRight 0.25s ease-out',
         'skeleton-pulse': 'skeletonPulse 1.5s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
-          '0%':   { opacity: '0', transform: 'translateY(4px)' },
+          '0%':   { opacity: '0', transform: 'translateY(6px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         slideInRight: {

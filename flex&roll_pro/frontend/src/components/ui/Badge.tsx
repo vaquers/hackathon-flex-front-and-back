@@ -20,7 +20,7 @@ const variantStyles: Record<string, string> = {
   'sentiment-neutral':  'bg-slate-100 text-ink-muted',
   'sentiment-negative': 'bg-red-50 text-risk-high',
   'sentiment-mixed':    'bg-amber-50 text-risk-medium',
-  stage:                'bg-blue-50 text-accent-text',
+  stage:                'bg-blue-50 text-accent',
   'urgency-low':        'bg-slate-100 text-ink-muted',
   'urgency-medium':     'bg-amber-50 text-risk-medium',
   'urgency-high':       'bg-orange-50 text-orange-700',
@@ -46,16 +46,17 @@ export function Badge({ children, variant = 'default', size = 'sm', dot, classNa
   return (
     <span
       className={clsx(
-        'inline-flex items-center gap-1.5 rounded-lg font-medium',
-        size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs',
+        'tag-pill font-medium',
+        size === 'sm' ? 'text-[11px]' : 'text-xs',
         variantStyles[variant],
+        dot && 'tag-dot',
         className
       )}
     >
       {dot && (
         <span
           className={clsx(
-            'w-1.5 h-1.5 rounded-full flex-shrink-0',
+            'w-[6px] h-[6px] rounded-full flex-shrink-0',
             dotColors[variant] ?? dotColors.default
           )}
         />

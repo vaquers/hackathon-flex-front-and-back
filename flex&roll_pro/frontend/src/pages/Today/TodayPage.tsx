@@ -49,10 +49,10 @@ export function TodayPage() {
   const sentimentFeed = sentimentQ.data ?? []
 
   return (
-    <div className="space-y-5 animate-fade-in max-w-[1400px]">
-      {/* Summary Stats — matching reference layout */}
-      <div className="bg-surface-card rounded-2xl shadow-card p-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+    <div className="space-y-4 animate-fade-in max-w-[1200px]">
+      {/* Summary Stats */}
+      <div className="bg-surface-card rounded-2xl shadow-card p-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
           <StatBlock
             label="Сделки в риске"
             value={summary.dealsAtRisk}
@@ -80,7 +80,7 @@ export function TodayPage() {
             color="violet"
           />
           <StatBlock
-            label="Follow-Up сегодня"
+            label="Follow-Up"
             value={summary.todayFollowUps}
             icon={checkIcon}
             color="green"
@@ -88,26 +88,26 @@ export function TodayPage() {
         </div>
       </div>
 
-      {/* VIP Clients — matching reference */}
+      {/* VIP Clients */}
       {vipAlerts.length > 0 && (
-        <div className="bg-surface-card rounded-2xl shadow-card p-6">
-          <h2 className="font-display text-ink text-[15px] mb-4">VIP Клиенты</h2>
-          <div className="space-y-3">
+        <div className="bg-surface-card rounded-2xl shadow-card p-5">
+          <h2 className="font-display text-ink text-[14px] mb-3">VIP Клиенты</h2>
+          <div className="space-y-2">
             {vipAlerts.map((alert) => (
               <div
                 key={alert.id}
-                className="bg-surface-inner rounded-2xl border border-edge p-4 flex items-center gap-4"
+                className="bg-surface-inner rounded-xl border border-edge px-4 py-3 flex items-center gap-3"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-medium text-ink text-sm">{alert.clientName}</span>
+                  <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span className="font-medium text-ink text-[13px]">{alert.clientName}</span>
                     <RiskBadge level={alert.severity} />
                   </div>
-                  <p className="text-xs text-ink-secondary leading-relaxed">{alert.alertMessage}</p>
+                  <p className="text-xs text-ink-secondary leading-relaxed line-clamp-2">{alert.alertMessage}</p>
                 </div>
-                <div className="text-right flex-shrink-0 mr-4">
-                  <p className="text-xs text-ink-muted">Менеджер</p>
-                  <p className="text-sm text-ink-secondary">{alert.managerName}</p>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-[10px] text-ink-muted">Менеджер</p>
+                  <p className="text-xs text-ink-secondary">{alert.managerName}</p>
                 </div>
                 <Button
                   size="sm"
@@ -125,8 +125,8 @@ export function TodayPage() {
 
       {/* Priority Deals */}
       <div className="bg-surface-card rounded-2xl shadow-card">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
-          <h2 className="font-display text-ink text-[15px]">Приоритетные сделки</h2>
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge">
+          <h2 className="font-display text-ink text-[14px]">Приоритетные сделки</h2>
           <Button size="sm" variant="ghost" onClick={() => navigate('/risks')} icon={<ChevronRight size={13} />}>
             Все риски
           </Button>
@@ -140,9 +140,9 @@ export function TodayPage() {
 
       {/* Incoming Requests */}
       <div className="bg-surface-card rounded-2xl shadow-card">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge">
           <div className="flex items-center gap-3">
-            <h2 className="font-display text-ink text-[15px]">Входящие обращения</h2>
+            <h2 className="font-display text-ink text-[14px]">Входящие обращения</h2>
             {incoming.length > 0 && (
               <span className="text-xs bg-blue-50 text-accent font-semibold rounded-lg px-2 py-0.5">
                 {incoming.length}
@@ -170,10 +170,10 @@ export function TodayPage() {
       {/* Sentiment Feed */}
       {sentimentFeed.length > 0 && (
         <div className="bg-surface-card rounded-2xl shadow-card">
-          <div className="px-6 py-4 border-b border-edge">
-            <h2 className="font-display text-ink text-[15px]">Изменения настроения клиентов</h2>
+          <div className="px-5 py-3.5 border-b border-edge">
+            <h2 className="font-display text-ink text-[14px]">Изменения настроения</h2>
           </div>
-          <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-2.5">
             {sentimentFeed.map((item) => (
               <div
                 key={item.clientId}
@@ -267,14 +267,14 @@ function StatBlock({
 }) {
   return (
     <div
-      className={onClick ? 'cursor-pointer' : ''}
+      className={onClick ? 'cursor-pointer group' : ''}
       onClick={onClick}
     >
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs text-ink-muted font-medium">{label}</span>
-        <img src={icon} alt="" className="w-4 h-4" style={{ filter: 'invert(1) brightness(0.5)' }} />
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <img src={icon} alt="" className="w-3.5 h-3.5" style={{ filter: 'invert(1) brightness(0.5)' }} />
+        <span className="text-[11px] text-ink-muted font-medium">{label}</span>
       </div>
-      <p className="text-[32px] font-display text-ink leading-none">{value}</p>
+      <p className="text-[28px] font-display text-ink leading-none group-hover:text-accent transition-colors">{value}</p>
     </div>
   )
 }
