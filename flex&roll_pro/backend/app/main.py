@@ -35,11 +35,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# ─── Iframe / X-Frame-Options ────────────────────────────────────────────────
+@app.middleware("http")
+async def add_iframe_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Frame-Options"] = "ALLOWALL"
+    response.headers["Content-Security-Policy"] = "frame-ancestors *;"
+    return response
+
 # ─── CORS ─────────────────────────────────────────────────────────────────────
 # In production, CORS_ORIGINS should include the Vercel frontend URL and
 # the Bitrix24 portal domain (*.bitrix24.ru).
 app.add_middleware(
     CORSMiddleware,
+    allow_origin_regex=r"https?://localhost:\d+|https://.*\.vercel\.app|https://.*\.bitrix24\.(ru|com)",
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],

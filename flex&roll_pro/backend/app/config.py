@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = [
         "http://localhost:5173",
         "http://localhost:3000",
+        "https://*.bitrix24.ru",
+        "https://*.bitrix24.com",
     ]
 
     # Mock mode — use in-memory fake data providers for non-lead endpoints

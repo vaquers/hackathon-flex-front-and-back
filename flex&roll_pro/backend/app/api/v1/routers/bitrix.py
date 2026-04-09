@@ -41,9 +41,11 @@ async def install(
         tokens = await exchange_code(code, domain, server_endpoint)
         logger.info("App installed on portal %s (member_id=%s)", domain, member_id)
         return HTMLResponse(
+            '<script src="https://api.bitrix24.com/api/v1/"></script>'
             "<h3>Flex&Roll AI</h3>"
             "<p>Приложение успешно установлено!</p>"
-            "<script>BX24.installFinish();</script>"
+            "<script>BX24.installFinish();</script>",
+            headers={"X-Frame-Options": "ALLOWALL", "Content-Security-Policy": "frame-ancestors *;"},
         )
     except Exception as e:
         logger.exception("Install failed for %s: %s", domain, e)
@@ -55,18 +57,44 @@ async def install(
 
 @router.get("/app")
 async def app_entry(
+    request: Request,
     domain: str = Query(None),
     DOMAIN: str = Query(None),
 ):
     """
     App entry point — Bitrix24 loads this URL in iframe.
-    Redirects to frontend with domain context.
+    Serves a small bootstrap page that loads frontend, avoiding redirect issues.
     """
     portal_domain = domain or DOMAIN
     frontend_url = settings.FRONTEND_PUBLIC_URL
     if portal_domain:
         frontend_url += f"?bitrix_domain={portal_domain}"
-    return RedirectResponse(url=frontend_url)
+
+    return HTMLResponse(
+        f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flex&Roll AI</title>
+    <style>
+        html, body {{ margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }}
+        iframe {{ border: none; width: 100%; height: 100%; }}
+    </style>
+</head>
+<body>
+    <iframe src="{frontend_url}" allow="clipboard-write"></iframe>
+    <script src="https://api.bitrix24.com/api/v1/"></script>
+    <script>
+        try {{ BX24.init(function() {{ BX24.installFinish(); }}); }} catch(e) {{}}
+    </script>
+</body>
+</html>""",
+        headers={
+            "Content-Security-Policy": "frame-ancestors *;",
+            "X-Frame-Options": "ALLOWALL",
+        },
+    )
 
 
 @router.get("/install/check", response_model=ApiResponse)
