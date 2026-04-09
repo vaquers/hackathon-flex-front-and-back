@@ -313,7 +313,7 @@ export interface SearchResponse {
   suggestedFilters: string[]
 }
 
-// ─── Leads ──────────────────────────────────────────────────────────────────
+// ─── Legacy Leads (mock CRM-style) ─────────────────────────────────────────
 
 export interface Lead {
   id: string
@@ -333,6 +333,62 @@ export interface Lead {
   isHidden: boolean
   generatedAt: string
   aiInsight: string
+}
+
+// ─── Generated Leads (real AI pipeline) ─────────────────────────────────────
+
+export interface ScoringFactor {
+  score: number
+  weight: number
+  explanation: string
+}
+
+export interface ScoringBreakdown {
+  product_packaging_fit?: ScoringFactor
+  labeling_need?: ScoringFactor
+  newness_signal?: ScoringFactor
+  urgency_signal?: ScoringFactor
+  data_quality?: ScoringFactor
+  sales_readiness?: ScoringFactor
+}
+
+export interface GeneratedLead {
+  id: string
+  company_name: string
+  normalized_name: string
+  registration_date: string | null
+  industry: string
+  product_category: string
+  why_recommended: string
+  score: number
+  confidence_score: number
+  priority_tier: 'hot' | 'warm' | 'cold'
+  source_url: string
+  source_name: string
+  company_summary: string
+  outreach_angle: string
+  suggested_pitch: string
+  sales_brief: string
+  scoring_breakdown: ScoringBreakdown | null
+  created_at: string
+}
+
+export interface TopLeadsResponse {
+  leads: GeneratedLead[]
+  generated_at: string
+  pipeline_status: 'idle' | 'running' | 'done' | 'error'
+  error_message: string
+  total_candidates: number
+  total_scored: number
+  cache_stale: boolean
+}
+
+export interface PipelineStatus {
+  pipeline_status: string
+  generated_at: string
+  leads_count: number
+  is_running: boolean
+  cache_stale: boolean
 }
 
 // ─── Shared ─────────────────────────────────────────────────────────────────

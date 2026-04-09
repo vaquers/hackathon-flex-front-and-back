@@ -69,3 +69,10 @@ frontend/.env.
 # 🧪 Claude / локальные настройки
 # =========================
 .claude/settings.local.js
+.claude/settings.local.json
+
+# =========================
+# 📊 Lead generation cache
+# =========================
+backend/app/scout/__pycache__/
+/tmp/leads_data/

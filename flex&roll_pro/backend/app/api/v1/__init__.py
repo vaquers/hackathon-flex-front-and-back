@@ -5,6 +5,7 @@ from .routers.risks import router as risks_router
 from .routers.analytics import router as analytics_router
 from .routers.search import router as search_router
 from .routers.leads import router as leads_router
+from .routers.bitrix import router as bitrix_router
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -15,3 +16,4 @@ api_router.include_router(risks_router)
 api_router.include_router(analytics_router)
 api_router.include_router(search_router)
 api_router.include_router(leads_router)
+api_router.include_router(bitrix_router)
