@@ -223,6 +223,11 @@ def get_client(client_id: str) -> Client | None:
     return CLIENTS_DB.get(client_id)
 
 
+def list_clients() -> list[Client]:
+    # TODO: Replace with Bitrix24 CRM clients query
+    return sorted(CLIENTS_DB.values(), key=lambda client: client.company)
+
+
 def get_ai_summary(client_id: str) -> AiClientSummary | None:
     # TODO: Replace with AI-generated summary from LLM (GPT-4 / Claude)
     summaries = {

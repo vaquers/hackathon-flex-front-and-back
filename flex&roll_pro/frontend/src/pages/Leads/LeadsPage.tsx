@@ -1,16 +1,22 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Sparkles, RefreshCw, ChevronDown, ExternalLink, UserPlus,
-  Target, Flame, Clock, BarChart3, AlertCircle, CheckCircle2, Loader2,
+  Target, Flame, Clock, BarChart3, AlertCircle, CheckCircle2, Loader2, Building2, Link2,
 } from 'lucide-react'
 import { leadsService } from '@/services/leadsService'
+import { clientService } from '@/services/clientService'
+import { bitrixService } from '@/services/bitrixService'
 import { Button } from '@/components/ui/Button'
 import { ScoreBar } from '@/components/ui/ScoreBar'
 import { SkeletonCard } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Tabs } from '@/components/ui/Tabs'
+import { Badge, RiskBadge, SentimentBadge, VipBadge } from '@/components/ui/Badge'
+import { formatDaysAgo, formatDateTime, formatRub } from '@/utils/format'
 import { clsx } from 'clsx'
-import type { GeneratedLead, TopLeadsResponse } from '@/types'
+import type { BitrixDealsSyncResult, Client, GeneratedLead, TopLeadsResponse } from '@/types'
 
 const TIER_CONFIG = {
   hot:  { label: 'HOT',  color: 'bg-red-50 text-red-600 border border-red-200', icon: Flame },
@@ -75,7 +81,10 @@ const PIPELINE_STEPS = [
 
 export function LeadsPage() {
   const qc = useQueryClient()
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<'prospects' | 'clients'>('prospects')
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [clientSearch, setClientSearch] = useState('')
 
   const { data, isLoading, error } = useQuery<TopLeadsResponse>({
     queryKey: ['generated-leads'],
@@ -86,10 +95,23 @@ export function LeadsPage() {
     },
   })
 
+  const clientsQ = useQuery<Client[]>({
+    queryKey: ['clients-list'],
+    queryFn: () => clientService.listClients(),
+    staleTime: 60_000,
+  })
+
   const refreshMutation = useMutation({
     mutationFn: () => leadsService.refreshLeads(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['generated-leads'] })
+    },
+  })
+
+  const syncDealsMutation = useMutation({
+    mutationFn: () => bitrixService.syncDeals(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['clients-list'] })
     },
   })
 
@@ -111,6 +133,19 @@ export function LeadsPage() {
     : scored < 10 ? 3
     : 4
 
+  const clients = clientsQ.data ?? []
+  const filteredClients = useMemo(() => {
+    const needle = clientSearch.trim().toLowerCase()
+    if (!needle) return clients
+    return clients.filter((client) =>
+      client.company.toLowerCase().includes(needle) ||
+      client.name.toLowerCase().includes(needle) ||
+      client.managerName.toLowerCase().includes(needle)
+    )
+  }, [clientSearch, clients])
+
+  const connectedClients = clients.filter((client) => client.bridgeConnected).length
+
   return (
     <div className="animate-fade-in max-w-[960px]">
       {/* Header */}
@@ -118,16 +153,16 @@ export function LeadsPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="font-display text-ink text-lg leading-tight">
-              Lead Explorer
+              Лиды и клиенты
             </h1>
             <span className="text-[9px] font-bold uppercase tracking-widest text-accent bg-blue-50 px-2 py-0.5 rounded-md">AI</span>
           </div>
           <p className="text-xs text-ink-muted mt-0.5">
-            Автоматический поиск и скоринг компаний для холодного контакта
+            Новые потенциальные клиенты и рабочая база текущих компаний в одном разделе
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {data?.generated_at && !isRunning && (
+          {activeTab === 'prospects' && data?.generated_at && !isRunning && (
             <div className="flex items-center gap-1.5 text-[11px] text-ink-muted bg-surface-card rounded-lg px-2.5 py-1.5 shadow-card border border-edge">
               {data.cache_stale ? (
                 <AlertCircle size={10} className="text-risk-medium" />
@@ -138,18 +173,105 @@ export function LeadsPage() {
             </div>
           )}
           <Button
+            variant="outline"
+            size="sm"
+            icon={<RefreshCw size={12} className={syncDealsMutation.isPending ? 'animate-spin' : ''} />}
+            loading={syncDealsMutation.isPending}
+            onClick={() => syncDealsMutation.mutate()}
+          >
+            Обновить сделки
+          </Button>
+          <Button
             variant="primary"
             size="sm"
             icon={<RefreshCw size={12} className={isRunning ? 'animate-spin' : ''} />}
             loading={refreshMutation.isPending}
             onClick={() => refreshMutation.mutate()}
-            disabled={isRunning}
+            disabled={isRunning || activeTab === 'clients'}
           >
             {isRunning ? 'Генерация...' : 'Найти лиды'}
           </Button>
         </div>
       </div>
 
+      <Tabs
+        tabs={[
+          { id: 'prospects', label: 'Новые потенциальные', count: leads.length || undefined },
+          { id: 'clients', label: 'Текущие клиенты', count: clients.length || undefined },
+        ]}
+        activeTab={activeTab}
+        onChange={(tabId) => setActiveTab(tabId as 'prospects' | 'clients')}
+        className="mb-4"
+      />
+
+      {syncDealsMutation.isSuccess && (
+        <SyncDealsBanner result={syncDealsMutation.data} />
+      )}
+
+      {syncDealsMutation.isError && (
+        <div className="bg-red-50 rounded-xl p-3 mb-4 flex items-center gap-2 border border-red-200">
+          <AlertCircle size={13} className="text-risk-high flex-shrink-0" />
+          <span className="text-xs text-risk-high">{syncDealsMutation.error.message}</span>
+        </div>
+      )}
+
+      {activeTab === 'clients' ? (
+        <div className="space-y-4">
+          <div className="bg-surface-card rounded-2xl shadow-card p-4 border border-edge">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-wrap gap-2 text-[11px] text-ink-muted">
+                <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+                  Компаний: {clients.length}
+                </span>
+                <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+                  Связано с Bitrix bridge: {connectedClients}
+                </span>
+              </div>
+              <input
+                value={clientSearch}
+                onChange={(event) => setClientSearch(event.target.value)}
+                placeholder="Поиск по компании, контакту или менеджеру"
+                className="w-full md:w-[360px] rounded-2xl border border-edge bg-surface-inner px-4 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-accent/20"
+              />
+            </div>
+          </div>
+
+          {clientsQ.isLoading && (
+            <div className="grid grid-cols-1 gap-3">
+              {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          )}
+
+          {clientsQ.isError && (
+            <EmptyState
+              icon={<AlertCircle />}
+              title="Не удалось загрузить текущих клиентов"
+              description={clientsQ.error.message}
+            />
+          )}
+
+          {!clientsQ.isLoading && !clientsQ.isError && filteredClients.length === 0 && (
+            <EmptyState
+              icon={<Building2 />}
+              title="Клиенты не найдены"
+              description={clientSearch ? 'Попробуйте изменить поисковый запрос' : 'В базе пока нет текущих клиентов'}
+            />
+          )}
+
+          {filteredClients.length > 0 && (
+            <div className="space-y-3">
+              {filteredClients.map((client) => (
+                <CurrentClientCard
+                  key={client.id}
+                  client={client}
+                  onOpen={() => navigate(`/clients/${client.id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
       {/* Pipeline progress */}
       {isRunning && (
         <div className="bg-surface-card rounded-2xl shadow-card p-4 mb-4 border border-blue-100">
@@ -255,6 +377,8 @@ export function LeadsPage() {
             />
           ))}
         </div>
+      )}
+        </>
       )}
     </div>
   )
@@ -439,6 +563,89 @@ function LeadCard({
           <ChevronDown size={10} className={clsx('transition-transform', expanded && 'rotate-180')} />
         </button>
       </div>
+    </div>
+  )
+}
+
+function CurrentClientCard({
+  client,
+  onOpen,
+}: {
+  client: Client
+  onOpen: () => void
+}) {
+  return (
+    <div className="bg-surface-card rounded-2xl shadow-card transition-shadow duration-200 hover:shadow-card-hover">
+      <div className="p-4 flex flex-col gap-3 md:flex-row md:items-start">
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <p className="font-display text-ink text-[15px] leading-tight">{client.company}</p>
+            {client.isVip && <VipBadge />}
+            <RiskBadge level={client.riskLevel} score={client.riskScore} />
+            <SentimentBadge sentiment={client.sentiment} />
+            {client.bridgeConnected ? (
+              <Badge variant="default" className="bg-emerald-50 text-risk-low border border-emerald-200">
+                <Link2 size={10} className="mr-1" />
+                Bridge
+              </Badge>
+            ) : (
+              <Badge variant="default">Без bridge</Badge>
+            )}
+          </div>
+          <p className="text-xs text-ink-muted mb-2">
+            {client.name} · {client.managerName} · {client.dealStageLabel}
+          </p>
+          <p className="text-sm text-ink-secondary leading-relaxed">{client.riskReason}</p>
+          <div className="flex flex-wrap gap-2 mt-3 text-[11px] text-ink-muted">
+            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+              {formatRub(client.dealAmount)}/мес.
+            </span>
+            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+              {client.segmentLabel}
+            </span>
+            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+              Контакт: {formatDateTime(client.lastContactAt)}
+            </span>
+            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+              {formatDaysAgo(client.daysSinceContact)}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-row md:flex-col items-start md:items-end gap-2 md:text-right">
+          <div>
+            <p className="text-[11px] text-ink-muted">Менеджер</p>
+            <p className="text-sm font-medium text-ink">{client.managerName}</p>
+          </div>
+          <Button variant="primary" size="sm" onClick={onOpen}>
+            Открыть клиента
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SyncDealsBanner({ result }: { result: BitrixDealsSyncResult }) {
+  const successCount = result.deals.filter((deal) => !deal.error).length
+  const errorCount = result.deals.filter((deal) => !!deal.error).length
+
+  return (
+    <div className="bg-surface-card rounded-2xl shadow-card p-4 mb-4 border border-edge">
+      <div className="flex flex-wrap items-center gap-2 mb-2">
+        <CheckCircle2 size={14} className="text-risk-low" />
+        <span className="text-sm font-medium text-ink">Синхронизация сделок завершена</span>
+        <span className="text-xs text-ink-muted">
+          Успешно: {successCount}
+        </span>
+        {errorCount > 0 && (
+          <span className="text-xs text-risk-high">
+            Ошибок: {errorCount}
+          </span>
+        )}
+      </div>
+      <p className="text-xs text-ink-muted">
+        Backend Антона вернул {result.deals.length} записей. Новые данные можно сразу открыть в разделе текущих клиентов.
+      </p>
     </div>
   )
 }

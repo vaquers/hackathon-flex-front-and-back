@@ -117,6 +117,9 @@ export interface Client {
   expectedVolume: string
   city: string
   inn?: string
+  bridgeContactId?: number | null
+  bridgeChatId?: string | null
+  bridgeConnected?: boolean
 }
 
 export interface AiClientSummary {
@@ -194,6 +197,86 @@ export interface RelatedDocument {
   date: string
   clientName?: string
   url?: string
+}
+
+export interface BitrixConversationSummary {
+  contactId: number
+  contactName: string
+  summary: string
+  data: Record<string, unknown>
+}
+
+export interface BitrixBrief {
+  company: string
+  segment: string
+  circulation: string
+  material: string
+  lastStage: string
+  churnRisk: string
+  priority: string
+  callTips: string[]
+}
+
+export interface BitrixCallListItem {
+  id: number | string
+  callId: string
+  chatTitle?: string
+  startedAt?: string | null
+  finishedAt?: string | null
+  startedAtFormatted?: string
+  finishedAtFormatted?: string
+  createdAt?: string
+  hasTranscript: boolean
+  hasSummary: boolean
+  hasAiReview: boolean
+}
+
+export interface BitrixCallDetail extends BitrixCallListItem {
+  transcriptText?: string | null
+  summaryText?: string | null
+  aiReview?: Record<string, unknown> | string | null
+  participants: Array<{
+    id: number | string
+    name: string
+    telegramId?: string | null
+    telegramUsername?: string | null
+  }>
+}
+
+export interface BitrixTeamMember {
+  id: number
+  bitrixUserId: number
+  name: string
+  role: string
+  experienceText: string
+  rating: number
+}
+
+export interface BitrixTempAssignment {
+  assignmentId: number
+  dialogId: string
+  createdAt?: string
+  originalManager: {
+    bitrixUserId: number
+    name: string | null
+  }
+  tempManager: {
+    bitrixUserId: number
+    name: string | null
+  }
+}
+
+export interface BitrixDealsSyncResult {
+  status: string
+  deals: Array<{
+    dealId?: number | string
+    contact: string
+    title?: string
+    stage?: string
+    probability?: number
+    opportunity?: number
+    error?: string
+  }>
 }
 
 // ─── Risks ──────────────────────────────────────────────────────────────────

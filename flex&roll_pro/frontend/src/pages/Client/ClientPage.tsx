@@ -1,34 +1,143 @@
-import { useParams, useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  ArrowLeft, Phone, Mail, Zap, FileText,
-  Phone as PhoneIcon, Mail as MailIcon, MessageSquare, StickyNote, GitBranch,
-  CheckCircle, AlertCircle,
+  AlertCircle,
+  ArrowLeft,
+  Bot,
+  CheckCircle,
+  FileText,
+  GitBranch,
+  Link2,
+  Mail,
+  Mail as MailIcon,
+  MessageSquare,
+  Phone,
+  Phone as PhoneIcon,
+  RefreshCw,
+  Sparkles,
+  StickyNote,
+  UserCog,
+  Users,
+  Zap,
 } from 'lucide-react'
+
+import { SidePanel } from '@/components/ui/SidePanel'
 import { clientService } from '@/services/clientService'
+import { bitrixService } from '@/services/bitrixService'
 import { Badge, RiskBadge, SentimentBadge, VipBadge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ScoreBar, ScoreCircle } from '@/components/ui/ScoreBar'
 import { ErrorState } from '@/components/ui/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { formatRub, formatDateTime, formatDate, formatDuration } from '@/utils/format'
+import { formatDate, formatDateTime, formatDuration, formatRub } from '@/utils/format'
 import { clsx } from 'clsx'
 import type { CommunicationEvent } from '@/types'
+
+type PanelType = 'conversation-summary' | 'brief' | 'last-call' | 'temp-manager' | null
+
+function normalizeName(value: string | null | undefined): string {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/\s+/g, ' ')
+}
+
+function formatBridgeFieldLabel(key: string): string {
+  return key
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+function formatBridgeFieldValue(value: unknown): string {
+  if (Array.isArray(value)) return value.join(', ')
+  if (value && typeof value === 'object') return JSON.stringify(value, null, 2)
+  if (value === null || value === undefined || value === '') return '—'
+  return String(value)
+}
 
 export function ClientPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const clientId = id && id !== 'undefined' ? id : null
 
-  const clientQ    = useQuery({ queryKey: ['client', clientId],        queryFn: () => clientService.getClient(clientId!),          enabled: !!clientId })
-  const summaryQ   = useQuery({ queryKey: ['ai-summary', clientId],    queryFn: () => clientService.getAiSummary(clientId!),       enabled: !!clientId })
-  const commsQ     = useQuery({ queryKey: ['communications', clientId], queryFn: () => clientService.getCommunications(clientId!), enabled: !!clientId })
-  const nextActionQ = useQuery({ queryKey: ['next-action', clientId],  queryFn: () => clientService.getAiNextAction(clientId!),    enabled: !!clientId })
-  const docsQ      = useQuery({ queryKey: ['related-docs', clientId],  queryFn: () => clientService.getRelatedDocuments(clientId!), enabled: !!clientId })
+  const [activePanel, setActivePanel] = useState<PanelType>(null)
+  const [selectedTempManagerId, setSelectedTempManagerId] = useState<number | null>(null)
+
+  const clientQ = useQuery({
+    queryKey: ['client', clientId],
+    queryFn: () => clientService.getClient(clientId!),
+    enabled: !!clientId,
+  })
+  const summaryQ = useQuery({
+    queryKey: ['ai-summary', clientId],
+    queryFn: () => clientService.getAiSummary(clientId!),
+    enabled: !!clientId,
+  })
+  const commsQ = useQuery({
+    queryKey: ['communications', clientId],
+    queryFn: () => clientService.getCommunications(clientId!),
+    enabled: !!clientId,
+  })
+  const nextActionQ = useQuery({
+    queryKey: ['next-action', clientId],
+    queryFn: () => clientService.getAiNextAction(clientId!),
+    enabled: !!clientId,
+  })
+  const docsQ = useQuery({
+    queryKey: ['related-docs', clientId],
+    queryFn: () => clientService.getRelatedDocuments(clientId!),
+    enabled: !!clientId,
+  })
+
+  const conversationSummaryMutation = useMutation({
+    mutationFn: () => clientService.getBitrixConversationSummary(clientId!),
+  })
+
+  const briefMutation = useMutation({
+    mutationFn: () => clientService.getBitrixBrief(clientId!),
+  })
+
+  const bitrixLastCallQ = useQuery({
+    queryKey: ['bitrix-last-call', clientId],
+    queryFn: () => clientService.getBitrixLastCall(clientId!),
+    enabled: !!clientId && activePanel === 'last-call',
+  })
+
+  const bitrixTeamQ = useQuery({
+    queryKey: ['bitrix-team'],
+    queryFn: () => bitrixService.getTeam(),
+    enabled: activePanel === 'temp-manager',
+    staleTime: 5 * 60_000,
+  })
+
+  const tempManagersQ = useQuery({
+    queryKey: ['bitrix-temp-managers', clientId],
+    queryFn: () => clientService.getBitrixTempManagers(clientId!),
+    enabled: !!clientId && activePanel === 'temp-manager',
+  })
+
+  const assignTempManagerMutation = useMutation({
+    mutationFn: ({ originalManagerBitrixId, tempManagerBitrixId }: { originalManagerBitrixId: number; tempManagerBitrixId: number }) =>
+      clientService.assignBitrixTempManager(clientId!, { originalManagerBitrixId, tempManagerBitrixId }),
+    onSuccess: () => {
+      setSelectedTempManagerId(null)
+      queryClient.invalidateQueries({ queryKey: ['bitrix-temp-managers', clientId] })
+    },
+  })
+
+  const removeTempManagerMutation = useMutation({
+    mutationFn: (assignmentId: number) => clientService.removeBitrixTempManager(clientId!, assignmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bitrix-temp-managers', clientId] })
+    },
+  })
 
   if (!clientId) {
-    return <ErrorState message="Карточка клиента недоступна" onRetry={() => navigate('/')} />
+    return <ErrorState message="Карточка клиента недоступна" onRetry={() => navigate('/leads')} />
   }
 
   if (clientQ.isLoading) {
@@ -47,19 +156,49 @@ export function ClientPage() {
     return <ErrorState message="Клиент не найден" onRetry={() => clientQ.refetch()} />
   }
 
-  const client     = clientQ.data!
-  const summary    = summaryQ.data
-  const comms      = commsQ.data ?? []
+  const client = clientQ.data!
+  const summary = summaryQ.data
+  const comms = commsQ.data ?? []
   const nextAction = nextActionQ.data
-  const docs       = docsQ.data ?? []
+  const docs = docsQ.data ?? []
+  const bitrixReady = Boolean(client.bridgeConnected)
+
+  const originalBridgeManager = useMemo(() => {
+    const team = bitrixTeamQ.data ?? []
+    const targetName = normalizeName(client.managerName)
+    return team.find((member) => normalizeName(member.name) === targetName) ?? null
+  }, [bitrixTeamQ.data, client.managerName])
+
+  const availableTempManagers = useMemo(() => {
+    const team = bitrixTeamQ.data ?? []
+    if (!originalBridgeManager) return team
+    return team.filter((member) => member.bitrixUserId !== originalBridgeManager.bitrixUserId)
+  }, [bitrixTeamQ.data, originalBridgeManager])
+
+  const openPanel = (panel: Exclude<PanelType, null>) => {
+    setActivePanel(panel)
+    if (panel === 'conversation-summary' && !conversationSummaryMutation.isPending && !conversationSummaryMutation.data) {
+      conversationSummaryMutation.mutate()
+    }
+    if (panel === 'brief' && !briefMutation.isPending && !briefMutation.data) {
+      briefMutation.mutate()
+    }
+  }
+
+  const handleAssignTempManager = () => {
+    if (!originalBridgeManager || !selectedTempManagerId) return
+    assignTempManagerMutation.mutate({
+      originalManagerBitrixId: originalBridgeManager.bitrixUserId,
+      tempManagerBitrixId: selectedTempManagerId,
+    })
+  }
 
   return (
     <div className="animate-fade-in -m-6">
-      {/* Sticky Header */}
       <div className="sticky top-0 z-10 bg-surface-card border-b border-edge px-6 py-3.5">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/leads')}
             className="text-ink-muted hover:text-ink p-1.5 rounded-xl hover:bg-surface-hover transition-colors flex-shrink-0"
           >
             <ArrowLeft size={16} />
@@ -70,6 +209,14 @@ export function ClientPage() {
               {client.isVip && <VipBadge />}
               <RiskBadge level={client.riskLevel} score={client.riskScore} />
               <SentimentBadge sentiment={client.sentiment} />
+              {bitrixReady ? (
+                <Badge variant="default" className="bg-emerald-50 text-risk-low border border-emerald-200">
+                  <Link2 size={10} className="mr-1" />
+                  Bitrix bridge
+                </Badge>
+              ) : (
+                <Badge variant="outline">Не связан с bridge</Badge>
+              )}
             </div>
             <p className="text-xs text-ink-muted mt-0.5">
               {client.name} · {client.managerName} · {client.dealStageLabel} · {formatRub(client.dealAmount)}/мес.
@@ -86,11 +233,66 @@ export function ClientPage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="p-6 grid grid-cols-1 xl:grid-cols-3 gap-5">
         <div className="xl:col-span-2 space-y-4">
+          <Card>
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                    <Bot size={11} className="text-accent" />
+                  </div>
+                  <h2 className="font-display text-ink text-sm">AI-инструменты клиента</h2>
+                </div>
+                <p className="text-xs text-ink-muted mt-1">
+                  Быстрые действия поверх переписки, звонков и маршрутизации в самом Bitrix24
+                </p>
+              </div>
+              <Badge variant={bitrixReady ? 'vip' : 'outline'}>
+                {bitrixReady ? 'Готово к работе' : 'Нужна связка с bridge'}
+              </Badge>
+            </div>
 
-          {/* AI Client Summary */}
+            {!bitrixReady && (
+              <div className="bg-amber-50 rounded-2xl p-3 mb-4 border border-amber-200">
+                <p className="text-xs text-ink-secondary">
+                  Для Bitrix-инструментов у клиента должен быть найден контакт в backend Антона. После подключения bridge кнопки заработают без отдельной донастройки фронта.
+                </p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ToolActionButton
+                icon={<MessageSquare size={14} />}
+                title="Summary переписки"
+                description="Собрать краткую выжимку по всей переписке клиента"
+                onClick={() => openPanel('conversation-summary')}
+                disabled={!bitrixReady}
+              />
+              <ToolActionButton
+                icon={<Sparkles size={14} />}
+                title="E-brief"
+                description="Подготовка менеджера к следующему звонку"
+                onClick={() => openPanel('brief')}
+                disabled={!bitrixReady}
+              />
+              <ToolActionButton
+                icon={<PhoneIcon size={14} />}
+                title="Summary последнего звонка"
+                description="Показать резюме, транскрипт и AI review последнего звонка"
+                onClick={() => openPanel('last-call')}
+                disabled={!bitrixReady}
+              />
+              <ToolActionButton
+                icon={<UserCog size={14} />}
+                title="Замена сотрудника"
+                description="Временно передать клиента другому менеджеру"
+                onClick={() => openPanel('temp-manager')}
+                disabled={!bitrixReady}
+              />
+            </div>
+          </Card>
+
           <Card>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
@@ -106,20 +308,20 @@ export function ClientPage() {
             {summary ? (
               <div className="grid grid-cols-2 gap-5">
                 <div className="space-y-2.5">
-                  <SummaryRow label="Компания"  value={summary.company} />
-                  <SummaryRow label="Сегмент"   value={summary.segment} />
-                  <SummaryRow label="Продукт"   value={summary.product} />
-                  <SummaryRow label="Объём"     value={summary.expectedVolume} />
-                  <SummaryRow label="Стадия"    value={summary.dealStage} />
+                  <SummaryRow label="Компания" value={summary.company} />
+                  <SummaryRow label="Сегмент" value={summary.segment} />
+                  <SummaryRow label="Продукт" value={summary.product} />
+                  <SummaryRow label="Объём" value={summary.expectedVolume} />
+                  <SummaryRow label="Стадия" value={summary.dealStage} />
                 </div>
                 <div className="space-y-3">
                   <div>
                     <p className="text-[11px] text-ink-muted font-medium uppercase tracking-wide mb-1.5">Последние действия</p>
                     <ul className="space-y-1">
-                      {summary.recentActions.map((a, i) => (
-                        <li key={i} className="text-xs text-ink-secondary flex items-start gap-1.5">
+                      {summary.recentActions.map((action, index) => (
+                        <li key={index} className="text-xs text-ink-secondary flex items-start gap-1.5">
                           <span className="text-accent flex-shrink-0 mt-0.5">·</span>
-                          {a}
+                          {action}
                         </li>
                       ))}
                     </ul>
@@ -132,8 +334,8 @@ export function ClientPage() {
                           className={clsx(
                             'h-full rounded-full',
                             summary.riskScore >= 70 ? 'bg-risk-high'
-                            : summary.riskScore >= 40 ? 'bg-risk-medium'
-                            : 'bg-risk-low'
+                              : summary.riskScore >= 40 ? 'bg-risk-medium'
+                                : 'bg-risk-low'
                           )}
                           style={{ width: `${summary.riskScore}%` }}
                         />
@@ -146,12 +348,11 @@ export function ClientPage() {
               </div>
             ) : summaryQ.isLoading ? (
               <div className="space-y-2">
-                {[1, 2, 3].map(i => <Skeleton key={i} className="h-4 w-full" />)}
+                {[1, 2, 3].map((index) => <Skeleton key={index} className="h-4 w-full" />)}
               </div>
             ) : null}
           </Card>
 
-          {/* AI Next Action */}
           {nextAction && (
             <Card>
               <div className="flex items-start gap-3">
@@ -176,7 +377,6 @@ export function ClientPage() {
             </Card>
           )}
 
-          {/* Communications Timeline */}
           <Card padding="none">
             <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
               <h2 className="font-display text-ink text-sm">Лента коммуникаций</h2>
@@ -190,18 +390,17 @@ export function ClientPage() {
           </Card>
         </div>
 
-        {/* Right sidebar */}
         <div className="space-y-4">
           <Card>
             <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Информация</p>
             <div className="space-y-2.5">
-              <SummaryRow label="Город"           value={client.city} />
+              <SummaryRow label="Город" value={client.city} />
               {client.inn && <SummaryRow label="ИНН" value={client.inn} />}
-              <SummaryRow label="Сегмент"         value={client.segmentLabel} />
-              <SummaryRow label="Продукт"         value={client.product} />
-              <SummaryRow label="Объём"           value={client.expectedVolume} />
-              <SummaryRow label="Сумма"           value={formatRub(client.dealAmount) + '/мес.'} />
-              <SummaryRow label="Контакт"         value={formatDateTime(client.lastContactAt)} />
+              <SummaryRow label="Сегмент" value={client.segmentLabel} />
+              <SummaryRow label="Продукт" value={client.product} />
+              <SummaryRow label="Объём" value={client.expectedVolume} />
+              <SummaryRow label="Сумма" value={formatRub(client.dealAmount) + '/мес.'} />
+              <SummaryRow label="Контакт" value={formatDateTime(client.lastContactAt)} />
             </div>
           </Card>
 
@@ -234,7 +433,304 @@ export function ClientPage() {
           </Card>
         </div>
       </div>
+
+      <SidePanel
+        open={!!activePanel}
+        onClose={() => setActivePanel(null)}
+        title={
+          activePanel === 'conversation-summary' ? 'Summary переписки'
+            : activePanel === 'brief' ? 'E-brief'
+              : activePanel === 'last-call' ? 'Summary последнего звонка'
+                : activePanel === 'temp-manager' ? 'Замена сотрудника'
+                  : undefined
+        }
+        width="lg"
+      >
+        {activePanel === 'conversation-summary' && (
+          <div className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-ink-muted">Переписка клиента в Bitrix24</p>
+              <Button
+                size="sm"
+                variant="outline"
+                icon={<RefreshCw size={12} className={conversationSummaryMutation.isPending ? 'animate-spin' : ''} />}
+                loading={conversationSummaryMutation.isPending}
+                onClick={() => conversationSummaryMutation.mutate()}
+              >
+                Обновить
+              </Button>
+            </div>
+            {conversationSummaryMutation.isPending && <Skeleton className="h-40 w-full" />}
+            {conversationSummaryMutation.isError && (
+              <PanelError message={conversationSummaryMutation.error.message} />
+            )}
+            {conversationSummaryMutation.data && (
+              <>
+                <Card className="bg-blue-50/60 border border-blue-100">
+                  <p className="text-sm leading-relaxed text-ink-secondary whitespace-pre-line">
+                    {conversationSummaryMutation.data.summary}
+                  </p>
+                </Card>
+                {Object.keys(conversationSummaryMutation.data.data).length > 0 && (
+                  <Card>
+                    <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Структурированные поля</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {Object.entries(conversationSummaryMutation.data.data).map(([key, value]) => (
+                        <div key={key} className="rounded-2xl border border-edge px-4 py-3">
+                          <p className="text-[11px] text-ink-muted mb-1">{formatBridgeFieldLabel(key)}</p>
+                          <p className="text-sm text-ink whitespace-pre-wrap">{formatBridgeFieldValue(value)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {activePanel === 'brief' && (
+          <div className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-ink-muted">Подготовка к следующему контакту</p>
+              <Button
+                size="sm"
+                variant="outline"
+                icon={<RefreshCw size={12} className={briefMutation.isPending ? 'animate-spin' : ''} />}
+                loading={briefMutation.isPending}
+                onClick={() => briefMutation.mutate()}
+              >
+                Обновить
+              </Button>
+            </div>
+            {briefMutation.isPending && <Skeleton className="h-40 w-full" />}
+            {briefMutation.isError && (
+              <PanelError message={briefMutation.error.message} />
+            )}
+            {briefMutation.data && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <InfoMetric label="Компания" value={briefMutation.data.company} />
+                  <InfoMetric label="Сегмент" value={briefMutation.data.segment} />
+                  <InfoMetric label="Тираж" value={briefMutation.data.circulation} />
+                  <InfoMetric label="Материал" value={briefMutation.data.material} />
+                  <InfoMetric label="Последняя стадия" value={briefMutation.data.lastStage} />
+                  <InfoMetric label="Риск оттока" value={briefMutation.data.churnRisk} />
+                  <InfoMetric label="Приоритет" value={briefMutation.data.priority} />
+                </div>
+                <Card>
+                  <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Советы на звонок</p>
+                  <div className="space-y-2">
+                    {briefMutation.data.callTips.map((tip, index) => (
+                      <div key={index} className="flex items-start gap-2 rounded-2xl bg-surface-inner px-4 py-3">
+                        <span className="text-accent mt-0.5">{index + 1}.</span>
+                        <p className="text-sm text-ink-secondary">{tip}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </>
+            )}
+          </div>
+        )}
+
+        {activePanel === 'last-call' && (
+          <div className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-ink-muted">Последний звонок по клиенту</p>
+              <Button
+                size="sm"
+                variant="outline"
+                icon={<RefreshCw size={12} className={bitrixLastCallQ.isFetching ? 'animate-spin' : ''} />}
+                onClick={() => bitrixLastCallQ.refetch()}
+              >
+                Обновить
+              </Button>
+            </div>
+            {bitrixLastCallQ.isLoading && <Skeleton className="h-40 w-full" />}
+            {bitrixLastCallQ.isError && (
+              <PanelError message={bitrixLastCallQ.error.message} />
+            )}
+            {bitrixLastCallQ.data && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <InfoMetric label="Call ID" value={bitrixLastCallQ.data.callId} />
+                  <InfoMetric label="Начало" value={bitrixLastCallQ.data.startedAtFormatted ?? (bitrixLastCallQ.data.startedAt ? formatDateTime(bitrixLastCallQ.data.startedAt) : '—')} />
+                  <InfoMetric label="Окончание" value={bitrixLastCallQ.data.finishedAtFormatted ?? (bitrixLastCallQ.data.finishedAt ? formatDateTime(bitrixLastCallQ.data.finishedAt) : '—')} />
+                  <InfoMetric label="Участники" value={String(bitrixLastCallQ.data.participants.length)} />
+                </div>
+
+                {bitrixLastCallQ.data.summaryText && (
+                  <Card className="bg-blue-50/60 border border-blue-100">
+                    <p className="text-[11px] font-semibold text-accent uppercase tracking-widest mb-2">Summary</p>
+                    <p className="text-sm text-ink-secondary whitespace-pre-line leading-relaxed">
+                      {bitrixLastCallQ.data.summaryText}
+                    </p>
+                  </Card>
+                )}
+
+                {bitrixLastCallQ.data.aiReview && (
+                  <Card>
+                    <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">AI review</p>
+                    {typeof bitrixLastCallQ.data.aiReview === 'string' ? (
+                      <p className="text-sm text-ink-secondary whitespace-pre-line">{bitrixLastCallQ.data.aiReview}</p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {Object.entries(bitrixLastCallQ.data.aiReview).map(([key, value]) => (
+                          <InfoMetric key={key} label={formatBridgeFieldLabel(key)} value={formatBridgeFieldValue(value)} />
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                )}
+
+                {bitrixLastCallQ.data.transcriptText && (
+                  <Card>
+                    <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Транскрипт</p>
+                    <div className="max-h-[280px] overflow-y-auto rounded-2xl bg-surface-inner px-4 py-3">
+                      <p className="text-sm text-ink-secondary whitespace-pre-line leading-relaxed">
+                        {bitrixLastCallQ.data.transcriptText}
+                      </p>
+                    </div>
+                  </Card>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {activePanel === 'temp-manager' && (
+          <div className="p-6 space-y-4">
+            <Card className="bg-surface-inner">
+              <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-2">Текущий менеджер</p>
+              <p className="text-sm font-medium text-ink">{client.managerName}</p>
+              {originalBridgeManager ? (
+                <p className="text-xs text-ink-muted mt-1">Bitrix user ID: {originalBridgeManager.bitrixUserId}</p>
+              ) : (
+                <p className="text-xs text-risk-high mt-1">
+                  Не удалось сопоставить текущего менеджера с командой backend Антона. Попроси Антона зарегистрировать сотрудника в `/employees/team`.
+                </p>
+              )}
+            </Card>
+
+            {(bitrixTeamQ.isLoading || tempManagersQ.isLoading) && <Skeleton className="h-40 w-full" />}
+
+            {(bitrixTeamQ.isError || tempManagersQ.isError) && (
+              <PanelError message={bitrixTeamQ.error?.message ?? tempManagersQ.error?.message ?? 'Не удалось загрузить данные по замене сотрудников'} />
+            )}
+
+            {!bitrixTeamQ.isLoading && !bitrixTeamQ.isError && (
+              <Card>
+                <div className="flex items-center gap-2 mb-3">
+                  <Users size={14} className="text-accent" />
+                  <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest">Кого назначить временно</p>
+                </div>
+                <div className="space-y-2">
+                  {availableTempManagers.map((member) => (
+                    <button
+                      key={member.id}
+                      onClick={() => setSelectedTempManagerId(member.bitrixUserId)}
+                      className={clsx(
+                        'w-full rounded-2xl border px-4 py-3 text-left transition-colors',
+                        selectedTempManagerId === member.bitrixUserId
+                          ? 'border-accent bg-blue-50'
+                          : 'border-edge hover:bg-surface-hover'
+                      )}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-medium text-ink">{member.name}</p>
+                          <p className="text-xs text-ink-muted mt-1">{member.role} · рейтинг {member.rating}/10</p>
+                        </div>
+                        {selectedTempManagerId === member.bitrixUserId && (
+                          <CheckCircle size={16} className="text-accent flex-shrink-0" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex justify-end mt-4">
+                  <Button
+                    variant="primary"
+                    loading={assignTempManagerMutation.isPending}
+                    disabled={!originalBridgeManager || !selectedTempManagerId}
+                    onClick={handleAssignTempManager}
+                  >
+                    Назначить временно
+                  </Button>
+                </div>
+                {assignTempManagerMutation.isError && (
+                  <p className="text-xs text-risk-high mt-3">{assignTempManagerMutation.error.message}</p>
+                )}
+              </Card>
+            )}
+
+            <Card>
+              <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Активные замены</p>
+              {tempManagersQ.data && tempManagersQ.data.length > 0 ? (
+                <div className="space-y-2">
+                  {tempManagersQ.data.map((assignment) => (
+                    <div key={assignment.assignmentId} className="rounded-2xl border border-edge px-4 py-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-medium text-ink">
+                            {assignment.originalManager.name ?? 'Основной менеджер'} → {assignment.tempManager.name ?? 'Временный менеджер'}
+                          </p>
+                          <p className="text-xs text-ink-muted mt-1">
+                            Создано: {assignment.createdAt ? formatDateTime(assignment.createdAt) : '—'}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          loading={removeTempManagerMutation.isPending && removeTempManagerMutation.variables === assignment.assignmentId}
+                          onClick={() => removeTempManagerMutation.mutate(assignment.assignmentId)}
+                        >
+                          Снять
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-ink-muted">Активных замен пока нет</p>
+              )}
+            </Card>
+          </div>
+        )}
+      </SidePanel>
     </div>
+  )
+}
+
+function ToolActionButton({
+  icon,
+  title,
+  description,
+  onClick,
+  disabled,
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+  onClick: () => void
+  disabled?: boolean
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={clsx(
+        'rounded-2xl border border-edge px-4 py-4 text-left transition-colors',
+        'hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed'
+      )}
+    >
+      <div className="flex items-center gap-2 mb-2 text-accent">
+        {icon}
+        <span className="text-sm font-medium text-ink">{title}</span>
+      </div>
+      <p className="text-xs text-ink-muted leading-relaxed">{description}</p>
+    </button>
   )
 }
 
@@ -247,29 +743,51 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   )
 }
 
+function InfoMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-edge px-4 py-3">
+      <p className="text-[11px] text-ink-muted mb-1">{label}</p>
+      <p className="text-sm text-ink">{value}</p>
+    </div>
+  )
+}
+
+function PanelError({ message }: { message: string }) {
+  return (
+    <Card className="bg-red-50 border border-red-200">
+      <div className="flex items-start gap-2">
+        <AlertCircle size={14} className="text-risk-high mt-0.5 flex-shrink-0" />
+        <p className="text-sm text-risk-high">{message}</p>
+      </div>
+    </Card>
+  )
+}
+
 function CommEventRow({ event }: { event: CommunicationEvent }) {
   const icons: Record<string, React.ReactNode> = {
-    call:          <PhoneIcon size={12} />,
-    email:         <MailIcon size={12} />,
-    messenger:     <MessageSquare size={12} />,
-    note:          <StickyNote size={12} />,
+    call: <PhoneIcon size={12} />,
+    email: <MailIcon size={12} />,
+    messenger: <MessageSquare size={12} />,
+    note: <StickyNote size={12} />,
     status_change: <GitBranch size={12} />,
   }
 
   const iconColors: Record<string, string> = {
-    call:          'bg-blue-50 text-accent',
-    email:         'bg-violet-50 text-violet-600',
-    messenger:     'bg-emerald-50 text-risk-low',
-    note:          'bg-amber-50 text-risk-medium',
+    call: 'bg-blue-50 text-accent',
+    email: 'bg-violet-50 text-violet-600',
+    messenger: 'bg-emerald-50 text-risk-low',
+    note: 'bg-amber-50 text-risk-medium',
     status_change: 'bg-slate-100 text-ink-secondary',
   }
 
   return (
     <div className={clsx('flex items-start gap-3 px-6 py-4', event.isImportant && 'bg-amber-50/40')}>
-      <div className={clsx(
-        'w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5',
-        iconColors[event.type] ?? 'bg-slate-100 text-ink-secondary'
-      )}>
+      <div
+        className={clsx(
+          'w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5',
+          iconColors[event.type] ?? 'bg-slate-100 text-ink-secondary'
+        )}
+      >
         {icons[event.type]}
       </div>
       <div className="flex-1 min-w-0">
@@ -296,9 +814,9 @@ function CommEventRow({ event }: { event: CommunicationEvent }) {
         </div>
         {event.attachments && event.attachments.length > 0 && (
           <div className="flex gap-2 mt-2">
-            {event.attachments.map((att, i) => (
-              <a key={i} href={att.url} className="text-xs text-accent hover:underline flex items-center gap-1">
-                <FileText size={10} />{att.name}
+            {event.attachments.map((attachment, index) => (
+              <a key={index} href={attachment.url} className="text-xs text-accent hover:underline flex items-center gap-1">
+                <FileText size={10} />{attachment.name}
               </a>
             ))}
           </div>
@@ -309,12 +827,12 @@ function CommEventRow({ event }: { event: CommunicationEvent }) {
 }
 
 function CallQualityCard({ comms }: { comms: CommunicationEvent[] }) {
-  const lastCall = comms.find((c) => c.type === 'call')
+  const lastCall = comms.find((item) => item.type === 'call')
 
   const qualityQ = useQuery({
     queryKey: ['call-quality', lastCall?.id],
-    queryFn:  () => clientService.getCallQuality(lastCall!.id),
-    enabled:  !!lastCall,
+    queryFn: () => clientService.getCallQuality(lastCall!.id),
+    enabled: !!lastCall,
   })
 
   const quality = qualityQ.data
@@ -334,24 +852,24 @@ function CallQualityCard({ comms }: { comms: CommunicationEvent[] }) {
 
       {quality && (
         <div className="space-y-2.5">
-          <ScoreBar score={quality.needIdentificationScore}  label="Выявление потребности" />
-          <ScoreBar score={quality.objectionHandlingScore}    label="Работа с возражениями" />
-          <ScoreBar score={quality.nextStepFixedScore}        label="Фиксация следующего шага" />
+          <ScoreBar score={quality.needIdentificationScore} label="Выявление потребности" />
+          <ScoreBar score={quality.objectionHandlingScore} label="Работа с возражениями" />
+          <ScoreBar score={quality.nextStepFixedScore} label="Фиксация следующего шага" />
 
           <div className="pt-3 border-t border-edge space-y-1.5">
             <p className="text-xs font-semibold text-risk-low flex items-center gap-1">
               <CheckCircle size={11} />Хорошо
             </p>
-            {quality.doneWell.slice(0, 2).map((item, i) => (
-              <p key={i} className="text-xs text-ink-secondary pl-3">· {item}</p>
+            {quality.doneWell.slice(0, 2).map((item, index) => (
+              <p key={index} className="text-xs text-ink-secondary pl-3">· {item}</p>
             ))}
           </div>
           <div className="space-y-1.5">
             <p className="text-xs font-semibold text-risk-high flex items-center gap-1">
               <AlertCircle size={11} />Упущено
             </p>
-            {quality.missed.slice(0, 2).map((item, i) => (
-              <p key={i} className="text-xs text-ink-secondary pl-3">· {item}</p>
+            {quality.missed.slice(0, 2).map((item, index) => (
+              <p key={index} className="text-xs text-ink-secondary pl-3">· {item}</p>
             ))}
           </div>
         </div>

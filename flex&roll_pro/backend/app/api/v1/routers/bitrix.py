@@ -10,11 +10,13 @@ import logging
 from urllib.parse import parse_qs
 
 from fastapi import APIRouter, Request
+from fastapi import HTTPException
 from fastapi.responses import HTMLResponse
 
 from app.config import settings
 from app.bitrix.auth import exchange_code, get_tokens
 from app.schemas.common import ApiResponse
+from app.services.bitrix_bridge import BitrixBridgeError, bridge_request, list_bridge_team
 
 logger = logging.getLogger("bitrix_router")
 
@@ -151,3 +153,23 @@ async def check_install(domain: str | None = None):
         "member_id": tokens.member_id,
         "token_expired": tokens.is_expired,
     })
+
+
+@router.post("/deals/sync", response_model=ApiResponse)
+async def sync_deals():
+    """Proxy deal synchronization to Anton's Bitrix bridge backend."""
+    try:
+        data = await bridge_request("POST", "/deals/sync")
+    except BitrixBridgeError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return ApiResponse(data=data)
+
+
+@router.get("/team", response_model=ApiResponse)
+async def get_team():
+    """Expose Anton bridge sales team in a frontend-friendly place."""
+    try:
+        data = await list_bridge_team()
+    except BitrixBridgeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return ApiResponse(data=data)

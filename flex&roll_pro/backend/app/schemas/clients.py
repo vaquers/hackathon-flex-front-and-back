@@ -32,6 +32,9 @@ class Client(BaseModel):
     expected_volume: str
     city: str
     inn: str | None = None
+    bridge_contact_id: int | None = None
+    bridge_chat_id: str | None = None
+    bridge_connected: bool = False
 
 
 class AiClientSummary(BaseModel):

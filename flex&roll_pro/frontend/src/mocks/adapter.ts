@@ -64,6 +64,11 @@ export async function mockGetClient(id: string): Promise<Client> {
   return client
 }
 
+export async function mockListClients(): Promise<Client[]> {
+  await delay()
+  return [...MOCK_CLIENTS]
+}
+
 export async function mockGetAiSummary(clientId: string): Promise<AiClientSummary> {
   await delay()
   const summary = MOCK_AI_SUMMARIES[clientId]

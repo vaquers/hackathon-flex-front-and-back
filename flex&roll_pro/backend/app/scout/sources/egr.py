@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import time
 from datetime import date, timedelta
@@ -26,8 +27,8 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0",
     "Connection": "close",
 }
-TIMEOUT = 60
-MAX_RETRIES = 2
+TIMEOUT = int(os.getenv("EGR_TIMEOUT_SECONDS", "15"))
+MAX_RETRIES = int(os.getenv("EGR_MAX_RETRIES", "2"))
 
 # Legal form abbreviations for cleaner names
 _LEGAL_FORMS = {

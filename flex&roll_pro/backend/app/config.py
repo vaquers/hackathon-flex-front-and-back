@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     FRONTEND_PUBLIC_URL: str = "http://localhost:5173"
     BACKEND_PUBLIC_URL: str = "http://localhost:8000"
 
+    # External Bitrix bridge backend (Anton)
+    BITRIX_BRIDGE_URL: str = ""
+    BITRIX_BRIDGE_TIMEOUT_SEC: int = 20
+
     class Config:
         env_file = ".env"
         case_sensitive = True

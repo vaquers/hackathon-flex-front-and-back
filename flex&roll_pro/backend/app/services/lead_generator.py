@@ -152,6 +152,7 @@ class LeadGeneratorService:
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         self._cache_file = DATA_DIR / "cached_leads.json"
         self._load_cache()
+        self._hydrate_cache_from_snapshot_if_needed()
 
     def _load_cache(self):
         if self._cache_file.exists():
@@ -234,8 +235,28 @@ class LeadGeneratorService:
         logger.info("Loaded %d leads from snapshot %s", len(results), SNAPSHOT_FILE)
         return results
 
+    def _hydrate_cache_from_snapshot_if_needed(self):
+        """Make snapshot leads immediately available if cache starts empty."""
+        if self._cache.leads:
+            return
+
+        snapshot_results = self._load_snapshot_results()
+        if not snapshot_results:
+            return
+
+        self._cache.leads = [lead.to_dict() for lead in snapshot_results]
+        self._cache.generated_at = snapshot_results[0].created_at
+        self._cache.pipeline_status = "done"
+        self._cache.error_message = "Showing snapshot leads while live EGR data is unavailable."
+        self._cache.total_candidates = len(snapshot_results)
+        self._cache.total_scored = len(snapshot_results)
+        self._save_cache()
+        logger.info("Hydrated lead cache from snapshot with %d leads", len(snapshot_results))
+
     def get_top_leads(self) -> dict:
         """Return cached top leads."""
+        if not self._cache.leads:
+            self._hydrate_cache_from_snapshot_if_needed()
         return {
             "leads": self._cache.leads[:TOP_K],
             "generated_at": self._cache.generated_at,
