@@ -19,12 +19,17 @@ import type { CommunicationEvent } from '@/types'
 export function ClientPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const clientId = id && id !== 'undefined' ? id : null
 
-  const clientQ    = useQuery({ queryKey: ['client', id],        queryFn: () => clientService.getClient(id!),          enabled: !!id })
-  const summaryQ   = useQuery({ queryKey: ['ai-summary', id],    queryFn: () => clientService.getAiSummary(id!),       enabled: !!id })
-  const commsQ     = useQuery({ queryKey: ['communications', id], queryFn: () => clientService.getCommunications(id!), enabled: !!id })
-  const nextActionQ = useQuery({ queryKey: ['next-action', id],  queryFn: () => clientService.getAiNextAction(id!),    enabled: !!id })
-  const docsQ      = useQuery({ queryKey: ['related-docs', id],  queryFn: () => clientService.getRelatedDocuments(id!), enabled: !!id })
+  const clientQ    = useQuery({ queryKey: ['client', clientId],        queryFn: () => clientService.getClient(clientId!),          enabled: !!clientId })
+  const summaryQ   = useQuery({ queryKey: ['ai-summary', clientId],    queryFn: () => clientService.getAiSummary(clientId!),       enabled: !!clientId })
+  const commsQ     = useQuery({ queryKey: ['communications', clientId], queryFn: () => clientService.getCommunications(clientId!), enabled: !!clientId })
+  const nextActionQ = useQuery({ queryKey: ['next-action', clientId],  queryFn: () => clientService.getAiNextAction(clientId!),    enabled: !!clientId })
+  const docsQ      = useQuery({ queryKey: ['related-docs', clientId],  queryFn: () => clientService.getRelatedDocuments(clientId!), enabled: !!clientId })
+
+  if (!clientId) {
+    return <ErrorState message="Карточка клиента недоступна" onRetry={() => navigate('/')} />
+  }
 
   if (clientQ.isLoading) {
     return (
