@@ -158,7 +158,7 @@ export function LeadsPage() {
             <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-accent">AI</span>
           </div>
           <p className="page-subtitle">
-            Новые потенциальные к��иенты и рабочая база текущих компаний в одном разделе
+            Новые потенциальные клиенты и рабочая база текущих компаний в одном разделе
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -189,7 +189,7 @@ export function LeadsPage() {
             onClick={() => refreshMutation.mutate()}
             disabled={isRunning || activeTab === 'clients'}
           >
-            {isRunning ? 'Ге��ерация...' : 'Найти лиды'}
+            {isRunning ? 'Генерация...' : 'Найти лиды'}
           </Button>
         </div>
       </div>
@@ -197,7 +197,7 @@ export function LeadsPage() {
       <Tabs
         tabs={[
           { id: 'prospects', label: 'Новые потенциальные', count: leads.length || undefined },
-          { id: 'clients', label: 'Текущие кл��енты', count: clients.length || undefined },
+          { id: 'clients', label: 'Текущие клиенты', count: clients.length || undefined },
         ]}
         activeTab={activeTab}
         onChange={(tabId) => setActiveTab(tabId as 'prospects' | 'clients')}
@@ -230,7 +230,7 @@ export function LeadsPage() {
               <input
                 value={clientSearch}
                 onChange={(event) => setClientSearch(event.target.value)}
-                placeholder="Поиск по компании, контакту или менеджер��"
+                placeholder="Поиск по компании, контакту или менеджер"
                 className="input-base w-full md:w-[360px] rounded-xl"
               />
             </div>
@@ -245,7 +245,7 @@ export function LeadsPage() {
           {clientsQ.isError && (
             <EmptyState
               icon={<AlertCircle />}
-              title="Не удалось загрузить текущих кли��нтов"
+              title="Не удалось загрузить текущих клиентов"
               description={clientsQ.error.message}
             />
           )}
@@ -254,7 +254,7 @@ export function LeadsPage() {
             <EmptyState
               icon={<Building2 />}
               title="Клиенты не найдены"
-              description={clientSearch ? 'Попробуйте изменить поиск��вый запрос' : 'В базе пока нет текущих клиентов'}
+              description={clientSearch ? 'Попробуйте изменить поисковый запрос' : 'В базе пока нет текущих клиентов'}
             />
           )}
 
