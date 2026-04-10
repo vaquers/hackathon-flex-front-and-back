@@ -472,12 +472,12 @@ function LeadCard({
         {lead.company_summary && (
           <p className="text-[11px] text-ink-secondary leading-relaxed mb-2 line-clamp-2">{lead.company_summary}</p>
         )}
-        <div className="bg-blue-50/70 rounded-xl p-3 mb-2">
+        <div className="bg-accent rounded-xl p-3 mb-2">
           <div className="flex items-center gap-1 mb-0.5">
-            <Sparkles size={10} className="text-accent" />
-            <span className="text-[10px] font-semibold text-accent">Почему рекомендуем</span>
+            <Sparkles size={10} className="text-white/70" />
+            <span className="text-[10px] font-semibold text-white/70">Почему рекомендуем</span>
           </div>
-          <p className="text-[11px] text-ink-secondary leading-relaxed">{lead.why_recommended}</p>
+          <p className="text-[11px] text-white leading-relaxed">{lead.why_recommended}</p>
         </div>
 
         {lead.outreach_angle && (
