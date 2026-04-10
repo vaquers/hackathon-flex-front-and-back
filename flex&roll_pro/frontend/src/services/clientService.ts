@@ -58,17 +58,6 @@ function toAttachmentArray(value: unknown): Array<{ name: string; url: string }>
     .filter((item): item is { name: string; url: string } => Boolean(item))
 }
 
-async function withMockFallback<T>(loader: () => Promise<T>, fallback: () => Promise<T>): Promise<T> {
-  try {
-    return await loader()
-  } catch (error) {
-    if (error instanceof Error && /404|не найден/i.test(error.message)) {
-      return fallback()
-    }
-    throw error
-  }
-}
-
 function mapClient(raw: RawRecord): Client {
   return {
     id: String(raw.id ?? ''),
@@ -272,58 +261,37 @@ export const clientService = {
 
   getClient(id: string): Promise<Client> {
     if (API_CONFIG.useMock || isPresentationMockClientId(id)) return mock.mockGetClient(id)
-    return withMockFallback(
-      () => apiClient.get<RawRecord>(`/clients/${id}`).then(mapClient),
-      () => mock.mockGetClient(id),
-    )
+    return apiClient.get<RawRecord>(`/clients/${id}`).then(mapClient)
   },
 
   getAiSummary(clientId: string): Promise<AiClientSummary> {
     if (API_CONFIG.useMock || isPresentationMockClientId(clientId)) return mock.mockGetAiSummary(clientId)
-    return withMockFallback(
-      () => apiClient.get<RawRecord>(`/clients/${clientId}/ai-summary`).then(mapAiSummary),
-      () => mock.mockGetAiSummary(clientId),
-    )
+    return apiClient.get<RawRecord>(`/clients/${clientId}/ai-summary`).then(mapAiSummary)
   },
 
   getCommunications(clientId: string): Promise<CommunicationEvent[]> {
     if (API_CONFIG.useMock || isPresentationMockClientId(clientId)) return mock.mockGetCommunications(clientId)
-    return withMockFallback(
-      () => apiClient.get<RawRecord[]>(`/clients/${clientId}/communications`).then((items) => items.map(mapCommunication)),
-      () => mock.mockGetCommunications(clientId),
-    )
+    return apiClient.get<RawRecord[]>(`/clients/${clientId}/communications`).then((items) => items.map(mapCommunication))
   },
 
   getCallSummary(eventId: string): Promise<CallSummary> {
     if (API_CONFIG.useMock || isPresentationMockEventId(eventId)) return mock.mockGetCallSummary(eventId)
-    return withMockFallback(
-      () => apiClient.get<RawRecord>(`/calls/${eventId}/summary`).then(mapCallSummary),
-      () => mock.mockGetCallSummary(eventId),
-    )
+    return apiClient.get<RawRecord>(`/calls/${eventId}/summary`).then(mapCallSummary)
   },
 
   getCallQuality(eventId: string): Promise<CallQualityReview> {
     if (API_CONFIG.useMock || isPresentationMockEventId(eventId)) return mock.mockGetCallQuality(eventId)
-    return withMockFallback(
-      () => apiClient.get<RawRecord>(`/calls/${eventId}/quality`).then(mapCallQuality),
-      () => mock.mockGetCallQuality(eventId),
-    )
+    return apiClient.get<RawRecord>(`/calls/${eventId}/quality`).then(mapCallQuality)
   },
 
   getAiNextAction(clientId: string): Promise<AiNextAction> {
     if (API_CONFIG.useMock || isPresentationMockClientId(clientId)) return mock.mockGetAiNextAction(clientId)
-    return withMockFallback(
-      () => apiClient.get<RawRecord>(`/clients/${clientId}/next-action`).then(mapNextAction),
-      () => mock.mockGetAiNextAction(clientId),
-    )
+    return apiClient.get<RawRecord>(`/clients/${clientId}/next-action`).then(mapNextAction)
   },
 
   getRelatedDocuments(clientId: string): Promise<RelatedDocument[]> {
     if (API_CONFIG.useMock || isPresentationMockClientId(clientId)) return mock.mockGetRelatedDocuments(clientId)
-    return withMockFallback(
-      () => apiClient.get<RawRecord[]>(`/clients/${clientId}/documents`).then((items) => items.map(mapRelatedDocument)),
-      () => mock.mockGetRelatedDocuments(clientId),
-    )
+    return apiClient.get<RawRecord[]>(`/clients/${clientId}/documents`).then((items) => items.map(mapRelatedDocument))
   },
 
   getBitrixConversationSummary(clientId: string): Promise<BitrixConversationSummary> {

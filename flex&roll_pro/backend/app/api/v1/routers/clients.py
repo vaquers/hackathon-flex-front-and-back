@@ -411,6 +411,77 @@ def _call_sort_key(call: dict[str, Any]) -> str:
     return str(call.get("started_at") or call.get("created_at") or "")
 
 
+def _parse_bridge_datetime(value: Any) -> datetime | None:
+    text = _safe_text(value, "").strip()
+    if not text:
+        return None
+
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _bridge_call_duration_seconds(call: dict[str, Any]) -> int | None:
+    started_at = _parse_bridge_datetime(bridge_value(call, "started_at"))
+    finished_at = _parse_bridge_datetime(bridge_value(call, "finished_at"))
+    if not started_at or not finished_at:
+        return None
+
+    duration = int((finished_at - started_at).total_seconds())
+    return max(duration, 0)
+
+
+def _bridge_call_to_communication(call: dict[str, Any], *, client: Client) -> CommunicationEvent | None:
+    call_id = _safe_text(bridge_value(call, "call_id", "id"), "").strip()
+    happened_at = _safe_text(
+        bridge_value(call, "started_at", "created_at"),
+        datetime.now(timezone.utc).isoformat(),
+    )
+    if not call_id:
+        return None
+
+    has_summary = bool(bridge_value(call, "has_summary"))
+    has_transcript = bool(bridge_value(call, "has_transcript"))
+    has_ai_review = bool(bridge_value(call, "has_ai_review"))
+
+    available_parts: list[str] = []
+    if has_summary:
+        available_parts.append("summary")
+    if has_transcript:
+        available_parts.append("транскрипт")
+    if has_ai_review:
+        available_parts.append("AI review")
+
+    chat_title = _safe_text(bridge_value(call, "chat_title"), "").strip()
+    title = f"Звонок: {chat_title}" if chat_title else "Звонок в Bitrix bridge"
+    summary = (
+        f"Доступно: {', '.join(available_parts)}."
+        if available_parts
+        else "Детали звонка доступны в Bitrix bridge."
+    )
+
+    return CommunicationEvent(
+        id=call_id,
+        client_id=client.id,
+        type="call",
+        type_label="Звонок",
+        title=title,
+        summary=summary,
+        author=client.manager_name,
+        author_id=client.manager_id,
+        happened_at=happened_at,
+        duration_seconds=_bridge_call_duration_seconds(call),
+        sentiment=None,
+        is_important=has_summary or has_ai_review,
+        attachments=[],
+    )
+
+
 @router.get("", response_model=ApiResponse[list[Client]])
 async def get_clients():
     try:
@@ -482,7 +553,23 @@ async def get_ai_summary(client_id: str):
 
 @router.get("/{client_id}/communications", response_model=ApiResponse[list[CommunicationEvent]])
 async def get_communications(client_id: str):
-    # TODO: Fetch from Bitrix24 activity feed + email/call integrations
+    client = await _get_client_or_404(client_id)
+    if client.bridge_connected:
+        bridge_contact = await _resolve_bridge_contact_or_404(client)
+        bridge_contact_id = _bridge_contact_id_value(bridge_contact)
+        try:
+            payload = await bridge_request("GET", f"/calls/contact/{bridge_contact_id}")
+        except BitrixBridgeError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+        calls = payload.get("calls", []) if isinstance(payload, dict) else []
+        events = []
+        for call in sorted(calls, key=_call_sort_key, reverse=True):
+            event = _bridge_call_to_communication(call, client=client)
+            if event:
+                events.append(event)
+        return ApiResponse(data=events)
+
     return ApiResponse(data=repo.get_communications(client_id))
 
 
@@ -609,6 +696,12 @@ calls_router = APIRouter(prefix="/calls", tags=["Calls"])
 
 @calls_router.get("/{event_id}/quality", response_model=ApiResponse[CallQualityReview])
 async def get_call_quality(event_id: str):
+    if not event_id.startswith("ev-"):
+        raise HTTPException(
+            status_code=404,
+            detail="AI-оценка для live Bitrix-звонков пока не поддерживается этим endpoint",
+        )
+
     # TODO: Fetch from AI call analysis pipeline (speech-to-text + LLM)
     quality = repo.get_call_quality(event_id)
     if not quality:
