@@ -18,32 +18,83 @@ import type {
 
 type RawRecord = Record<string, any>
 
+function isPresentationMockClientId(id: string): boolean {
+  return /^c-\d+$/.test(id)
+}
+
+function isPresentationMockEventId(id: string): boolean {
+  return /^ev-\d+$/.test(id)
+}
+
+function toNumber(value: unknown, fallback = 0): number {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+function toStringValue(value: unknown, fallback = '—'): string {
+  if (typeof value === 'string' && value.trim()) return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  return fallback
+}
+
+function toStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((item) => (typeof item === 'string' ? item : typeof item === 'number' || typeof item === 'boolean' ? String(item) : null))
+    .filter((item): item is string => Boolean(item && item.trim()))
+}
+
+function toAttachmentArray(value: unknown): Array<{ name: string; url: string }> {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((item) => {
+      if (!item || typeof item !== 'object') return null
+      const record = item as RawRecord
+      const name = toStringValue(record.name, '')
+      const url = toStringValue(record.url, '')
+      if (!name || !url) return null
+      return { name, url }
+    })
+    .filter((item): item is { name: string; url: string } => Boolean(item))
+}
+
+async function withMockFallback<T>(loader: () => Promise<T>, fallback: () => Promise<T>): Promise<T> {
+  try {
+    return await loader()
+  } catch (error) {
+    if (error instanceof Error && /404|не найден/i.test(error.message)) {
+      return fallback()
+    }
+    throw error
+  }
+}
+
 function mapClient(raw: RawRecord): Client {
   return {
-    id: raw.id,
-    name: raw.name,
-    company: raw.company,
-    segment: raw.segment,
-    segmentLabel: raw.segmentLabel ?? raw.segment_label,
-    isVip: raw.isVip ?? raw.is_vip,
-    managerId: raw.managerId ?? raw.manager_id,
-    managerName: raw.managerName ?? raw.manager_name,
+    id: String(raw.id ?? ''),
+    name: raw.name ?? 'Контакт',
+    company: raw.company ?? raw.name ?? 'Клиент',
+    segment: raw.segment ?? 'mid',
+    segmentLabel: raw.segmentLabel ?? raw.segment_label ?? 'Bitrix bridge',
+    isVip: Boolean(raw.isVip ?? raw.is_vip),
+    managerId: raw.managerId ?? raw.manager_id ?? 'bridge',
+    managerName: raw.managerName ?? raw.manager_name ?? 'Backend Антона',
     phone: raw.phone ?? undefined,
     email: raw.email ?? undefined,
-    dealId: raw.dealId ?? raw.deal_id,
-    dealAmount: raw.dealAmount ?? raw.deal_amount,
-    dealCurrency: raw.dealCurrency ?? raw.deal_currency,
-    dealStage: raw.dealStage ?? raw.deal_stage,
-    dealStageLabel: raw.dealStageLabel ?? raw.deal_stage_label,
-    riskScore: raw.riskScore ?? raw.risk_score,
-    riskLevel: raw.riskLevel ?? raw.risk_level,
-    riskReason: raw.riskReason ?? raw.risk_reason,
-    sentiment: raw.sentiment,
-    lastContactAt: raw.lastContactAt ?? raw.last_contact_at,
-    daysSinceContact: raw.daysSinceContact ?? raw.days_since_contact,
-    product: raw.product,
-    expectedVolume: raw.expectedVolume ?? raw.expected_volume,
-    city: raw.city,
+    dealId: raw.dealId ?? raw.deal_id ?? String(raw.id ?? ''),
+    dealAmount: toNumber(raw.dealAmount ?? raw.deal_amount, 0),
+    dealCurrency: raw.dealCurrency ?? raw.deal_currency ?? 'RUB',
+    dealStage: raw.dealStage ?? raw.deal_stage ?? 'qualification',
+    dealStageLabel: raw.dealStageLabel ?? raw.deal_stage_label ?? 'Bitrix bridge',
+    riskScore: toNumber(raw.riskScore ?? raw.risk_score, 0),
+    riskLevel: raw.riskLevel ?? raw.risk_level ?? 'low',
+    riskReason: raw.riskReason ?? raw.risk_reason ?? 'Нет дополнительных сигналов риска',
+    sentiment: raw.sentiment ?? 'neutral',
+    lastContactAt: raw.lastContactAt ?? raw.last_contact_at ?? new Date().toISOString(),
+    daysSinceContact: toNumber(raw.daysSinceContact ?? raw.days_since_contact, 0),
+    product: raw.product ?? '—',
+    expectedVolume: raw.expectedVolume ?? raw.expected_volume ?? '—',
+    city: raw.city ?? '—',
     inn: raw.inn ?? undefined,
     bridgeContactId: raw.bridgeContactId ?? raw.bridge_contact_id ?? null,
     bridgeChatId: raw.bridgeChatId ?? raw.bridge_chat_id ?? null,
@@ -53,88 +104,88 @@ function mapClient(raw: RawRecord): Client {
 
 function mapAiSummary(raw: RawRecord): AiClientSummary {
   return {
-    clientId: raw.clientId ?? raw.client_id,
-    company: raw.company,
-    segment: raw.segment,
-    product: raw.product,
-    expectedVolume: raw.expectedVolume ?? raw.expected_volume,
-    recentActions: raw.recentActions ?? raw.recent_actions ?? [],
-    dealStage: raw.dealStage ?? raw.deal_stage,
-    riskScore: raw.riskScore ?? raw.risk_score,
-    riskReason: raw.riskReason ?? raw.risk_reason,
-    priority: raw.priority,
-    priorityLabel: raw.priorityLabel ?? raw.priority_label,
-    recommendedNextStep: raw.recommendedNextStep ?? raw.recommended_next_step,
-    generatedAt: raw.generatedAt ?? raw.generated_at,
+    clientId: String(raw.clientId ?? raw.client_id ?? ''),
+    company: toStringValue(raw.company),
+    segment: toStringValue(raw.segment),
+    product: toStringValue(raw.product),
+    expectedVolume: toStringValue(raw.expectedVolume ?? raw.expected_volume),
+    recentActions: toStringArray(raw.recentActions ?? raw.recent_actions),
+    dealStage: toStringValue(raw.dealStage ?? raw.deal_stage),
+    riskScore: toNumber(raw.riskScore ?? raw.risk_score, 0),
+    riskReason: toStringValue(raw.riskReason ?? raw.risk_reason),
+    priority: raw.priority ?? 'medium',
+    priorityLabel: toStringValue(raw.priorityLabel ?? raw.priority_label),
+    recommendedNextStep: toStringValue(raw.recommendedNextStep ?? raw.recommended_next_step),
+    generatedAt: toStringValue(raw.generatedAt ?? raw.generated_at, new Date().toISOString()),
   }
 }
 
 function mapCommunication(raw: RawRecord): CommunicationEvent {
   return {
-    id: raw.id,
-    clientId: raw.clientId ?? raw.client_id,
-    type: raw.type,
-    typeLabel: raw.typeLabel ?? raw.type_label,
-    title: raw.title,
-    summary: raw.summary ?? undefined,
-    body: raw.body ?? undefined,
-    author: raw.author,
-    authorId: raw.authorId ?? raw.author_id,
-    happenedAt: raw.happenedAt ?? raw.happened_at,
-    durationSeconds: raw.durationSeconds ?? raw.duration_seconds ?? undefined,
+    id: String(raw.id ?? ''),
+    clientId: String(raw.clientId ?? raw.client_id ?? ''),
+    type: raw.type ?? 'note',
+    typeLabel: toStringValue(raw.typeLabel ?? raw.type_label, 'Событие'),
+    title: toStringValue(raw.title, 'Событие'),
+    summary: raw.summary ? String(raw.summary) : undefined,
+    body: raw.body ? String(raw.body) : undefined,
+    author: toStringValue(raw.author, 'Система'),
+    authorId: String(raw.authorId ?? raw.author_id ?? 'system'),
+    happenedAt: toStringValue(raw.happenedAt ?? raw.happened_at, new Date().toISOString()),
+    durationSeconds: toNumber(raw.durationSeconds ?? raw.duration_seconds, 0) || undefined,
     sentiment: raw.sentiment ?? undefined,
     isImportant: raw.isImportant ?? raw.is_important ?? false,
-    attachments: raw.attachments ?? [],
+    attachments: toAttachmentArray(raw.attachments),
   }
 }
 
 function mapCallSummary(raw: RawRecord): CallSummary {
   return {
-    id: raw.id,
-    clientId: raw.clientId ?? raw.client_id,
-    happenedAt: raw.happenedAt ?? raw.happened_at,
-    durationSeconds: raw.durationSeconds ?? raw.duration_seconds,
-    summary: raw.summary,
-    agreements: raw.agreements ?? [],
-    nextStep: raw.nextStep ?? raw.next_step,
-    responsible: raw.responsible,
+    id: String(raw.id ?? ''),
+    clientId: String(raw.clientId ?? raw.client_id ?? ''),
+    happenedAt: toStringValue(raw.happenedAt ?? raw.happened_at, new Date().toISOString()),
+    durationSeconds: toNumber(raw.durationSeconds ?? raw.duration_seconds, 0),
+    summary: toStringValue(raw.summary),
+    agreements: toStringArray(raw.agreements),
+    nextStep: toStringValue(raw.nextStep ?? raw.next_step),
+    responsible: toStringValue(raw.responsible),
     sentiment: raw.sentiment,
-    qualityScore: raw.qualityScore ?? raw.quality_score,
+    qualityScore: toNumber(raw.qualityScore ?? raw.quality_score, 0),
   }
 }
 
 function mapCallQuality(raw: RawRecord): CallQualityReview {
   return {
-    callId: raw.callId ?? raw.call_id,
-    doneWell: raw.doneWell ?? raw.done_well ?? [],
-    missed: raw.missed ?? [],
-    needIdentificationScore: raw.needIdentificationScore ?? raw.need_identification_score,
-    objectionHandlingScore: raw.objectionHandlingScore ?? raw.objection_handling_score,
-    nextStepFixedScore: raw.nextStepFixedScore ?? raw.next_step_fixed_score,
-    overallScore: raw.overallScore ?? raw.overall_score,
-    recommendations: raw.recommendations ?? [],
+    callId: String(raw.callId ?? raw.call_id ?? ''),
+    doneWell: toStringArray(raw.doneWell ?? raw.done_well),
+    missed: toStringArray(raw.missed),
+    needIdentificationScore: toNumber(raw.needIdentificationScore ?? raw.need_identification_score, 0),
+    objectionHandlingScore: toNumber(raw.objectionHandlingScore ?? raw.objection_handling_score, 0),
+    nextStepFixedScore: toNumber(raw.nextStepFixedScore ?? raw.next_step_fixed_score, 0),
+    overallScore: toNumber(raw.overallScore ?? raw.overall_score, 0),
+    recommendations: toStringArray(raw.recommendations),
   }
 }
 
 function mapNextAction(raw: RawRecord): AiNextAction {
   return {
-    clientId: raw.clientId ?? raw.client_id,
-    action: raw.action,
-    reason: raw.reason,
-    urgency: raw.urgency,
+    clientId: String(raw.clientId ?? raw.client_id ?? ''),
+    action: toStringValue(raw.action),
+    reason: toStringValue(raw.reason),
+    urgency: raw.urgency ?? 'medium',
     deadline: raw.deadline ?? undefined,
-    type: raw.type,
+    type: raw.type ?? 'internal',
   }
 }
 
 function mapRelatedDocument(raw: RawRecord): RelatedDocument {
   return {
-    id: raw.id,
-    type: raw.type,
-    typeLabel: raw.typeLabel ?? raw.type_label,
-    name: raw.name,
-    relevance: raw.relevance,
-    date: raw.date,
+    id: String(raw.id ?? ''),
+    type: raw.type ?? 'proposal',
+    typeLabel: toStringValue(raw.typeLabel ?? raw.type_label, 'Документ'),
+    name: toStringValue(raw.name, 'Документ'),
+    relevance: toNumber(raw.relevance, 0),
+    date: toStringValue(raw.date, new Date().toISOString()),
     clientName: raw.clientName ?? raw.client_name ?? undefined,
     url: raw.url ?? undefined,
   }
@@ -158,7 +209,7 @@ function mapBitrixBrief(raw: RawRecord): BitrixBrief {
     lastStage: raw.lastStage ?? raw.last_stage ?? '—',
     churnRisk: raw.churnRisk ?? raw.churn_risk ?? '—',
     priority: raw.priority ?? '—',
-    callTips: raw.callTips ?? raw.call_tips ?? [],
+    callTips: toStringArray(raw.callTips ?? raw.call_tips),
   }
 }
 
@@ -184,12 +235,16 @@ function mapBitrixCallDetail(raw: RawRecord): BitrixCallDetail {
     transcriptText: raw.transcriptText ?? raw.transcript_text ?? null,
     summaryText: raw.summaryText ?? raw.summary_text ?? null,
     aiReview: raw.aiReview ?? raw.ai_review ?? null,
-    participants: (raw.participants ?? []).map((participant: RawRecord) => ({
-      id: participant.id,
-      name: participant.name,
-      telegramId: participant.telegramId ?? participant.telegram_id ?? null,
-      telegramUsername: participant.telegramUsername ?? participant.telegram_username ?? null,
-    })),
+    participants: Array.isArray(raw.participants)
+      ? raw.participants
+          .filter((participant: unknown): participant is RawRecord => Boolean(participant && typeof participant === 'object'))
+          .map((participant) => ({
+            id: participant.id ?? '',
+            name: toStringValue(participant.name, 'Участник'),
+            telegramId: participant.telegramId ?? participant.telegram_id ?? null,
+            telegramUsername: participant.telegramUsername ?? participant.telegram_username ?? null,
+          }))
+      : [],
   }
 }
 
@@ -216,38 +271,59 @@ export const clientService = {
   },
 
   getClient(id: string): Promise<Client> {
-    if (API_CONFIG.useMock) return mock.mockGetClient(id)
-    return apiClient.get<RawRecord>(`/clients/${id}`).then(mapClient)
+    if (API_CONFIG.useMock || isPresentationMockClientId(id)) return mock.mockGetClient(id)
+    return withMockFallback(
+      () => apiClient.get<RawRecord>(`/clients/${id}`).then(mapClient),
+      () => mock.mockGetClient(id),
+    )
   },
 
   getAiSummary(clientId: string): Promise<AiClientSummary> {
-    if (API_CONFIG.useMock) return mock.mockGetAiSummary(clientId)
-    return apiClient.get<RawRecord>(`/clients/${clientId}/ai-summary`).then(mapAiSummary)
+    if (API_CONFIG.useMock || isPresentationMockClientId(clientId)) return mock.mockGetAiSummary(clientId)
+    return withMockFallback(
+      () => apiClient.get<RawRecord>(`/clients/${clientId}/ai-summary`).then(mapAiSummary),
+      () => mock.mockGetAiSummary(clientId),
+    )
   },
 
   getCommunications(clientId: string): Promise<CommunicationEvent[]> {
-    if (API_CONFIG.useMock) return mock.mockGetCommunications(clientId)
-    return apiClient.get<RawRecord[]>(`/clients/${clientId}/communications`).then((items) => items.map(mapCommunication))
+    if (API_CONFIG.useMock || isPresentationMockClientId(clientId)) return mock.mockGetCommunications(clientId)
+    return withMockFallback(
+      () => apiClient.get<RawRecord[]>(`/clients/${clientId}/communications`).then((items) => items.map(mapCommunication)),
+      () => mock.mockGetCommunications(clientId),
+    )
   },
 
   getCallSummary(eventId: string): Promise<CallSummary> {
-    if (API_CONFIG.useMock) return mock.mockGetCallSummary(eventId)
-    return apiClient.get<RawRecord>(`/calls/${eventId}/summary`).then(mapCallSummary)
+    if (API_CONFIG.useMock || isPresentationMockEventId(eventId)) return mock.mockGetCallSummary(eventId)
+    return withMockFallback(
+      () => apiClient.get<RawRecord>(`/calls/${eventId}/summary`).then(mapCallSummary),
+      () => mock.mockGetCallSummary(eventId),
+    )
   },
 
   getCallQuality(eventId: string): Promise<CallQualityReview> {
-    if (API_CONFIG.useMock) return mock.mockGetCallQuality(eventId)
-    return apiClient.get<RawRecord>(`/calls/${eventId}/quality`).then(mapCallQuality)
+    if (API_CONFIG.useMock || isPresentationMockEventId(eventId)) return mock.mockGetCallQuality(eventId)
+    return withMockFallback(
+      () => apiClient.get<RawRecord>(`/calls/${eventId}/quality`).then(mapCallQuality),
+      () => mock.mockGetCallQuality(eventId),
+    )
   },
 
   getAiNextAction(clientId: string): Promise<AiNextAction> {
-    if (API_CONFIG.useMock) return mock.mockGetAiNextAction(clientId)
-    return apiClient.get<RawRecord>(`/clients/${clientId}/next-action`).then(mapNextAction)
+    if (API_CONFIG.useMock || isPresentationMockClientId(clientId)) return mock.mockGetAiNextAction(clientId)
+    return withMockFallback(
+      () => apiClient.get<RawRecord>(`/clients/${clientId}/next-action`).then(mapNextAction),
+      () => mock.mockGetAiNextAction(clientId),
+    )
   },
 
   getRelatedDocuments(clientId: string): Promise<RelatedDocument[]> {
-    if (API_CONFIG.useMock) return mock.mockGetRelatedDocuments(clientId)
-    return apiClient.get<RawRecord[]>(`/clients/${clientId}/documents`).then((items) => items.map(mapRelatedDocument))
+    if (API_CONFIG.useMock || isPresentationMockClientId(clientId)) return mock.mockGetRelatedDocuments(clientId)
+    return withMockFallback(
+      () => apiClient.get<RawRecord[]>(`/clients/${clientId}/documents`).then((items) => items.map(mapRelatedDocument)),
+      () => mock.mockGetRelatedDocuments(clientId),
+    )
   },
 
   getBitrixConversationSummary(clientId: string): Promise<BitrixConversationSummary> {

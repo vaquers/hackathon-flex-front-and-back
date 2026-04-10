@@ -161,6 +161,8 @@ export function ClientPage() {
   const comms = commsQ.data ?? []
   const nextAction = nextActionQ.data
   const docs = docsQ.data ?? []
+  const summaryRecentActions = Array.isArray(summary?.recentActions) ? summary.recentActions : []
+  const briefCallTips = Array.isArray(briefMutation.data?.callTips) ? briefMutation.data.callTips : []
   const bitrixReady = Boolean(client.bridgeConnected)
 
   const originalBridgeManager = useMemo(() => {
@@ -321,7 +323,7 @@ export function ClientPage() {
                   <div>
                     <p className="text-[11px] text-ink-muted font-medium uppercase tracking-wide mb-1.5">Последние действия</p>
                     <ul className="space-y-1">
-                      {summary.recentActions.map((action, index) => (
+                      {summaryRecentActions.map((action, index) => (
                         <li key={index} className="text-[12px] text-ink-secondary flex items-start gap-1.5">
                           <span className="text-accent flex-shrink-0 mt-0.5">·</span>
                           {action}
@@ -521,7 +523,7 @@ export function ClientPage() {
                 <Card>
                   <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Советы на звонок</p>
                   <div className="space-y-2">
-                    {briefMutation.data.callTips.map((tip, index) => (
+                    {briefCallTips.map((tip, index) => (
                       <div key={index} className="flex items-start gap-2 glass-inner rounded-xl px-4 py-3">
                         <span className="text-accent mt-0.5">{index + 1}.</span>
                         <p className="text-[13px] text-ink-secondary">{tip}</p>
@@ -557,7 +559,7 @@ export function ClientPage() {
                   <InfoMetric label="Call ID" value={bitrixLastCallQ.data.callId} />
                   <InfoMetric label="Начало" value={bitrixLastCallQ.data.startedAtFormatted ?? (bitrixLastCallQ.data.startedAt ? formatDateTime(bitrixLastCallQ.data.startedAt) : '—')} />
                   <InfoMetric label="Окончание" value={bitrixLastCallQ.data.finishedAtFormatted ?? (bitrixLastCallQ.data.finishedAt ? formatDateTime(bitrixLastCallQ.data.finishedAt) : '—')} />
-                  <InfoMetric label="Участники" value={String(bitrixLastCallQ.data.participants.length)} />
+                  <InfoMetric label="Участники" value={String(bitrixLastCallQ.data.participants?.length ?? 0)} />
                 </div>
 
                 {bitrixLastCallQ.data.summaryText && (

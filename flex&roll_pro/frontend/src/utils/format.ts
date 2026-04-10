@@ -1,6 +1,7 @@
 import type { UrgencyLevel } from '@/types'
 
-export function formatRub(amount: number): string {
+export function formatRub(amount: number | null | undefined): string {
+  if (typeof amount !== 'number' || Number.isNaN(amount)) return '—'
   if (amount >= 1_000_000) {
     return `${(amount / 1_000_000).toFixed(1)} млн ₽`
   }
@@ -10,7 +11,8 @@ export function formatRub(amount: number): string {
   return `${amount.toLocaleString('ru-RU')} ₽`
 }
 
-export function formatDaysAgo(days: number): string {
+export function formatDaysAgo(days: number | null | undefined): string {
+  if (typeof days !== 'number' || Number.isNaN(days)) return '—'
   if (days === 0) return 'Сегодня'
   if (days === 1) return '1 день назад'
   if (days < 5) return `${days} дня назад`
@@ -18,8 +20,11 @@ export function formatDaysAgo(days: number): string {
   return `${days} дн. назад`
 }
 
-export function formatDateTime(isoString: string): string {
-  return new Date(isoString).toLocaleString('ru-RU', {
+export function formatDateTime(isoString: string | null | undefined): string {
+  if (!isoString) return '—'
+  const value = new Date(isoString)
+  if (Number.isNaN(value.getTime())) return '—'
+  return value.toLocaleString('ru-RU', {
     day: 'numeric',
     month: 'short',
     hour: '2-digit',
@@ -27,15 +32,19 @@ export function formatDateTime(isoString: string): string {
   })
 }
 
-export function formatDate(isoString: string): string {
-  return new Date(isoString).toLocaleDateString('ru-RU', {
+export function formatDate(isoString: string | null | undefined): string {
+  if (!isoString) return '—'
+  const value = new Date(isoString)
+  if (Number.isNaN(value.getTime())) return '—'
+  return value.toLocaleDateString('ru-RU', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
 }
 
-export function formatDuration(seconds: number): string {
+export function formatDuration(seconds: number | null | undefined): string {
+  if (typeof seconds !== 'number' || Number.isNaN(seconds)) return '—'
   const m = Math.floor(seconds / 60)
   const s = seconds % 60
   return `${m}:${s.toString().padStart(2, '0')}`
