@@ -155,7 +155,7 @@ export function LeadsPage() {
             <h1 className="font-display text-ink text-lg leading-tight">
               Лиды и клиенты
             </h1>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-accent bg-blue-50 px-2 py-0.5 rounded-md">AI</span>
+            <span className="rounded-full border border-white/80 bg-white/92 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-accent shadow-panel-soft">AI</span>
           </div>
           <p className="text-xs text-ink-muted mt-0.5">
             Новые потенциальные клиенты и рабочая база текущих компаний в одном разделе
@@ -163,7 +163,7 @@ export function LeadsPage() {
         </div>
         <div className="flex items-center gap-2">
           {activeTab === 'prospects' && data?.generated_at && !isRunning && (
-            <div className="flex items-center gap-1.5 text-[11px] text-ink-muted bg-surface-card rounded-lg px-2.5 py-1.5 shadow-card border border-edge">
+            <div className="flex items-center gap-1.5 rounded-full border border-white/82 bg-white/92 px-3 py-1.5 text-[11px] text-ink-muted shadow-panel-soft">
               {data.cache_stale ? (
                 <AlertCircle size={10} className="text-risk-medium" />
               ) : (
@@ -217,13 +217,13 @@ export function LeadsPage() {
 
       {activeTab === 'clients' ? (
         <div className="space-y-4">
-          <div className="bg-surface-card rounded-2xl shadow-card p-4 border border-edge">
+          <div className="glass-panel p-5 border border-white/80">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="flex flex-wrap gap-2 text-[11px] text-ink-muted">
-                <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+                <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
                   Компаний: {clients.length}
                 </span>
-                <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+                <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
                   Связано с Bitrix bridge: {connectedClients}
                 </span>
               </div>
@@ -231,7 +231,7 @@ export function LeadsPage() {
                 value={clientSearch}
                 onChange={(event) => setClientSearch(event.target.value)}
                 placeholder="Поиск по компании, контакту или менеджеру"
-                className="w-full md:w-[360px] rounded-2xl border border-edge bg-surface-inner px-4 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-accent/20"
+                className="w-full md:w-[360px] rounded-full border border-white/80 bg-surface-inner px-4 py-3 text-sm text-ink placeholder:text-ink-muted shadow-panel-soft focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
           </div>
@@ -274,7 +274,7 @@ export function LeadsPage() {
         <>
       {/* Pipeline progress */}
       {isRunning && (
-        <div className="bg-surface-card rounded-2xl shadow-card p-4 mb-4 border border-blue-100">
+        <div className="glass-panel p-4 mb-4 border border-blue-100">
           <div className="flex items-center gap-2 mb-3">
             <Loader2 size={14} className="text-accent animate-spin" />
             <span className="text-sm font-medium text-accent">Генерация лидов</span>
@@ -313,13 +313,13 @@ export function LeadsPage() {
       {/* Stats pills */}
       {data && data.total_candidates > 0 && !isRunning && (
         <div className="flex gap-2 mb-4 text-[11px] text-ink-muted">
-          <span className="bg-surface-card rounded-lg px-2.5 py-1.5 shadow-card border border-edge">
+          <span className="glass-panel rounded-full px-3 py-2 border border-white/80">
             📊 {data.total_candidates} кандидатов
           </span>
-          <span className="bg-surface-card rounded-lg px-2.5 py-1.5 shadow-card border border-edge">
+          <span className="glass-panel rounded-full px-3 py-2 border border-white/80">
             ✅ {data.total_scored} оценено
           </span>
-          <span className="bg-surface-card rounded-lg px-2.5 py-1.5 shadow-card border border-edge">
+          <span className="glass-panel rounded-full px-3 py-2 border border-white/80">
             🏆 Топ-{leads.length}
           </span>
         </div>
@@ -343,8 +343,8 @@ export function LeadsPage() {
 
       {/* Empty */}
       {!isLoading && !error && leads.length === 0 && !isRunning && (
-        <div className="bg-surface-card rounded-2xl shadow-card p-10 text-center">
-          <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="glass-panel p-10 text-center">
+          <div className="w-14 h-14 bg-blue-50 rounded-[24px] flex items-center justify-center mx-auto mb-4 shadow-panel-soft">
             <Sparkles size={24} className="text-accent" />
           </div>
           <h3 className="font-display text-ink text-[15px] mb-1">Запустите поиск лидов</h3>
@@ -404,7 +404,7 @@ function LeadCard({
   const TierIcon = tier.icon
 
   return (
-    <div className="bg-surface-card rounded-2xl shadow-card transition-shadow duration-200 hover:shadow-card-hover">
+    <div className="glass-panel transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
       <div className="p-4">
         {/* Header row */}
         <div className="flex items-start gap-3 mb-2.5">
@@ -472,7 +472,7 @@ function LeadCard({
         {lead.company_summary && (
           <p className="text-[11px] text-ink-secondary leading-relaxed mb-2 line-clamp-2">{lead.company_summary}</p>
         )}
-        <div className="bg-blue-50/70 rounded-lg p-2.5 mb-2">
+        <div className="bg-blue-50/70 rounded-[24px] p-3 mb-2 shadow-panel-soft">
           <div className="flex items-center gap-1 mb-0.5">
             <Sparkles size={10} className="text-accent" />
             <span className="text-[10px] font-semibold text-accent">Почему рекомендуем</span>
@@ -575,7 +575,7 @@ function CurrentClientCard({
   onOpen: () => void
 }) {
   return (
-    <div className="bg-surface-card rounded-2xl shadow-card transition-shadow duration-200 hover:shadow-card-hover">
+    <div className="glass-panel transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
       <div className="p-4 flex flex-col gap-3 md:flex-row md:items-start">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
@@ -597,16 +597,16 @@ function CurrentClientCard({
           </p>
           <p className="text-sm text-ink-secondary leading-relaxed">{client.riskReason}</p>
           <div className="flex flex-wrap gap-2 mt-3 text-[11px] text-ink-muted">
-            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+            <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
               {formatRub(client.dealAmount)}/мес.
             </span>
-            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+            <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
               {client.segmentLabel}
             </span>
-            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+            <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
               Контакт: {formatDateTime(client.lastContactAt)}
             </span>
-            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
+            <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
               {formatDaysAgo(client.daysSinceContact)}
             </span>
           </div>
@@ -630,7 +630,7 @@ function SyncDealsBanner({ result }: { result: BitrixDealsSyncResult }) {
   const errorCount = result.deals.filter((deal) => !!deal.error).length
 
   return (
-    <div className="bg-surface-card rounded-2xl shadow-card p-4 mb-4 border border-edge">
+    <div className="glass-panel p-4 mb-4 border border-white/80">
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <CheckCircle2 size={14} className="text-risk-low" />
         <span className="text-sm font-medium text-ink">Синхронизация сделок завершена</span>

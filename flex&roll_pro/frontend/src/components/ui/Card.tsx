@@ -20,7 +20,7 @@ export function Card({ children, className, hover, onClick, padding = 'md' }: Ca
       className={clsx(
         'glass-panel',
         paddingStyles[padding],
-        hover && 'hover:shadow-card-hover transition-shadow duration-200 cursor-pointer',
+        hover && 'hover:-translate-y-0.5 hover:shadow-card-hover transition-all duration-200 cursor-pointer',
         onClick && 'cursor-pointer',
         className
       )}
@@ -76,8 +76,8 @@ export function StatCard({
   return (
     <div
       className={clsx(
-        'glass-metric p-5',
-        onClick && 'hover:shadow-card-hover transition-shadow duration-200 cursor-pointer'
+        'glass-metric p-4 md:p-5',
+        onClick && 'hover:-translate-y-0.5 hover:shadow-card-hover transition-all duration-200 cursor-pointer'
       )}
       onClick={onClick}
     >

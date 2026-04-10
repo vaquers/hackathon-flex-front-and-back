@@ -59,9 +59,9 @@ export function SearchPage() {
       </div>
 
       {/* Search Box */}
-      <div className="bg-surface-card rounded-2xl shadow-card p-4 mb-4">
+      <div className="glass-panel p-5 mb-4">
         <div className="flex gap-3 items-center">
-          <div className="flex-1 flex items-center gap-2.5 bg-surface-inner border border-edge rounded-xl px-4 py-3">
+          <div className="flex-1 flex items-center gap-2.5 bg-surface-inner border border-white/80 rounded-[28px] px-4 py-3 shadow-panel-soft">
             <Search size={15} className="text-ink-muted flex-shrink-0" />
             <input
               ref={inputRef}
@@ -94,7 +94,7 @@ export function SearchPage() {
                 'text-xs px-3 py-1.5 rounded-xl transition-colors',
                 activeType === f.id
                   ? 'bg-blue-50 text-accent font-medium'
-                  : 'border border-edge text-ink-secondary bg-surface-card hover:bg-surface-hover'
+                  : 'border border-white/80 text-ink-secondary bg-white/90 hover:bg-surface-hover shadow-panel-soft'
               )}
             >
               {f.label}
@@ -128,7 +128,7 @@ export function SearchPage() {
           {searchQ.isFetching && (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-surface-card rounded-2xl p-5 space-y-2 shadow-card">
+                <div key={i} className="glass-panel p-5 space-y-2">
                   <Skeleton className="h-4 w-2/3" />
                   <Skeleton className="h-3 w-full" />
                   <Skeleton className="h-3 w-4/5" />
@@ -148,7 +148,7 @@ export function SearchPage() {
       {/* No search yet */}
       {!committed && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="bg-surface-card rounded-2xl shadow-card p-6">
+          <div className="glass-panel p-6">
             <div className="flex items-center gap-2 mb-4">
               <Clock size={13} className="text-ink-muted" />
               <h2 className="font-display text-ink text-sm">Часто используемые</h2>
@@ -157,7 +157,7 @@ export function SearchPage() {
             {popularQ.data && (
               <div className="space-y-1.5">
                 {popularQ.data.map((doc) => (
-                  <div key={doc.id} className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-surface-hover cursor-pointer transition-colors">
+                  <div key={doc.id} className="flex items-center gap-2.5 p-3 rounded-[24px] hover:bg-surface-hover cursor-pointer transition-colors">
                     <span className="text-ink-muted">{DOC_TYPE_ICONS[doc.type as SearchResult['type']]}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-ink truncate">{doc.name}</p>
@@ -170,7 +170,7 @@ export function SearchPage() {
             )}
           </div>
 
-          <div className="bg-surface-card rounded-2xl shadow-card p-6">
+          <div className="glass-panel p-6">
             <div className="flex items-center gap-2 mb-4">
               <Sparkles size={13} className="text-accent" />
               <h2 className="font-display text-ink text-sm">Примеры запросов</h2>
@@ -185,7 +185,7 @@ export function SearchPage() {
               ].map((hint) => (
                 <button
                   key={hint}
-                  className="w-full text-left text-sm text-accent hover:bg-blue-50 px-3 py-2 rounded-xl transition-colors"
+                  className="w-full text-left text-sm text-accent hover:bg-blue-50 px-3 py-2.5 rounded-[24px] transition-colors"
                   onClick={() => { setQuery(hint); setCommitted(hint) }}
                 >
                   <Search size={10} className="inline mr-2 text-ink-muted" />
@@ -210,7 +210,7 @@ function SearchResultCard({ result }: { result: SearchResult }) {
   }
 
   return (
-    <div className="bg-surface-card rounded-2xl shadow-card p-5 hover:shadow-card-hover transition-shadow cursor-pointer">
+    <div className="glass-panel p-5 hover:-translate-y-0.5 hover:shadow-card-hover transition-all cursor-pointer">
       <div className="flex items-start gap-3">
         <div className={clsx('w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0', typeIconBg[result.type])}>
           {DOC_TYPE_ICONS[result.type]}
@@ -222,7 +222,7 @@ function SearchResultCard({ result }: { result: SearchResult }) {
             <span className="text-xs text-ink-muted ml-auto">{formatDate(result.date)}</span>
           </div>
 
-          <div className="bg-blue-50 rounded-xl p-3 mb-3">
+          <div className="bg-blue-50 rounded-[24px] p-3 mb-3 shadow-panel-soft">
             <div className="flex items-center gap-1 mb-1">
               <Sparkles size={10} className="text-accent" />
               <span className="text-xs font-semibold text-accent">AI Summary</span>

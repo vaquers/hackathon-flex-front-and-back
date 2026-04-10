@@ -79,7 +79,7 @@ export function RisksPage() {
           <span>Фильтры:</span>
         </div>
         <select
-          className="text-sm border border-edge rounded-xl px-3 py-2 text-ink bg-surface-card focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+          className="text-sm border border-white/80 rounded-full px-4 py-2.5 text-ink bg-white/92 shadow-panel-soft focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
           value={managerId}
           onChange={(e) => setManagerId(e.target.value)}
         >
@@ -89,10 +89,10 @@ export function RisksPage() {
         </select>
         <button
           className={clsx(
-            'text-sm px-3 py-2 rounded-xl transition-colors',
+            'text-sm px-4 py-2.5 rounded-full transition-colors',
             vipOnly
               ? 'bg-blue-50 text-accent font-medium'
-              : 'border border-edge text-ink-secondary bg-surface-card hover:bg-surface-hover'
+              : 'border border-white/80 text-ink-secondary bg-white/92 hover:bg-surface-hover shadow-panel-soft'
           )}
           onClick={() => setVipOnly(!vipOnly)}
         >
@@ -101,7 +101,7 @@ export function RisksPage() {
       </div>
 
       {/* Table card */}
-      <div className="bg-surface-card rounded-2xl shadow-card overflow-hidden">
+      <div className="glass-panel overflow-hidden">
         <div className="px-6 pt-4 border-b border-edge">
           <Tabs
             tabs={tabsWithCount.map((t) => ({ id: t.id, label: t.label, count: t.count }))}
@@ -172,12 +172,12 @@ export function RisksPage() {
               </div>
             </div>
 
-            <div className="bg-red-50 rounded-2xl p-4">
+            <div className="bg-red-50 rounded-[24px] p-4 shadow-panel-soft">
               <p className="text-xs font-semibold text-risk-high mb-1">Причина риска</p>
               <p className="text-sm text-red-800">{selectedRisk.riskReason}</p>
             </div>
 
-            <div className="bg-blue-50 rounded-2xl p-4">
+            <div className="bg-blue-50 rounded-[24px] p-4 shadow-panel-soft">
               <div className="flex items-center gap-1.5 mb-2">
                 <Zap size={12} className="text-accent" />
                 <p className="text-xs font-semibold text-accent">AI рекомендация</p>

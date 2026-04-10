@@ -44,7 +44,7 @@ export function TodayPage() {
   return (
     <div className="space-y-4 animate-fade-in max-w-[1200px]">
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatBlock
             label="Сделки в риске"
             value={summary.dealsAtRisk}
@@ -77,13 +77,13 @@ export function TodayPage() {
       {/* VIP Clients */}
       {vipAlerts.length > 0 && (
         <section
-          className="rounded-[46px] px-10 py-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.32),0_24px_48px_rgba(129,149,193,0.16)]"
+          className="rounded-[38px] px-7 py-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.32),0_20px_38px_rgba(129,149,193,0.15)]"
           style={{
             background: 'linear-gradient(180deg, rgba(191,203,231,0.72) 0%, rgba(187,199,228,0.68) 100%)',
           }}
         >
-          <h2 className="font-display text-[28px] leading-none tracking-[-0.06em] text-[#0c1018]">VIP Клиенты</h2>
-          <div className="mt-8 space-y-9">
+          <h2 className="font-display text-[22px] leading-none tracking-[-0.06em] text-[#0c1018]">VIP Клиенты</h2>
+          <div className="mt-5 space-y-5">
             {vipAlerts.map((alert) => (
               <VipClientRow
                 key={alert.id}
@@ -245,22 +245,22 @@ function StatBlock({
       onClick={onClick}
     >
       <div
-        className="flex min-h-[114px] flex-col rounded-[30px] border border-white/85 px-7 pb-4 pt-5 shadow-[0_18px_36px_rgba(133,149,184,0.18)] transition-all duration-200"
+        className="flex min-h-[92px] flex-col rounded-[26px] border border-white/85 px-5.5 pb-3 pt-4 shadow-[0_14px_26px_rgba(133,149,184,0.15)] transition-all duration-200"
         style={{
           background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,248,250,0.96) 100%)',
         }}
       >
         <div className="flex items-start justify-between gap-3">
-          <p className="font-display text-[15px] leading-[1.15] tracking-[-0.05em] text-[#111111]">
+          <p className="font-display text-[13px] leading-[1.08] tracking-[-0.05em] text-[#111111]">
             {label}
           </p>
-          <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center text-accent transition-transform duration-200 group-hover:scale-105">
+          <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center text-accent transition-transform duration-200 group-hover:scale-105">
             {icon}
           </span>
         </div>
 
-        <div className="mt-auto flex justify-center pt-4">
-          <p className="font-display text-[34px] leading-none tracking-[-0.07em] text-[#05070b]">
+        <div className="mt-auto flex justify-center pt-2.5">
+          <p className="font-display text-[28px] leading-none tracking-[-0.07em] text-[#05070b]">
             {value}
           </p>
         </div>
@@ -293,42 +293,42 @@ function VipClientRow({
 
   return (
     <div
-      className="rounded-[42px] border border-white/86 px-8 py-8 shadow-[0_26px_56px_rgba(122,143,187,0.18)]"
+      className="rounded-[34px] border border-white/86 px-5 py-5 shadow-[0_18px_34px_rgba(122,143,187,0.15)]"
       style={{
         background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.96) 100%)',
       }}
     >
-      <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-start">
         <div
-          className="min-w-0 flex-1 rounded-[30px] px-5 py-5"
+          className="min-w-0 flex-1 rounded-[24px] px-4.5 py-4"
           style={{ background: 'rgba(214, 219, 225, 0.62)' }}
         >
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_230px] xl:items-start">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_210px] xl:items-start">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
-                <p className="truncate font-display text-[20px] leading-tight tracking-[-0.055em] text-[#0d1018]">
+                <p className="truncate font-display text-[17px] leading-tight tracking-[-0.055em] text-[#0d1018]">
                   {clientName}
                 </p>
                 <span
-                  className="inline-flex items-center gap-1.5 text-[18px] font-medium tracking-[-0.05em]"
+                  className="inline-flex items-center gap-1.5 text-[15px] font-medium tracking-[-0.05em]"
                   style={{ color: currentSeverity.color }}
                 >
-                  <Flag size={15} strokeWidth={2.2} />
+                  <Flag size={14} strokeWidth={2.2} />
                   {currentSeverity.label}
                 </span>
               </div>
-              <div className="mt-4 h-px w-full bg-[rgba(129,139,155,0.28)]" />
-              <p className="mt-4 text-[16px] leading-[1.35] tracking-[-0.045em] text-[#7e848c]">
+              <div className="mt-3 h-px w-full bg-[rgba(129,139,155,0.28)]" />
+              <p className="mt-3 text-[14px] leading-[1.34] tracking-[-0.045em] text-[#7e848c]">
                 {message}
               </p>
             </div>
 
             <div className="min-w-0 xl:pl-4">
-              <p className="font-display text-[20px] leading-tight tracking-[-0.05em] text-[#0d1018]">
+              <p className="font-display text-[17px] leading-tight tracking-[-0.05em] text-[#0d1018]">
                 Менеджер
               </p>
-              <div className="mt-4 h-px w-full bg-[rgba(129,139,155,0.28)]" />
-              <p className="mt-4 truncate text-[16px] leading-[1.35] tracking-[-0.045em] text-[#7e848c]">
+              <div className="mt-3 h-px w-full bg-[rgba(129,139,155,0.28)]" />
+              <p className="mt-3 truncate text-[14px] leading-[1.34] tracking-[-0.045em] text-[#7e848c]">
                 {managerName}
               </p>
             </div>
@@ -337,7 +337,7 @@ function VipClientRow({
 
         <button
           onClick={onOpen}
-          className="flex h-[56px] min-w-[172px] items-center justify-center self-center rounded-full bg-[linear-gradient(180deg,#2471ff_0%,#0056f5_100%)] px-7 text-[17px] font-medium tracking-[-0.045em] text-white shadow-[0_16px_32px_rgba(0,86,245,0.28)] transition-transform duration-150 hover:-translate-y-0.5"
+          className="flex h-[48px] min-w-[148px] items-center justify-center self-center rounded-full bg-[linear-gradient(180deg,#2471ff_0%,#0056f5_100%)] px-5 text-[15px] font-medium tracking-[-0.045em] text-white shadow-[0_14px_28px_rgba(0,86,245,0.26)] transition-transform duration-150 hover:-translate-y-0.5"
         >
           Смотреть
         </button>

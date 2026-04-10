@@ -54,13 +54,13 @@ export function AnalyticsPage() {
           <h1 className="font-display text-ink text-lg leading-tight">Аналитика</h1>
           <p className="text-xs text-ink-muted mt-0.5">Executive Dashboard · {overview.period}</p>
         </div>
-        <div className="flex gap-0.5 bg-surface-card rounded-xl p-1 shadow-card">
+        <div className="flex gap-0.5 glass-panel p-1">
           {PERIODS.map((p) => (
             <button
               key={p.id}
               onClick={() => setPeriod(p.id)}
               className={clsx(
-                'text-xs px-3 py-1.5 rounded-lg transition-colors font-medium',
+                'text-xs px-3 py-1.5 rounded-full transition-colors font-medium',
                 period === p.id
                   ? 'bg-accent text-white'
                   : 'text-ink-muted hover:text-ink-secondary'
@@ -84,7 +84,7 @@ export function AnalyticsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-surface-card rounded-2xl shadow-card overflow-hidden">
+      <div className="glass-panel overflow-hidden">
         <div className="px-6 pt-4 border-b border-edge">
           <Tabs tabs={TABS} activeTab={activeTab} onChange={(id) => setActiveTab(id as AnalyticsTab)} />
         </div>
@@ -267,7 +267,7 @@ function QualityTab({ period }: { period: string }) {
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-ink mb-1">Сравнение по критериям</h3>
         {quality?.map((emp) => (
-          <div key={emp.managerId} className="p-4 bg-surface-inner rounded-2xl border border-edge">
+          <div key={emp.managerId} className="p-4 bg-surface-inner rounded-[28px] border border-white/80 shadow-panel-soft">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-ink">{emp.managerName}</span>
               <QualityChip score={emp.avgCommunicationScore} />
@@ -385,7 +385,7 @@ function LossesTab({ period }: { period: string }) {
         </Card>
       </div>
 
-      <div className="bg-blue-50 rounded-2xl p-5">
+      <div className="glass-panel p-5">
         <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-3">AI Инсайты</p>
         <ul className="space-y-2">
           <li className="text-xs text-ink-secondary">· Главная причина потерь — долгий расчёт (32%). Введите KPI «расчёт за 48 часов» для снижения на ~15%</li>
@@ -406,7 +406,7 @@ function OverviewStat({ label, value, color }: { label: string; value: string; c
     accent:  'text-accent',
   }
   return (
-    <div className="bg-surface-card rounded-xl shadow-card p-3 text-center">
+    <div className="rounded-[24px] border border-white/82 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,250,253,0.95)_100%)] p-3 text-center shadow-panel-soft">
       <p className="text-[10px] text-ink-muted mb-0.5 truncate">{label}</p>
       <p className={clsx('font-display text-[14px]', color ? colorStyles[color] : 'text-ink')}>
         {value}
@@ -438,5 +438,5 @@ function QualityChip({ score }: { score: number }) {
     : score >= 65
     ? 'bg-amber-50 text-risk-medium'
     : 'bg-red-50 text-risk-high'
-  return <span className={clsx('text-xs font-bold px-2.5 py-1 rounded-lg', color)}>{score}</span>
+  return <span className={clsx('text-xs font-bold px-2.5 py-1 rounded-full border border-white/80 shadow-panel-soft', color)}>{score}</span>
 }

@@ -195,7 +195,10 @@ export function ClientPage() {
 
   return (
     <div className="animate-fade-in -m-6">
-      <div className="sticky top-0 z-10 bg-surface-card border-b border-edge px-6 py-3.5">
+      <div
+        className="sticky top-0 z-10 border-b border-white/65 px-6 py-4 backdrop-blur-xl"
+        style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(246,249,254,0.9) 100%)' }}
+      >
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/leads')}
@@ -254,7 +257,7 @@ export function ClientPage() {
             </div>
 
             {!bitrixReady && (
-              <div className="bg-amber-50 rounded-2xl p-3 mb-4 border border-amber-200">
+              <div className="mb-4 rounded-[26px] border border-amber-200/80 bg-[linear-gradient(180deg,rgba(255,248,236,0.98)_0%,rgba(255,244,225,0.94)_100%)] p-4 shadow-panel-soft">
                 <p className="text-xs text-ink-secondary">
                   Для Bitrix-инструментов у клиента должен быть найден контакт в backend Антона. После подключения bridge кнопки заработают без отдельной донастройки фронта.
                 </p>
@@ -476,7 +479,7 @@ export function ClientPage() {
                     <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Структурированные поля</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {Object.entries(conversationSummaryMutation.data.data).map(([key, value]) => (
-                        <div key={key} className="rounded-2xl border border-edge px-4 py-3">
+                        <div key={key} className="rounded-[24px] border border-white/80 bg-white/88 px-4 py-3 shadow-panel-soft">
                           <p className="text-[11px] text-ink-muted mb-1">{formatBridgeFieldLabel(key)}</p>
                           <p className="text-sm text-ink whitespace-pre-wrap">{formatBridgeFieldValue(value)}</p>
                         </div>
@@ -522,7 +525,7 @@ export function ClientPage() {
                   <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Советы на звонок</p>
                   <div className="space-y-2">
                     {briefMutation.data.callTips.map((tip, index) => (
-                      <div key={index} className="flex items-start gap-2 rounded-2xl bg-surface-inner px-4 py-3">
+                      <div key={index} className="flex items-start gap-2 rounded-[24px] border border-white/70 bg-[rgba(214,219,225,0.44)] px-4 py-3 shadow-panel-soft">
                         <span className="text-accent mt-0.5">{index + 1}.</span>
                         <p className="text-sm text-ink-secondary">{tip}</p>
                       </div>
@@ -587,7 +590,7 @@ export function ClientPage() {
                 {bitrixLastCallQ.data.transcriptText && (
                   <Card>
                     <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Транскрипт</p>
-                    <div className="max-h-[280px] overflow-y-auto rounded-2xl bg-surface-inner px-4 py-3">
+                    <div className="max-h-[280px] overflow-y-auto rounded-[24px] border border-white/70 bg-[rgba(214,219,225,0.4)] px-4 py-3 shadow-panel-soft">
                       <p className="text-sm text-ink-secondary whitespace-pre-line leading-relaxed">
                         {bitrixLastCallQ.data.transcriptText}
                       </p>
@@ -601,7 +604,7 @@ export function ClientPage() {
 
         {activePanel === 'temp-manager' && (
           <div className="p-6 space-y-4">
-            <Card className="bg-surface-inner">
+            <Card className="border border-white/75 bg-[rgba(214,219,225,0.42)] shadow-panel-soft">
               <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-2">Текущий менеджер</p>
               <p className="text-sm font-medium text-ink">{client.managerName}</p>
               {originalBridgeManager ? (
@@ -631,10 +634,10 @@ export function ClientPage() {
                       key={member.id}
                       onClick={() => setSelectedTempManagerId(member.bitrixUserId)}
                       className={clsx(
-                        'w-full rounded-2xl border px-4 py-3 text-left transition-colors',
+                        'w-full rounded-[24px] border px-4 py-3 text-left transition-all duration-150',
                         selectedTempManagerId === member.bitrixUserId
-                          ? 'border-accent bg-blue-50'
-                          : 'border-edge hover:bg-surface-hover'
+                          ? 'border-accent bg-[linear-gradient(180deg,rgba(232,241,255,0.98)_0%,rgba(223,236,255,0.92)_100%)] shadow-panel-soft'
+                          : 'border-white/80 bg-white/88 shadow-panel-soft hover:-translate-y-0.5 hover:bg-white'
                       )}
                     >
                       <div className="flex items-center justify-between gap-3">
@@ -670,7 +673,7 @@ export function ClientPage() {
               {tempManagersQ.data && tempManagersQ.data.length > 0 ? (
                 <div className="space-y-2">
                   {tempManagersQ.data.map((assignment) => (
-                    <div key={assignment.assignmentId} className="rounded-2xl border border-edge px-4 py-3">
+                    <div key={assignment.assignmentId} className="rounded-[24px] border border-white/80 bg-white/88 px-4 py-3 shadow-panel-soft">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-sm font-medium text-ink">
@@ -721,12 +724,14 @@ function ToolActionButton({
       onClick={onClick}
       disabled={disabled}
       className={clsx(
-        'rounded-2xl border border-edge px-4 py-4 text-left transition-colors',
-        'hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed'
+        'rounded-[28px] border border-white/82 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(247,250,254,0.95)_100%)] px-5 py-4 text-left shadow-panel-soft transition-all duration-150',
+        'hover:-translate-y-0.5 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed'
       )}
     >
-      <div className="flex items-center gap-2 mb-2 text-accent">
-        {icon}
+      <div className="mb-2 flex items-center gap-2 text-accent">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 shadow-panel-soft">
+          {icon}
+        </span>
         <span className="text-sm font-medium text-ink">{title}</span>
       </div>
       <p className="text-xs text-ink-muted leading-relaxed">{description}</p>
@@ -736,7 +741,7 @@ function ToolActionButton({
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-baseline gap-2">
+    <div className="flex items-baseline gap-2 rounded-[18px] border border-white/70 bg-white/68 px-3 py-2 shadow-panel-soft">
       <span className="text-xs text-ink-muted flex-shrink-0 w-20">{label}</span>
       <span className="text-xs text-ink font-medium">{value}</span>
     </div>
@@ -745,7 +750,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
 
 function InfoMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-edge px-4 py-3">
+    <div className="rounded-[24px] border border-white/80 bg-white/88 px-4 py-3 shadow-panel-soft">
       <p className="text-[11px] text-ink-muted mb-1">{label}</p>
       <p className="text-sm text-ink">{value}</p>
     </div>
@@ -754,7 +759,7 @@ function InfoMetric({ label, value }: { label: string; value: string }) {
 
 function PanelError({ message }: { message: string }) {
   return (
-    <Card className="bg-red-50 border border-red-200">
+    <Card className="border border-red-200/80 bg-[linear-gradient(180deg,rgba(255,244,244,0.98)_0%,rgba(255,236,236,0.94)_100%)] shadow-panel-soft">
       <div className="flex items-start gap-2">
         <AlertCircle size={14} className="text-risk-high mt-0.5 flex-shrink-0" />
         <p className="text-sm text-risk-high">{message}</p>
