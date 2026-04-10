@@ -13,6 +13,10 @@ class BitrixBridgeError(RuntimeError):
     """Raised when the external Bitrix bridge cannot fulfill a request."""
 
 
+def _normalize_key(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", value.casefold())
+
+
 def _base_url() -> str:
     if not settings.BITRIX_BRIDGE_URL:
         raise BitrixBridgeError("BITRIX_BRIDGE_URL is not configured")
@@ -52,6 +56,38 @@ async def bridge_request(
     return payload
 
 
+def bridge_value(record: dict[str, Any], *keys: str) -> Any:
+    lookup = {_normalize_key(str(key)): value for key, value in record.items()}
+    for key in keys:
+        value = lookup.get(_normalize_key(key))
+        if value not in (None, ""):
+            return value
+    return None
+
+
+def _extract_collection(payload: Any, *preferred_keys: str) -> list[dict[str, Any]]:
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)]
+
+    if not isinstance(payload, dict):
+        return []
+
+    for key in preferred_keys:
+        value = bridge_value(payload, key)
+        if isinstance(value, list):
+            return [item for item in value if isinstance(item, dict)]
+
+    for value in payload.values():
+        if isinstance(value, list):
+            return [item for item in value if isinstance(item, dict)]
+        if isinstance(value, dict):
+            nested = _extract_collection(value, *preferred_keys)
+            if nested:
+                return nested
+
+    return []
+
+
 def normalize_match_key(value: str | None) -> str:
     if not value:
         return ""
@@ -61,12 +97,40 @@ def normalize_match_key(value: str | None) -> str:
 
 async def list_bridge_contacts() -> list[dict[str, Any]]:
     payload = await bridge_request("GET", "/contacts")
-    return payload if isinstance(payload, list) else []
+    return _extract_collection(payload, "contacts", "items", "results", "data")
 
 
 async def list_bridge_team() -> list[dict[str, Any]]:
     payload = await bridge_request("GET", "/employees/team")
-    return payload if isinstance(payload, list) else []
+    return _extract_collection(payload, "team", "employees", "items", "results", "data")
+
+
+async def list_bridge_cards() -> list[dict[str, Any]]:
+    payload = await bridge_request("GET", "/client-cards")
+    return _extract_collection(payload, "client_cards", "cards", "items", "results", "data")
+
+
+def find_bridge_contact_by_id(
+    contacts: list[dict[str, Any]],
+    contact_id: int | str | None,
+) -> dict[str, Any] | None:
+    if contact_id in (None, ""):
+        return None
+
+    expected = str(contact_id)
+    for contact in contacts:
+        current = bridge_value(contact, "id", "contact_id")
+        if current is not None and str(current) == expected:
+            return contact
+    return None
+
+
+def _contact_match_fields(contact: dict[str, Any]) -> list[str]:
+    return [
+        normalize_match_key(str(bridge_value(contact, "name", "full_name", "contact_name", "title") or "")),
+        normalize_match_key(str(bridge_value(contact, "company", "company_name", "organization", "org_name") or "")),
+        normalize_match_key(str(bridge_value(contact, "email", "email_address", "mail") or "")),
+    ]
 
 
 def match_bridge_contact(
@@ -82,7 +146,7 @@ def match_bridge_contact(
     email_key = normalize_match_key(email)
     if email_key:
         for contact in contacts:
-            if normalize_match_key(contact.get("email")) == email_key:
+            if email_key in _contact_match_fields(contact):
                 return contact
 
     candidate_keys = [
@@ -93,7 +157,7 @@ def match_bridge_contact(
 
     for key in candidate_keys:
         for contact in contacts:
-            if normalize_match_key(contact.get("name")) == key:
+            if key in _contact_match_fields(contact):
                 return contact
 
     for key in candidate_keys:
@@ -101,7 +165,9 @@ def match_bridge_contact(
         if not key_tokens:
             continue
         for contact in contacts:
-            contact_tokens = set(normalize_match_key(contact.get("name")).split())
+            contact_tokens = set()
+            for field in _contact_match_fields(contact):
+                contact_tokens.update(field.split())
             if key_tokens and contact_tokens and key_tokens & contact_tokens == key_tokens:
                 return contact
 

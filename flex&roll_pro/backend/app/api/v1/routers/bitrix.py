@@ -16,11 +16,39 @@ from fastapi.responses import HTMLResponse
 from app.config import settings
 from app.bitrix.auth import exchange_code, get_tokens
 from app.schemas.common import ApiResponse
-from app.services.bitrix_bridge import BitrixBridgeError, bridge_request, list_bridge_team
+from app.services.bitrix_bridge import (
+    BitrixBridgeError,
+    bridge_request,
+    bridge_value,
+    list_bridge_cards,
+    list_bridge_contacts,
+    list_bridge_team,
+)
 
 logger = logging.getLogger("bitrix_router")
 
 router = APIRouter(prefix="/bitrix", tags=["Bitrix24"])
+
+
+def _coerce_int(value: object, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _normalize_team_member(item: dict[str, object]) -> dict[str, object]:
+    bitrix_user_id = _coerce_int(
+        bridge_value(item, "bitrix_user_id", "user_id", "employee_id", "id"),
+    )
+    return {
+        "id": _coerce_int(bridge_value(item, "id", "employee_id", "user_id"), bitrix_user_id),
+        "bitrix_user_id": bitrix_user_id,
+        "name": str(bridge_value(item, "name", "full_name", "employee_name", "user_name") or "Сотрудник"),
+        "role": str(bridge_value(item, "role", "position", "title") or "Менеджер"),
+        "experience_text": str(bridge_value(item, "experience_text", "experience", "description") or ""),
+        "rating": _coerce_int(bridge_value(item, "rating", "score"), 0),
+    }
 
 
 async def _collect_bitrix_params(request: Request) -> dict[str, str]:
@@ -169,7 +197,29 @@ async def sync_deals():
 async def get_team():
     """Expose Anton bridge sales team in a frontend-friendly place."""
     try:
-        data = await list_bridge_team()
+        data = [_normalize_team_member(item) for item in await list_bridge_team()]
     except BitrixBridgeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     return ApiResponse(data=data)
+
+
+@router.get("/bridge-health", response_model=ApiResponse)
+async def bridge_health():
+    """Quick diagnostics for Anton bridge availability and payload parsing."""
+    try:
+        cards = await list_bridge_cards()
+        contacts = await list_bridge_contacts()
+        team = await list_bridge_team()
+    except BitrixBridgeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    return ApiResponse(data={
+        "status": "ok",
+        "bridge_url": settings.BITRIX_BRIDGE_URL,
+        "cards_count": len(cards),
+        "contacts_count": len(contacts),
+        "team_count": len(team),
+        "sample_card_keys": sorted(list(cards[0].keys())) if cards else [],
+        "sample_contact_keys": sorted(list(contacts[0].keys())) if contacts else [],
+        "sample_team_keys": sorted(list(team[0].keys())) if team else [],
+    })
