@@ -108,6 +108,8 @@ export function LeadsPage() {
     refetchOnMount: 'always',
     refetchOnWindowFocus: 'always',
     refetchOnReconnect: 'always',
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: true,
   })
 
   const refreshMutation = useMutation({
