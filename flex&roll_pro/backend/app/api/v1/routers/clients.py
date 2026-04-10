@@ -6,6 +6,7 @@ import re
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from app.config import settings
 from app.schemas.common import ApiResponse
 from app.schemas.clients import (
     Client, AiClientSummary, CommunicationEvent, CallSummary,
@@ -34,6 +35,12 @@ class TempManagerAssignRequest(BaseModel):
 
 def _bridge_client_id(contact_id: int | str) -> str:
     return f"{BRIDGE_CLIENT_PREFIX}{contact_id}"
+
+
+def _bridge_contact_key(value: Any) -> str | None:
+    if value in (None, ""):
+        return None
+    return str(value)
 
 
 def _coerce_float(value: Any, default: float = 0.0) -> float:
@@ -239,29 +246,34 @@ def _bridge_card_to_client(
         return None
 
     contact = find_bridge_contact_by_id(contacts, contact_id)
+    if not contact:
+        # Client cards can outlive the contact in Anton bridge. Such cards
+        # should not keep deleted clients alive in the current clients list.
+        return None
+
     assigned_ids = _parse_assigned_employee_ids(bridge_value(card, "assigned_employees"))
     manager_name, manager_id = _resolve_bridge_manager(assigned_ids, team)
 
     name = _safe_text(
-        bridge_value(contact or {}, "name", "full_name", "contact_name"),
+        bridge_value(contact, "name", "full_name", "contact_name"),
         f"Контакт #{contact_id}",
     )
     company = _safe_text(
         bridge_value(card, "company", "company_name"),
         _safe_text(
-            bridge_value(contact or {}, "company", "company_name", "organization"),
+            bridge_value(contact, "company", "company_name", "organization"),
             name,
         ),
     )
     segment = _safe_text(bridge_value(card, "segment"), "")
     product = _safe_text(
         bridge_value(card, "product_type", "product"),
-        _safe_text(bridge_value(contact or {}, "product", "product_name"), "—"),
+        _safe_text(bridge_value(contact, "product", "product_name"), "—"),
     )
     last_contact_at = _safe_text(
         bridge_value(card, "created_at"),
         _safe_text(
-            bridge_value(contact or {}, "updated_at", "created_at"),
+            bridge_value(contact, "updated_at", "created_at"),
             datetime.now(timezone.utc).isoformat(),
         ),
     )
@@ -277,8 +289,8 @@ def _bridge_card_to_client(
         is_vip=priority.strip().casefold() == "vip",
         manager_id=manager_id,
         manager_name=manager_name,
-        phone=_safe_text(bridge_value(contact or {}, "phone", "phone_number", "mobile"), "") or None,
-        email=_safe_text(bridge_value(contact or {}, "email", "email_address", "mail"), "") or None,
+        phone=_safe_text(bridge_value(contact, "phone", "phone_number", "mobile"), "") or None,
+        email=_safe_text(bridge_value(contact, "email", "email_address", "mail"), "") or None,
         deal_id=_safe_text(bridge_value(card, "id"), _bridge_client_id(contact_id)),
         deal_amount=0.0,
         deal_currency="RUB",
@@ -295,10 +307,10 @@ def _bridge_card_to_client(
         days_since_contact=_days_since(last_contact_at),
         product=product,
         expected_volume=_safe_text(bridge_value(card, "volume", "expected_volume"), "—"),
-        city=_safe_text(bridge_value(contact or {}, "city", "location"), "—"),
-        inn=_safe_text(bridge_value(contact or {}, "inn", "unp"), "") or None,
+        city=_safe_text(bridge_value(contact, "city", "location"), "—"),
+        inn=_safe_text(bridge_value(contact, "inn", "unp"), "") or None,
         bridge_contact_id=_coerce_int(contact_id),
-        bridge_chat_id=_safe_text(bridge_value(contact or {}, "bitrix_chat_id", "chat_id"), "") or None,
+        bridge_chat_id=_safe_text(bridge_value(contact, "bitrix_chat_id", "chat_id"), "") or None,
         bridge_connected=True,
     )
 
@@ -414,50 +426,38 @@ async def get_clients():
     except BitrixBridgeError:
         bridge_team = []
 
-    clients = []
-    matched_bridge_ids: set[str] = set()
-    card_bridge_ids: set[str] = set()
-    for client in repo.list_clients():
-        bridge_contact = match_bridge_contact(
-            bridge_contacts,
-            client_name=client.name,
-            company_name=client.company,
-            email=client.email,
-        )
-        if bridge_contact:
-            contact_id = bridge_value(bridge_contact, "id", "contact_id")
-            if contact_id not in (None, ""):
-                matched_bridge_ids.add(str(contact_id))
-            clients.append(client.model_copy(update={
-                "bridge_contact_id": _coerce_int(contact_id),
-                "bridge_chat_id": _safe_text(bridge_value(bridge_contact, "bitrix_chat_id", "chat_id"), "") or None,
-                "bridge_connected": True,
-            }))
-        else:
-            clients.append(client)
+    if not bridge_contacts:
+        clients = repo.list_clients() if settings.USE_MOCK else []
+        clients.sort(key=lambda client: client.company.casefold())
+        return ApiResponse(data=clients)
 
+    bridge_cards_by_contact: dict[str, dict[str, Any]] = {}
     for card in bridge_cards:
-        bridge_client = _bridge_card_to_client(
-            card,
-            contacts=bridge_contacts,
-            team=bridge_team,
-        )
-        if not bridge_client or not bridge_client.bridge_contact_id:
+        contact_key = _bridge_contact_key(bridge_value(card, "contact_id", "id"))
+        if not contact_key or contact_key in bridge_cards_by_contact:
             continue
-        bridge_contact_key = str(bridge_client.bridge_contact_id)
-        card_bridge_ids.add(bridge_contact_key)
-        if bridge_contact_key in matched_bridge_ids:
+        if not find_bridge_contact_by_id(bridge_contacts, contact_key):
             continue
-        clients.append(bridge_client)
+        bridge_cards_by_contact[contact_key] = card
 
+    clients: list[Client] = []
     for contact in bridge_contacts:
-        contact_id = bridge_value(contact, "id", "contact_id")
-        if contact_id in (None, ""):
+        contact_key = _bridge_contact_key(bridge_value(contact, "id", "contact_id"))
+        if not contact_key:
             continue
-        contact_key = str(contact_id)
-        if contact_key in matched_bridge_ids or contact_key in card_bridge_ids:
-            continue
-        bridge_client = _bridge_contact_to_client(contact)
+
+        bridge_client = None
+        bridge_card = bridge_cards_by_contact.get(contact_key)
+        if bridge_card:
+            bridge_client = _bridge_card_to_client(
+                bridge_card,
+                contacts=bridge_contacts,
+                team=bridge_team,
+            )
+
+        if not bridge_client:
+            bridge_client = _bridge_contact_to_client(contact)
+
         if bridge_client:
             clients.append(bridge_client)
 
