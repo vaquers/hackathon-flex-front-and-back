@@ -30,8 +30,8 @@ class Settings(BaseSettings):
     FRONTEND_PUBLIC_URL: str = "http://localhost:5173"
     BACKEND_PUBLIC_URL: str = "http://localhost:8000"
 
-    # External Bitrix bridge backend (Anton)
-    BITRIX_BRIDGE_URL: str = ""
+    # External Bitrix bridge backend (Anton). Can still be overridden via env.
+    BITRIX_BRIDGE_URL: str = "https://hackathon-flex-back-bitrix-production.up.railway.app"
     BITRIX_BRIDGE_TIMEOUT_SEC: int = 20
 
     class Config:

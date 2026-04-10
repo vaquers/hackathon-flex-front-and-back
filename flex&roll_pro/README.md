@@ -163,6 +163,7 @@ curl http://localhost:8000/api/v1/leads/top
    CORS_ORIGINS=["https://your-frontend.vercel.app"]
    FRONTEND_PUBLIC_URL=https://your-frontend.vercel.app
    BACKEND_PUBLIC_URL=https://your-backend.up.railway.app
+   BITRIX_BRIDGE_URL=https://hackathon-flex-back-bitrix-production.up.railway.app
    DEBUG=false
    USE_MOCK=false
    ```
@@ -202,6 +203,7 @@ curl http://localhost:8000/api/v1/leads/top
 BITRIX_CLIENT_ID=        # Из настроек приложения
 BITRIX_CLIENT_SECRET=    # Из настроек приложения
 BITRIX_SCOPE=crm,user    # Требуемые права
+BITRIX_BRIDGE_URL=https://hackathon-flex-back-bitrix-production.up.railway.app  # Backend Антона для bridge API
 FRONTEND_PUBLIC_URL=     # URL фронтенда (для redirect из iframe)
 BACKEND_PUBLIC_URL=      # URL бэкенда (для handler/install URL)
 ```
@@ -222,6 +224,7 @@ BACKEND_PUBLIC_URL=      # URL бэкенда (для handler/install URL)
 | `LEAD_CACHE_TTL` | Нет | TTL кэша в секундах (3600) |
 | `BITRIX_CLIENT_ID` | Для Bitrix24 | ID приложения |
 | `BITRIX_CLIENT_SECRET` | Для Bitrix24 | Секрет приложения |
+| `BITRIX_BRIDGE_URL` | Для Bitrix bridge | Базовый URL backend Антона |
 | `DEBUG` | Нет | Debug mode (true) |
 
 ### Frontend
