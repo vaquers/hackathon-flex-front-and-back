@@ -149,21 +149,21 @@ export function LeadsPage() {
   return (
     <div className="animate-fade-in max-w-[960px]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="font-display text-ink text-lg leading-tight">
+            <h1 className="font-display page-title">
               Лиды и клиенты
             </h1>
-            <span className="rounded-full border border-white/80 bg-white/92 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-accent shadow-panel-soft">AI</span>
+            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-accent">AI</span>
           </div>
-          <p className="text-xs text-ink-muted mt-0.5">
-            Новые потенциальные клиенты и рабочая база текущих компаний в одном разделе
+          <p className="page-subtitle">
+            Новые потенциальные к��иенты и рабочая база текущих компаний в одном разделе
           </p>
         </div>
         <div className="flex items-center gap-2">
           {activeTab === 'prospects' && data?.generated_at && !isRunning && (
-            <div className="flex items-center gap-1.5 rounded-full border border-white/82 bg-white/92 px-3 py-1.5 text-[11px] text-ink-muted shadow-panel-soft">
+            <div className="flex items-center gap-1.5 rounded-full bg-white/80 border border-edge px-3 py-1.5 text-[11px] text-ink-muted shadow-input">
               {data.cache_stale ? (
                 <AlertCircle size={10} className="text-risk-medium" />
               ) : (
@@ -189,7 +189,7 @@ export function LeadsPage() {
             onClick={() => refreshMutation.mutate()}
             disabled={isRunning || activeTab === 'clients'}
           >
-            {isRunning ? 'Генерация...' : 'Найти лиды'}
+            {isRunning ? 'Ге��ерация...' : 'Найти лиды'}
           </Button>
         </div>
       </div>
@@ -197,11 +197,11 @@ export function LeadsPage() {
       <Tabs
         tabs={[
           { id: 'prospects', label: 'Новые потенциальные', count: leads.length || undefined },
-          { id: 'clients', label: 'Текущие клиенты', count: clients.length || undefined },
+          { id: 'clients', label: 'Текущие кл��енты', count: clients.length || undefined },
         ]}
         activeTab={activeTab}
         onChange={(tabId) => setActiveTab(tabId as 'prospects' | 'clients')}
-        className="mb-4"
+        className="mb-5"
       />
 
       {syncDealsMutation.isSuccess && (
@@ -217,21 +217,21 @@ export function LeadsPage() {
 
       {activeTab === 'clients' ? (
         <div className="space-y-4">
-          <div className="glass-panel p-5 border border-white/80">
+          <div className="glass-panel p-5">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="flex flex-wrap gap-2 text-[11px] text-ink-muted">
-                <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
+                <span className="glass-inner rounded-full px-3 py-1.5">
                   Компаний: {clients.length}
                 </span>
-                <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
+                <span className="glass-inner rounded-full px-3 py-1.5">
                   Связано с Bitrix bridge: {connectedClients}
                 </span>
               </div>
               <input
                 value={clientSearch}
                 onChange={(event) => setClientSearch(event.target.value)}
-                placeholder="Поиск по компании, контакту или менеджеру"
-                className="w-full md:w-[360px] rounded-full border border-white/80 bg-surface-inner px-4 py-3 text-sm text-ink placeholder:text-ink-muted shadow-panel-soft focus:outline-none focus:ring-2 focus:ring-accent/20"
+                placeholder="Поиск по компании, контакту или менеджер��"
+                className="input-base w-full md:w-[360px] rounded-xl"
               />
             </div>
           </div>
@@ -245,7 +245,7 @@ export function LeadsPage() {
           {clientsQ.isError && (
             <EmptyState
               icon={<AlertCircle />}
-              title="Не удалось загрузить текущих клиентов"
+              title="Не удалось загрузить текущих кли��нтов"
               description={clientsQ.error.message}
             />
           )}
@@ -254,7 +254,7 @@ export function LeadsPage() {
             <EmptyState
               icon={<Building2 />}
               title="Клиенты не найдены"
-              description={clientSearch ? 'Попробуйте изменить поисковый запрос' : 'В базе пока нет текущих клиентов'}
+              description={clientSearch ? 'Попробуйте изменить поиск��вый запрос' : 'В базе пока нет текущих клиентов'}
             />
           )}
 
@@ -279,7 +279,7 @@ export function LeadsPage() {
             <Loader2 size={14} className="text-accent animate-spin" />
             <span className="text-sm font-medium text-accent">Генерация лидов</span>
             {candidates > 0 && (
-              <span className="text-xs text-ink-muted ml-auto">
+              <span className="text-[11px] text-ink-muted ml-auto">
                 {scored} / {candidates} обработано
               </span>
             )}
@@ -313,13 +313,13 @@ export function LeadsPage() {
       {/* Stats pills */}
       {data && data.total_candidates > 0 && !isRunning && (
         <div className="flex gap-2 mb-4 text-[11px] text-ink-muted">
-          <span className="glass-panel rounded-full px-3 py-2 border border-white/80">
+          <span className="glass-inner rounded-full px-3 py-1.5">
             📊 {data.total_candidates} кандидатов
           </span>
-          <span className="glass-panel rounded-full px-3 py-2 border border-white/80">
+          <span className="glass-inner rounded-full px-3 py-1.5">
             ✅ {data.total_scored} оценено
           </span>
-          <span className="glass-panel rounded-full px-3 py-2 border border-white/80">
+          <span className="glass-inner rounded-full px-3 py-1.5">
             🏆 Топ-{leads.length}
           </span>
         </div>
@@ -344,11 +344,11 @@ export function LeadsPage() {
       {/* Empty */}
       {!isLoading && !error && leads.length === 0 && !isRunning && (
         <div className="glass-panel p-10 text-center">
-          <div className="w-14 h-14 bg-blue-50 rounded-[24px] flex items-center justify-center mx-auto mb-4 shadow-panel-soft">
-            <Sparkles size={24} className="text-accent" />
+          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <Sparkles size={22} className="text-accent" />
           </div>
-          <h3 className="font-display text-ink text-[15px] mb-1">Запустите поиск лидов</h3>
-          <p className="text-xs text-ink-muted mb-4 max-w-sm mx-auto">
+          <h3 className="font-display text-ink text-sm mb-1">Запустите поиск лидов</h3>
+          <p className="text-[12px] text-ink-muted mb-4 max-w-sm mx-auto">
             AI проанализирует реестр новых компаний, обогатит данные и покажет топ кандидатов для вашего бизнеса
           </p>
           <Button
@@ -413,7 +413,7 @@ function LeadCard({
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="font-display text-ink text-[14px] leading-tight">
+            <p className="font-display text-ink text-sm leading-tight">
               {lead.company_name}
             </p>
             {lead.normalized_name !== lead.company_name && (
@@ -472,7 +472,7 @@ function LeadCard({
         {lead.company_summary && (
           <p className="text-[11px] text-ink-secondary leading-relaxed mb-2 line-clamp-2">{lead.company_summary}</p>
         )}
-        <div className="bg-blue-50/70 rounded-[24px] p-3 mb-2 shadow-panel-soft">
+        <div className="bg-blue-50/70 rounded-xl p-3 mb-2">
           <div className="flex items-center gap-1 mb-0.5">
             <Sparkles size={10} className="text-accent" />
             <span className="text-[10px] font-semibold text-accent">Почему рекомендуем</span>
@@ -536,7 +536,7 @@ function LeadCard({
                   className="inline-flex items-center gap-0.5 text-accent hover:underline ml-auto"
                 >
                   <ExternalLink size={9} />
-                  Источник
+                  Источ��ик
                 </a>
               )}
             </div>
@@ -579,7 +579,7 @@ function CurrentClientCard({
       <div className="p-4 flex flex-col gap-3 md:flex-row md:items-start">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
-            <p className="font-display text-ink text-[15px] leading-tight">{client.company}</p>
+            <p className="font-display text-ink text-sm leading-tight">{client.company}</p>
             {client.isVip && <VipBadge />}
             <RiskBadge level={client.riskLevel} score={client.riskScore} />
             <SentimentBadge sentiment={client.sentiment} />
@@ -592,21 +592,21 @@ function CurrentClientCard({
               <Badge variant="default">Без bridge</Badge>
             )}
           </div>
-          <p className="text-xs text-ink-muted mb-2">
+          <p className="text-[11px] text-ink-muted mb-2">
             {client.name} · {client.managerName} · {client.dealStageLabel}
           </p>
-          <p className="text-sm text-ink-secondary leading-relaxed">{client.riskReason}</p>
+          <p className="text-[12px] text-ink-secondary leading-relaxed">{client.riskReason}</p>
           <div className="flex flex-wrap gap-2 mt-3 text-[11px] text-ink-muted">
-            <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
+            <span className="glass-inner rounded-full px-3 py-1.5">
               {formatRub(client.dealAmount)}/мес.
             </span>
-            <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
+            <span className="glass-inner rounded-full px-3 py-1.5">
               {client.segmentLabel}
             </span>
-            <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
+            <span className="glass-inner rounded-full px-3 py-1.5">
               Контакт: {formatDateTime(client.lastContactAt)}
             </span>
-            <span className="bg-surface-inner rounded-full px-3 py-2 border border-white/80 shadow-panel-soft">
+            <span className="glass-inner rounded-full px-3 py-1.5">
               {formatDaysAgo(client.daysSinceContact)}
             </span>
           </div>
@@ -630,20 +630,20 @@ function SyncDealsBanner({ result }: { result: BitrixDealsSyncResult }) {
   const errorCount = result.deals.filter((deal) => !!deal.error).length
 
   return (
-    <div className="glass-panel p-4 mb-4 border border-white/80">
+    <div className="glass-panel p-4 mb-4">
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <CheckCircle2 size={14} className="text-risk-low" />
         <span className="text-sm font-medium text-ink">Синхронизация сделок завершена</span>
-        <span className="text-xs text-ink-muted">
+        <span className="text-[11px] text-ink-muted">
           Успешно: {successCount}
         </span>
         {errorCount > 0 && (
-          <span className="text-xs text-risk-high">
+          <span className="text-[11px] text-risk-high">
             Ошибок: {errorCount}
           </span>
         )}
       </div>
-      <p className="text-xs text-ink-muted">
+      <p className="text-[11px] text-ink-muted">
         Backend Антона вернул {result.deals.length} записей. Новые данные можно сразу открыть в разделе текущих клиентов.
       </p>
     </div>

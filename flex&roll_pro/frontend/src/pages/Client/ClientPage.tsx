@@ -196,7 +196,7 @@ export function ClientPage() {
   return (
     <div className="animate-fade-in -m-6">
       <div
-        className="sticky top-0 z-10 border-b border-white/65 px-6 py-4 backdrop-blur-xl"
+        className="sticky top-0 z-10 border-b border-edge px-6 py-4 backdrop-blur-xl"
         style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(246,249,254,0.9) 100%)' }}
       >
         <div className="flex items-center gap-3">
@@ -221,7 +221,7 @@ export function ClientPage() {
                 <Badge variant="outline">Не связан с bridge</Badge>
               )}
             </div>
-            <p className="text-xs text-ink-muted mt-0.5">
+            <p className="text-[11px] text-ink-muted mt-0.5">
               {client.name} · {client.managerName} · {client.dealStageLabel} · {formatRub(client.dealAmount)}/мес.
             </p>
           </div>
@@ -236,7 +236,7 @@ export function ClientPage() {
         </div>
       </div>
 
-      <div className="p-6 grid grid-cols-1 xl:grid-cols-3 gap-5">
+      <div className="p-6 grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2 space-y-4">
           <Card>
             <div className="flex items-center justify-between gap-3 mb-4">
@@ -247,7 +247,7 @@ export function ClientPage() {
                   </div>
                   <h2 className="font-display text-ink text-sm">AI-инструменты клиента</h2>
                 </div>
-                <p className="text-xs text-ink-muted mt-1">
+                <p className="text-[11px] text-ink-muted mt-1">
                   Быстрые действия поверх переписки, звонков и маршрутизации в самом Bitrix24
                 </p>
               </div>
@@ -257,8 +257,8 @@ export function ClientPage() {
             </div>
 
             {!bitrixReady && (
-              <div className="mb-4 rounded-[26px] border border-amber-200/80 bg-[linear-gradient(180deg,rgba(255,248,236,0.98)_0%,rgba(255,244,225,0.94)_100%)] p-4 shadow-panel-soft">
-                <p className="text-xs text-ink-secondary">
+              <div className="mb-4 rounded-xl border border-amber-200/80 bg-amber-50/60 p-4">
+                <p className="text-[12px] text-ink-secondary">
                   Для Bitrix-инструментов у клиента должен быть найден контакт в backend Антона. После подключения bridge кнопки заработают без отдельной донастройки фронта.
                 </p>
               </div>
@@ -304,7 +304,7 @@ export function ClientPage() {
               <h2 className="font-display text-ink text-sm">AI Client Summary</h2>
               {summaryQ.isLoading && <Skeleton className="h-3 w-20 ml-auto" />}
               {summary && (
-                <span className="text-xs text-ink-muted ml-auto">{formatDate(summary.generatedAt)}</span>
+                <span className="text-[11px] text-ink-muted ml-auto">{formatDate(summary.generatedAt)}</span>
               )}
             </div>
 
@@ -322,7 +322,7 @@ export function ClientPage() {
                     <p className="text-[11px] text-ink-muted font-medium uppercase tracking-wide mb-1.5">Последние действия</p>
                     <ul className="space-y-1">
                       {summary.recentActions.map((action, index) => (
-                        <li key={index} className="text-xs text-ink-secondary flex items-start gap-1.5">
+                        <li key={index} className="text-[12px] text-ink-secondary flex items-start gap-1.5">
                           <span className="text-accent flex-shrink-0 mt-0.5">·</span>
                           {action}
                         </li>
@@ -343,9 +343,9 @@ export function ClientPage() {
                           style={{ width: `${summary.riskScore}%` }}
                         />
                       </div>
-                      <span className="text-xs font-bold text-ink tabular-nums">{summary.riskScore}%</span>
+                      <span className="text-[12px] font-bold text-ink tabular-nums">{summary.riskScore}%</span>
                     </div>
-                    <p className="text-xs text-ink-muted mt-1">{summary.riskReason}</p>
+                    <p className="text-[11px] text-ink-muted mt-1">{summary.riskReason}</p>
                   </div>
                 </div>
               </div>
@@ -369,11 +369,11 @@ export function ClientPage() {
                       {nextAction.urgency === 'critical' ? 'Срочно' : nextAction.urgency === 'high' ? 'Высокая' : 'Обычная'}
                     </Badge>
                     {nextAction.deadline && (
-                      <span className="text-xs text-ink-muted">до {formatDate(nextAction.deadline)}</span>
+                      <span className="text-[11px] text-ink-muted">до {formatDate(nextAction.deadline)}</span>
                     )}
                   </div>
                   <p className="font-medium text-ink text-sm">{nextAction.action}</p>
-                  <p className="text-sm text-ink-secondary mt-1">{nextAction.reason}</p>
+                  <p className="text-[12px] text-ink-secondary mt-1">{nextAction.reason}</p>
                 </div>
                 <Button size="sm" variant="primary" className="flex-shrink-0">Выполнить</Button>
               </div>
@@ -381,9 +381,9 @@ export function ClientPage() {
           )}
 
           <Card padding="none">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-edge">
               <h2 className="font-display text-ink text-sm">Лента коммуникаций</h2>
-              <span className="text-xs text-ink-muted">{comms.length} событий</span>
+              <span className="text-[11px] text-ink-muted">{comms.length} событий</span>
             </div>
             <div className="divide-y divide-edge">
               {comms.map((event) => (
@@ -415,9 +415,9 @@ export function ClientPage() {
               <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest">Документы</p>
             </div>
             {docs.length === 0 ? (
-              <p className="text-xs text-ink-muted text-center py-4">Нет связанных документов</p>
+              <p className="text-[12px] text-ink-muted text-center py-4">Нет связанных документов</p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {docs.map((doc) => (
                   <div
                     key={doc.id}
@@ -425,10 +425,10 @@ export function ClientPage() {
                   >
                     <Badge variant="stage" size="sm">{doc.typeLabel}</Badge>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-ink line-clamp-2">{doc.name}</p>
-                      <p className="text-xs text-ink-muted">{formatDate(doc.date)}</p>
+                      <p className="text-[12px] font-medium text-ink line-clamp-2">{doc.name}</p>
+                      <p className="text-[11px] text-ink-muted">{formatDate(doc.date)}</p>
                     </div>
-                    <span className="text-xs text-ink-muted flex-shrink-0">{doc.relevance}%</span>
+                    <span className="text-[11px] text-ink-muted flex-shrink-0">{doc.relevance}%</span>
                   </div>
                 ))}
               </div>
@@ -452,7 +452,7 @@ export function ClientPage() {
         {activePanel === 'conversation-summary' && (
           <div className="p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-ink-muted">Переписка клиента в Bitrix24</p>
+              <p className="text-[12px] text-ink-muted">Переписка клиента в Bitrix24</p>
               <Button
                 size="sm"
                 variant="outline"
@@ -479,10 +479,7 @@ export function ClientPage() {
                     <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Структурированные поля</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {Object.entries(conversationSummaryMutation.data.data).map(([key, value]) => (
-                        <div key={key} className="rounded-[24px] border border-white/80 bg-white/88 px-4 py-3 shadow-panel-soft">
-                          <p className="text-[11px] text-ink-muted mb-1">{formatBridgeFieldLabel(key)}</p>
-                          <p className="text-sm text-ink whitespace-pre-wrap">{formatBridgeFieldValue(value)}</p>
-                        </div>
+                        <InfoMetric key={key} label={formatBridgeFieldLabel(key)} value={formatBridgeFieldValue(value)} />
                       ))}
                     </div>
                   </Card>
@@ -495,7 +492,7 @@ export function ClientPage() {
         {activePanel === 'brief' && (
           <div className="p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-ink-muted">Подготовка к следующему контакту</p>
+              <p className="text-[12px] text-ink-muted">Подготовка к следующему контакту</p>
               <Button
                 size="sm"
                 variant="outline"
@@ -525,9 +522,9 @@ export function ClientPage() {
                   <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Советы на звонок</p>
                   <div className="space-y-2">
                     {briefMutation.data.callTips.map((tip, index) => (
-                      <div key={index} className="flex items-start gap-2 rounded-[24px] border border-white/70 bg-[rgba(214,219,225,0.44)] px-4 py-3 shadow-panel-soft">
+                      <div key={index} className="flex items-start gap-2 glass-inner rounded-xl px-4 py-3">
                         <span className="text-accent mt-0.5">{index + 1}.</span>
-                        <p className="text-sm text-ink-secondary">{tip}</p>
+                        <p className="text-[13px] text-ink-secondary">{tip}</p>
                       </div>
                     ))}
                   </div>
@@ -540,7 +537,7 @@ export function ClientPage() {
         {activePanel === 'last-call' && (
           <div className="p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-ink-muted">Последний звонок по клиенту</p>
+              <p className="text-[12px] text-ink-muted">Последний звонок по клиенту</p>
               <Button
                 size="sm"
                 variant="outline"
@@ -566,7 +563,7 @@ export function ClientPage() {
                 {bitrixLastCallQ.data.summaryText && (
                   <Card className="bg-blue-50/60 border border-blue-100">
                     <p className="text-[11px] font-semibold text-accent uppercase tracking-widest mb-2">Summary</p>
-                    <p className="text-sm text-ink-secondary whitespace-pre-line leading-relaxed">
+                    <p className="text-[13px] text-ink-secondary whitespace-pre-line leading-relaxed">
                       {bitrixLastCallQ.data.summaryText}
                     </p>
                   </Card>
@@ -576,7 +573,7 @@ export function ClientPage() {
                   <Card>
                     <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">AI review</p>
                     {typeof bitrixLastCallQ.data.aiReview === 'string' ? (
-                      <p className="text-sm text-ink-secondary whitespace-pre-line">{bitrixLastCallQ.data.aiReview}</p>
+                      <p className="text-[13px] text-ink-secondary whitespace-pre-line">{bitrixLastCallQ.data.aiReview}</p>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {Object.entries(bitrixLastCallQ.data.aiReview).map(([key, value]) => (
@@ -590,8 +587,8 @@ export function ClientPage() {
                 {bitrixLastCallQ.data.transcriptText && (
                   <Card>
                     <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-3">Транскрипт</p>
-                    <div className="max-h-[280px] overflow-y-auto rounded-[24px] border border-white/70 bg-[rgba(214,219,225,0.4)] px-4 py-3 shadow-panel-soft">
-                      <p className="text-sm text-ink-secondary whitespace-pre-line leading-relaxed">
+                    <div className="max-h-[280px] overflow-y-auto glass-inner rounded-xl px-4 py-3">
+                      <p className="text-[13px] text-ink-secondary whitespace-pre-line leading-relaxed">
                         {bitrixLastCallQ.data.transcriptText}
                       </p>
                     </div>
@@ -604,13 +601,13 @@ export function ClientPage() {
 
         {activePanel === 'temp-manager' && (
           <div className="p-6 space-y-4">
-            <Card className="border border-white/75 bg-[rgba(214,219,225,0.42)] shadow-panel-soft">
+            <Card className="glass-inner">
               <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-2">Текущий менеджер</p>
               <p className="text-sm font-medium text-ink">{client.managerName}</p>
               {originalBridgeManager ? (
-                <p className="text-xs text-ink-muted mt-1">Bitrix user ID: {originalBridgeManager.bitrixUserId}</p>
+                <p className="text-[11px] text-ink-muted mt-1">Bitrix user ID: {originalBridgeManager.bitrixUserId}</p>
               ) : (
-                <p className="text-xs text-risk-high mt-1">
+                <p className="text-[11px] text-risk-high mt-1">
                   Не удалось сопоставить текущего менеджера с командой backend Антона. Попроси Антона зарегистрировать сотрудника в `/employees/team`.
                 </p>
               )}
@@ -634,16 +631,16 @@ export function ClientPage() {
                       key={member.id}
                       onClick={() => setSelectedTempManagerId(member.bitrixUserId)}
                       className={clsx(
-                        'w-full rounded-[24px] border px-4 py-3 text-left transition-all duration-150',
+                        'w-full rounded-xl border px-4 py-3 text-left transition-all duration-150',
                         selectedTempManagerId === member.bitrixUserId
-                          ? 'border-accent bg-[linear-gradient(180deg,rgba(232,241,255,0.98)_0%,rgba(223,236,255,0.92)_100%)] shadow-panel-soft'
-                          : 'border-white/80 bg-white/88 shadow-panel-soft hover:-translate-y-0.5 hover:bg-white'
+                          ? 'border-accent bg-blue-50/60 shadow-panel-soft'
+                          : 'border-edge bg-white/80 hover:-translate-y-0.5 hover:bg-white'
                       )}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div>
                           <p className="text-sm font-medium text-ink">{member.name}</p>
-                          <p className="text-xs text-ink-muted mt-1">{member.role} · рейтинг {member.rating}/10</p>
+                          <p className="text-[11px] text-ink-muted mt-1">{member.role} · рейтинг {member.rating}/10</p>
                         </div>
                         {selectedTempManagerId === member.bitrixUserId && (
                           <CheckCircle size={16} className="text-accent flex-shrink-0" />
@@ -663,7 +660,7 @@ export function ClientPage() {
                   </Button>
                 </div>
                 {assignTempManagerMutation.isError && (
-                  <p className="text-xs text-risk-high mt-3">{assignTempManagerMutation.error.message}</p>
+                  <p className="text-[11px] text-risk-high mt-3">{assignTempManagerMutation.error.message}</p>
                 )}
               </Card>
             )}
@@ -673,13 +670,13 @@ export function ClientPage() {
               {tempManagersQ.data && tempManagersQ.data.length > 0 ? (
                 <div className="space-y-2">
                   {tempManagersQ.data.map((assignment) => (
-                    <div key={assignment.assignmentId} className="rounded-[24px] border border-white/80 bg-white/88 px-4 py-3 shadow-panel-soft">
+                    <div key={assignment.assignmentId} className="rounded-xl border border-edge bg-white/80 px-4 py-3">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-sm font-medium text-ink">
                             {assignment.originalManager.name ?? 'Основной менеджер'} → {assignment.tempManager.name ?? 'Временный менеджер'}
                           </p>
-                          <p className="text-xs text-ink-muted mt-1">
+                          <p className="text-[11px] text-ink-muted mt-1">
                             Создано: {assignment.createdAt ? formatDateTime(assignment.createdAt) : '—'}
                           </p>
                         </div>
@@ -696,7 +693,7 @@ export function ClientPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-ink-muted">Активных замен пока нет</p>
+                <p className="text-[12px] text-ink-muted">Активных замен пока нет</p>
               )}
             </Card>
           </div>
@@ -724,45 +721,45 @@ function ToolActionButton({
       onClick={onClick}
       disabled={disabled}
       className={clsx(
-        'rounded-[28px] border border-white/82 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(247,250,254,0.95)_100%)] px-5 py-4 text-left shadow-panel-soft transition-all duration-150',
-        'hover:-translate-y-0.5 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed'
+        'glass-panel px-5 py-4 text-left transition-all duration-150',
+        'hover:-translate-y-0.5 hover:shadow-card-hover disabled:opacity-50 disabled:cursor-not-allowed'
       )}
     >
       <div className="mb-2 flex items-center gap-2 text-accent">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 shadow-panel-soft">
+        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50">
           {icon}
         </span>
         <span className="text-sm font-medium text-ink">{title}</span>
       </div>
-      <p className="text-xs text-ink-muted leading-relaxed">{description}</p>
+      <p className="text-[11px] text-ink-muted leading-relaxed">{description}</p>
     </button>
   )
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-baseline gap-2 rounded-[18px] border border-white/70 bg-white/68 px-3 py-2 shadow-panel-soft">
-      <span className="text-xs text-ink-muted flex-shrink-0 w-20">{label}</span>
-      <span className="text-xs text-ink font-medium">{value}</span>
+    <div className="flex items-baseline gap-2 glass-inner rounded-lg px-3 py-2">
+      <span className="text-[11px] text-ink-muted flex-shrink-0 w-20">{label}</span>
+      <span className="text-[12px] text-ink font-medium">{value}</span>
     </div>
   )
 }
 
 function InfoMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[24px] border border-white/80 bg-white/88 px-4 py-3 shadow-panel-soft">
+    <div className="rounded-xl border border-edge bg-white/80 px-4 py-3">
       <p className="text-[11px] text-ink-muted mb-1">{label}</p>
-      <p className="text-sm text-ink">{value}</p>
+      <p className="text-[13px] text-ink">{value}</p>
     </div>
   )
 }
 
 function PanelError({ message }: { message: string }) {
   return (
-    <Card className="border border-red-200/80 bg-[linear-gradient(180deg,rgba(255,244,244,0.98)_0%,rgba(255,236,236,0.94)_100%)] shadow-panel-soft">
+    <Card className="border border-red-200/80 bg-red-50/60">
       <div className="flex items-start gap-2">
         <AlertCircle size={14} className="text-risk-high mt-0.5 flex-shrink-0" />
-        <p className="text-sm text-risk-high">{message}</p>
+        <p className="text-[13px] text-risk-high">{message}</p>
       </div>
     </Card>
   )
@@ -786,10 +783,10 @@ function CommEventRow({ event }: { event: CommunicationEvent }) {
   }
 
   return (
-    <div className={clsx('flex items-start gap-3 px-6 py-4', event.isImportant && 'bg-amber-50/40')}>
+    <div className={clsx('flex items-start gap-3 px-5 py-3.5', event.isImportant && 'bg-amber-50/40')}>
       <div
         className={clsx(
-          'w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5',
+          'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5',
           iconColors[event.type] ?? 'bg-slate-100 text-ink-secondary'
         )}
       >
@@ -800,19 +797,19 @@ function CommEventRow({ event }: { event: CommunicationEvent }) {
           <span className="text-sm font-medium text-ink">{event.title}</span>
           {event.isImportant && <Badge variant="urgency-high">Важно</Badge>}
           {event.durationSeconds && (
-            <span className="text-xs text-ink-muted">{formatDuration(event.durationSeconds)}</span>
+            <span className="text-[11px] text-ink-muted">{formatDuration(event.durationSeconds)}</span>
           )}
         </div>
         {(event.summary || event.body) && (
-          <p className="text-xs text-ink-secondary leading-relaxed">{event.summary ?? event.body}</p>
+          <p className="text-[12px] text-ink-secondary leading-relaxed">{event.summary ?? event.body}</p>
         )}
         <div className="flex items-center gap-3 mt-1">
-          <span className="text-xs text-ink-muted">{event.author}</span>
-          <span className="text-xs text-ink-faint">·</span>
-          <span className="text-xs text-ink-muted">{formatDateTime(event.happenedAt)}</span>
+          <span className="text-[11px] text-ink-muted">{event.author}</span>
+          <span className="text-[11px] text-ink-faint">·</span>
+          <span className="text-[11px] text-ink-muted">{formatDateTime(event.happenedAt)}</span>
           {event.sentiment && (
             <>
-              <span className="text-xs text-ink-faint">·</span>
+              <span className="text-[11px] text-ink-faint">·</span>
               <SentimentBadge sentiment={event.sentiment} />
             </>
           )}
@@ -820,7 +817,7 @@ function CommEventRow({ event }: { event: CommunicationEvent }) {
         {event.attachments && event.attachments.length > 0 && (
           <div className="flex gap-2 mt-2">
             {event.attachments.map((attachment, index) => (
-              <a key={index} href={attachment.url} className="text-xs text-accent hover:underline flex items-center gap-1">
+              <a key={index} href={attachment.url} className="text-[11px] text-accent hover:underline flex items-center gap-1">
                 <FileText size={10} />{attachment.name}
               </a>
             ))}
@@ -862,19 +859,19 @@ function CallQualityCard({ comms }: { comms: CommunicationEvent[] }) {
           <ScoreBar score={quality.nextStepFixedScore} label="Фиксация следующего шага" />
 
           <div className="pt-3 border-t border-edge space-y-1.5">
-            <p className="text-xs font-semibold text-risk-low flex items-center gap-1">
+            <p className="text-[12px] font-semibold text-risk-low flex items-center gap-1">
               <CheckCircle size={11} />Хорошо
             </p>
             {quality.doneWell.slice(0, 2).map((item, index) => (
-              <p key={index} className="text-xs text-ink-secondary pl-3">· {item}</p>
+              <p key={index} className="text-[12px] text-ink-secondary pl-3">· {item}</p>
             ))}
           </div>
           <div className="space-y-1.5">
-            <p className="text-xs font-semibold text-risk-high flex items-center gap-1">
+            <p className="text-[12px] font-semibold text-risk-high flex items-center gap-1">
               <AlertCircle size={11} />Упущено
             </p>
             {quality.missed.slice(0, 2).map((item, index) => (
-              <p key={index} className="text-xs text-ink-secondary pl-3">· {item}</p>
+              <p key={index} className="text-[12px] text-ink-secondary pl-3">· {item}</p>
             ))}
           </div>
         </div>

@@ -14,6 +14,7 @@ import { ErrorState } from '@/components/ui/EmptyState'
 import { SidePanel } from '@/components/ui/SidePanel'
 import type { IncomingRequest, PriorityDeal } from '@/types'
 import { formatRub, formatDaysAgo, formatDateTime, urgencyLabel } from '@/utils/format'
+import { clsx } from 'clsx'
 
 export function TodayPage() {
   const navigate = useNavigate()
@@ -42,48 +43,43 @@ export function TodayPage() {
   const sentimentFeed = sentimentQ.data ?? []
 
   return (
-    <div className="space-y-4 animate-fade-in max-w-[1200px]">
+    <div className="space-y-5 animate-fade-in max-w-[1200px]">
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <StatBlock
-            label="Сделки в риске"
-            value={summary.dealsAtRisk}
-            icon={<AlertTriangle size={22} strokeWidth={2.2} />}
-            onClick={() => navigate('/risks')}
-          />
-          <StatBlock
-            label="Зависшие сделки"
-            value={summary.stalledDeals}
-            icon={<Clock size={22} strokeWidth={2.2} />}
-            onClick={() => navigate('/risks?category=stalled')}
-          />
-          <StatBlock
-            label="Входящих"
-            value={summary.pendingIncoming}
-            icon={<Inbox size={22} strokeWidth={2.2} />}
-          />
-          <StatBlock
-            label="VIP клиенты"
-            value={summary.vipClients}
-            icon={<Crown size={22} strokeWidth={2.2} />}
-          />
-          <StatBlock
-            label="Follow-Up сегодня"
-            value={summary.todayFollowUps}
-            icon={<Clock size={22} strokeWidth={2.2} />}
-          />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <StatBlock
+          label="Сделки в риске"
+          value={summary.dealsAtRisk}
+          icon={<AlertTriangle size={18} strokeWidth={2} />}
+          onClick={() => navigate('/risks')}
+        />
+        <StatBlock
+          label="Зависшие сделки"
+          value={summary.stalledDeals}
+          icon={<Clock size={18} strokeWidth={2} />}
+          onClick={() => navigate('/risks?category=stalled')}
+        />
+        <StatBlock
+          label="Входящих"
+          value={summary.pendingIncoming}
+          icon={<Inbox size={18} strokeWidth={2} />}
+        />
+        <StatBlock
+          label="VIP клиенты"
+          value={summary.vipClients}
+          icon={<Crown size={18} strokeWidth={2} />}
+        />
+        <StatBlock
+          label="Follow-Up сегодня"
+          value={summary.todayFollowUps}
+          icon={<Clock size={18} strokeWidth={2} />}
+        />
       </div>
 
       {/* VIP Clients */}
       {vipAlerts.length > 0 && (
-        <section
-          className="rounded-[38px] px-7 py-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.32),0_20px_38px_rgba(129,149,193,0.15)]"
-          style={{
-            background: 'linear-gradient(180deg, rgba(191,203,231,0.72) 0%, rgba(187,199,228,0.68) 100%)',
-          }}
-        >
-          <h2 className="font-display text-[22px] leading-none tracking-[-0.06em] text-[#0c1018]">VIP Клиенты</h2>
-          <div className="mt-5 space-y-5">
+        <section className="glass-section px-6 py-6">
+          <h2 className="font-display text-[18px] leading-none tracking-display text-ink">VIP Клиенты</h2>
+          <div className="mt-4 space-y-3">
             {vipAlerts.map((alert) => (
               <VipClientRow
                 key={alert.id}
@@ -100,13 +96,13 @@ export function TodayPage() {
 
       {/* Priority Deals */}
       <div>
-        <div className="mb-2 flex items-center justify-between px-2 py-1.5">
-          <h2 className="font-display text-ink text-[14px]">Приоритетные сделки</h2>
+        <div className="mb-2 flex items-center justify-between px-1">
+          <h2 className="font-display text-ink text-sm">Приоритетные сделки</h2>
           <Button size="sm" variant="ghost" onClick={() => navigate('/risks')} icon={<ChevronRight size={13} />}>
             Все риски
           </Button>
         </div>
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {deals.map((deal) => (
             <PriorityDealRow key={deal.id} deal={deal} onClick={() => navigate(`/clients/${deal.clientId}`)} />
           ))}
@@ -115,21 +111,21 @@ export function TodayPage() {
 
       {/* Incoming Requests */}
       <div>
-        <div className="mb-2 flex items-center justify-between px-2 py-1.5">
+        <div className="mb-2 flex items-center justify-between px-1">
           <div className="flex items-center gap-3">
-            <h2 className="font-display text-ink text-[14px]">Входящие обращения</h2>
+            <h2 className="font-display text-ink text-sm">Входящие обращения</h2>
             {incoming.length > 0 && (
-              <span className="text-xs bg-blue-50 text-accent font-semibold rounded-lg px-2 py-0.5">
+              <span className="text-[11px] bg-blue-50 text-accent font-semibold rounded-lg px-2 py-0.5">
                 {incoming.length}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-ink-muted">
+          <div className="flex items-center gap-1.5 text-[11px] text-ink-muted">
             <Zap size={10} className="text-accent" />
             AI-маршрутизация
           </div>
         </div>
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {incoming.map((req) => (
             <IncomingRequestRow
               key={req.id}
@@ -145,21 +141,21 @@ export function TodayPage() {
       {/* Sentiment Feed */}
       {sentimentFeed.length > 0 && (
         <div>
-          <div className="mb-2 px-2 py-1.5">
-            <h2 className="font-display text-ink text-[14px]">Изменения настроения</h2>
+          <div className="mb-2 px-1">
+            <h2 className="font-display text-ink text-sm">Изменения настроения</h2>
           </div>
-          <div className="grid grid-cols-1 gap-2.5 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             {sentimentFeed.map((item) => (
               <div
                 key={item.clientId}
-                className="glass-panel p-4 hover:bg-surface-hover cursor-pointer transition-colors"
+                className="glass-panel p-4 hover:shadow-card-hover hover:-translate-y-0.5 cursor-pointer transition-all duration-200"
                 onClick={() => navigate(`/clients/${item.clientId}`)}
               >
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2.5">
                   {item.isVip && <VipBadge />}
                   <span className="font-medium text-ink text-xs truncate">{item.clientName}</span>
                 </div>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2.5">
                   <SentimentBadge sentiment={item.previousSentiment} />
                   {item.change === 'improved'
                     ? <TrendingUp size={12} className="text-risk-low" />
@@ -168,7 +164,7 @@ export function TodayPage() {
                     : <Minus size={12} className="text-ink-faint" />}
                   <SentimentBadge sentiment={item.currentSentiment} />
                 </div>
-                <p className="text-xs text-ink-muted leading-relaxed">{item.reason}</p>
+                <p className="text-[11px] text-ink-muted leading-relaxed">{item.reason}</p>
               </div>
             ))}
           </div>
@@ -195,7 +191,7 @@ export function TodayPage() {
               <p className="text-sm text-ink-secondary mt-2">{selectedRequest.summary}</p>
             </div>
 
-            <div className="bg-blue-50 rounded-2xl p-4">
+            <div className="bg-blue-50 rounded-xl p-4">
               <div className="flex items-center gap-1.5 mb-2">
                 <Zap size={12} className="text-accent" />
                 <span className="text-xs font-semibold text-accent">AI Рекомендация</span>
@@ -241,29 +237,24 @@ function StatBlock({
 }) {
   return (
     <div
-      className={onClick ? 'cursor-pointer group' : ''}
+      className={clsx(
+        'glass-panel flex flex-col min-h-[88px] px-5 pb-3 pt-4 transition-all duration-200',
+        onClick && 'cursor-pointer group hover:-translate-y-0.5 hover:shadow-card-hover',
+      )}
       onClick={onClick}
     >
-      <div
-        className="flex min-h-[92px] flex-col rounded-[26px] border border-white/85 px-5.5 pb-3 pt-4 shadow-[0_14px_26px_rgba(133,149,184,0.15)] transition-all duration-200"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,248,250,0.96) 100%)',
-        }}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <p className="font-display text-[13px] leading-[1.08] tracking-[-0.05em] text-[#111111]">
-            {label}
-          </p>
-          <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center text-accent transition-transform duration-200 group-hover:scale-105">
-            {icon}
-          </span>
-        </div>
-
-        <div className="mt-auto flex justify-center pt-2.5">
-          <p className="font-display text-[28px] leading-none tracking-[-0.07em] text-[#05070b]">
-            {value}
-          </p>
-        </div>
+      <div className="flex items-start justify-between gap-3">
+        <p className="font-display text-[13px] leading-tight tracking-display text-ink">
+          {label}
+        </p>
+        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50 text-accent transition-transform duration-200 group-hover:scale-105 [&>svg]:w-[18px] [&>svg]:h-[18px]">
+          {icon}
+        </span>
+      </div>
+      <div className="mt-auto flex justify-center pt-2">
+        <p className="font-display text-[26px] leading-none tracking-metric text-ink">
+          {value}
+        </p>
       </div>
     </div>
   )
@@ -283,64 +274,50 @@ function VipClientRow({
   onOpen: () => void
 }) {
   const severityConfig = {
-    low: { label: 'Низкий', color: '#10b981' },
-    medium: { label: 'Средний', color: '#ff8a1e' },
-    high: { label: 'Высокий', color: '#ff4343' },
-    critical: { label: 'Критический', color: '#d11f1f' },
+    low: { label: 'Низкий', color: 'text-risk-low' },
+    medium: { label: 'Средний', color: 'text-risk-medium' },
+    high: { label: 'Высокий', color: 'text-risk-high' },
+    critical: { label: 'Критический', color: 'text-risk-critical' },
   } as const
 
   const currentSeverity = severityConfig[severity]
 
   return (
-    <div
-      className="rounded-[34px] border border-white/86 px-5 py-5 shadow-[0_18px_34px_rgba(122,143,187,0.15)]"
-      style={{
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.96) 100%)',
-      }}
-    >
+    <div className="glass-panel px-5 py-4">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start">
-        <div
-          className="min-w-0 flex-1 rounded-[24px] px-4.5 py-4"
-          style={{ background: 'rgba(214, 219, 225, 0.62)' }}
-        >
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_210px] xl:items-start">
+        <div className="min-w-0 flex-1 glass-inner rounded-xl px-4 py-3.5">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_200px] xl:items-start">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
-                <p className="truncate font-display text-[17px] leading-tight tracking-[-0.055em] text-[#0d1018]">
+                <p className="truncate font-display text-[15px] leading-tight tracking-display text-ink">
                   {clientName}
                 </p>
-                <span
-                  className="inline-flex items-center gap-1.5 text-[15px] font-medium tracking-[-0.05em]"
-                  style={{ color: currentSeverity.color }}
-                >
-                  <Flag size={14} strokeWidth={2.2} />
+                <span className={clsx('inline-flex items-center gap-1.5 text-sm font-medium tracking-tight', currentSeverity.color)}>
+                  <Flag size={13} strokeWidth={2.2} />
                   {currentSeverity.label}
                 </span>
               </div>
-              <div className="mt-3 h-px w-full bg-[rgba(129,139,155,0.28)]" />
-              <p className="mt-3 text-[14px] leading-[1.34] tracking-[-0.045em] text-[#7e848c]">
+              <div className="mt-2.5 h-px w-full bg-edge" />
+              <p className="mt-2.5 text-[13px] leading-relaxed text-ink-muted">
                 {message}
               </p>
             </div>
 
             <div className="min-w-0 xl:pl-4">
-              <p className="font-display text-[17px] leading-tight tracking-[-0.05em] text-[#0d1018]">
+              <p className="font-display text-[15px] leading-tight tracking-display text-ink">
                 Менеджер
               </p>
-              <div className="mt-3 h-px w-full bg-[rgba(129,139,155,0.28)]" />
-              <p className="mt-3 truncate text-[14px] leading-[1.34] tracking-[-0.045em] text-[#7e848c]">
+              <div className="mt-2.5 h-px w-full bg-edge" />
+              <p className="mt-2.5 truncate text-[13px] leading-relaxed text-ink-muted">
                 {managerName}
               </p>
             </div>
           </div>
         </div>
 
-        <button
-          onClick={onOpen}
-          className="flex h-[48px] min-w-[148px] items-center justify-center self-center rounded-full bg-[linear-gradient(180deg,#2471ff_0%,#0056f5_100%)] px-5 text-[15px] font-medium tracking-[-0.045em] text-white shadow-[0_14px_28px_rgba(0,86,245,0.26)] transition-transform duration-150 hover:-translate-y-0.5"
-        >
+        <Button variant="primary" size="lg" onClick={onOpen} className="self-center min-w-[140px]">
           Смотреть
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -348,19 +325,19 @@ function VipClientRow({
 
 function PriorityDealRow({ deal, onClick }: { deal: PriorityDeal; onClick: () => void }) {
   return (
-    <div className="glass-panel flex items-center gap-4 px-6 py-4 transition-colors group">
+    <div className="glass-panel flex items-center gap-4 px-5 py-3.5 transition-all duration-200 group hover:shadow-card-hover">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <span className="font-medium text-ink text-sm truncate">{deal.clientName}</span>
           {deal.isVip && <VipBadge />}
         </div>
-        <p className="text-xs text-ink-muted truncate">{deal.riskReason}</p>
+        <p className="text-[11px] text-ink-muted truncate">{deal.riskReason}</p>
       </div>
 
       <div className="flex items-center gap-3 flex-shrink-0">
         <div className="text-right hidden md:block">
           <p className="text-xs font-semibold text-ink">{formatRub(deal.amount)}</p>
-          <p className="text-xs text-ink-muted">{deal.stageLabel}</p>
+          <p className="text-[11px] text-ink-muted">{deal.stageLabel}</p>
         </div>
         <Badge variant="stage" className="hidden lg:inline-flex">{deal.managerName}</Badge>
         <RiskBadge level={deal.riskLevel} score={deal.riskScore} />
@@ -370,11 +347,11 @@ function PriorityDealRow({ deal, onClick }: { deal: PriorityDeal; onClick: () =>
       <div className="flex-shrink-0 hidden xl:block max-w-[220px]">
         <div className="flex items-start gap-1.5">
           <Zap size={10} className="text-accent flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-ink-muted leading-relaxed line-clamp-2">{deal.aiNextAction}</p>
+          <p className="text-[11px] text-ink-muted leading-relaxed line-clamp-2">{deal.aiNextAction}</p>
         </div>
       </div>
 
-      <div className="text-xs text-ink-muted flex-shrink-0 hidden lg:block text-right">
+      <div className="text-[11px] text-ink-muted flex-shrink-0 hidden lg:block text-right">
         <p>{formatDaysAgo(deal.daysSinceContact)}</p>
       </div>
 
@@ -409,7 +386,7 @@ function IncomingRequestRow({
   }[request.channel]
 
   return (
-    <div className="glass-panel flex items-center gap-4 px-6 py-4 transition-colors group">
+    <div className="glass-panel flex items-center gap-4 px-5 py-3.5 transition-all duration-200 group hover:shadow-card-hover">
       <div className="flex-shrink-0 text-ink-muted">{channelIcon}</div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
@@ -417,12 +394,12 @@ function IncomingRequestRow({
           <Badge variant={`urgency-${request.urgency}`} dot>{urgencyLabel(request.urgency)}</Badge>
           {request.isNew && <Badge variant="stage">Новое</Badge>}
         </div>
-        <p className="text-xs text-ink-muted truncate">{request.topic}</p>
+        <p className="text-[11px] text-ink-muted truncate">{request.topic}</p>
       </div>
 
       <div className="flex-shrink-0 hidden md:block text-right">
         <p className="text-xs font-medium text-ink">{request.recommendedAssignee}</p>
-        <p className="text-xs text-ink-muted">AI рекомендация</p>
+        <p className="text-[11px] text-ink-muted">AI рекомендация</p>
       </div>
 
       <div className="flex items-center gap-2 flex-shrink-0">

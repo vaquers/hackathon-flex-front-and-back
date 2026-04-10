@@ -21,7 +21,7 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
           key={tab.id}
           onClick={() => onChange(tab.id)}
           className={clsx(
-            'px-4 py-2.5 text-[12px] font-medium rounded-xl transition-colors duration-150 flex items-center gap-1.5',
+            'px-3.5 py-2 text-[12px] font-medium rounded-xl transition-colors duration-150 flex items-center gap-1.5',
             activeTab === tab.id
               ? 'bg-blue-50 text-accent'
               : 'text-ink-muted hover:text-ink-secondary hover:bg-surface-hover'

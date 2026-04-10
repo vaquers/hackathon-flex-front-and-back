@@ -2,7 +2,7 @@ import { clsx } from 'clsx'
 
 export function Skeleton({ className }: { className?: string }) {
   return (
-    <div className={clsx('rounded-2xl bg-edge/40 animate-skeleton-pulse', className)} />
+    <div className={clsx('rounded-lg bg-edge/40 animate-skeleton-pulse', className)} />
   )
 }
 

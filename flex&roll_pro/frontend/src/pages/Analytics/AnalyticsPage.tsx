@@ -49,10 +49,10 @@ export function AnalyticsPage() {
   return (
     <div className="animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="font-display text-ink text-lg leading-tight">Аналитика</h1>
-          <p className="text-xs text-ink-muted mt-0.5">Executive Dashboard · {overview.period}</p>
+          <h1 className="font-display page-title">Аналитика</h1>
+          <p className="page-subtitle">Executive Dashboard · {overview.period}</p>
         </div>
         <div className="flex gap-0.5 glass-panel p-1">
           {PERIODS.map((p) => (
@@ -60,7 +60,7 @@ export function AnalyticsPage() {
               key={p.id}
               onClick={() => setPeriod(p.id)}
               className={clsx(
-                'text-xs px-3 py-1.5 rounded-full transition-colors font-medium',
+                'text-[12px] px-3 py-1.5 rounded-lg transition-colors font-medium',
                 period === p.id
                   ? 'bg-accent text-white'
                   : 'text-ink-muted hover:text-ink-secondary'
@@ -73,7 +73,7 @@ export function AnalyticsPage() {
       </div>
 
       {/* Overview stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 mb-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 mb-5">
         <OverviewStat label="Выручка"         value={formatRub(overview.totalRevenue)}  color="emerald" />
         <OverviewStat label="Всего сделок"    value={overview.totalDeals.toString()} />
         <OverviewStat label="Закрыто"         value={overview.wonDeals.toString()}       color="emerald" />
@@ -85,11 +85,11 @@ export function AnalyticsPage() {
 
       {/* Tabs */}
       <div className="glass-panel overflow-hidden">
-        <div className="px-6 pt-4 border-b border-edge">
+        <div className="px-5 pt-4 border-b border-edge">
           <Tabs tabs={TABS} activeTab={activeTab} onChange={(id) => setActiveTab(id as AnalyticsTab)} />
         </div>
 
-        <div className="p-6">
+        <div className="p-5">
           {activeTab === 'kpi'      && <KpiTab period={period} />}
           {activeTab === 'dynamics' && <DynamicsTab period={period} />}
           {activeTab === 'quality'  && <QualityTab period={period} />}
@@ -123,15 +123,15 @@ function KpiTab({ period }: { period: string }) {
         <tbody className="divide-y divide-edge">
           {kpi?.map((emp) => (
             <tr key={emp.managerId} className="hover:bg-surface-hover transition-colors">
-              <td className="py-3.5 pr-4">
+              <td className="py-3 pr-4">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-blue-50 text-accent text-xs font-bold flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-accent text-xs font-bold flex items-center justify-center flex-shrink-0">
                     {emp.managerName.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                   </div>
                   <span className="text-sm font-medium text-ink">{emp.managerName}</span>
                 </div>
               </td>
-              <td className="py-3.5 pr-4">
+              <td className="py-3 pr-4">
                 <span className={clsx(
                   'text-sm font-medium',
                   emp.avgResponseTimeMinutes <= 90  ? 'text-risk-low'
@@ -141,10 +141,10 @@ function KpiTab({ period }: { period: string }) {
                   {Math.floor(emp.avgResponseTimeMinutes / 60)}ч {emp.avgResponseTimeMinutes % 60}м
                 </span>
               </td>
-              <td className="py-3.5 pr-4">
+              <td className="py-3 pr-4">
                 <span className="text-sm text-ink-secondary">{emp.activeDeals}</span>
               </td>
-              <td className="py-3.5 pr-4">
+              <td className="py-3 pr-4">
                 <div className="flex items-center gap-2">
                   <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div className="h-full bg-accent rounded-full" style={{ width: `${emp.conversionRate * 3}%` }} />
@@ -152,10 +152,10 @@ function KpiTab({ period }: { period: string }) {
                   <span className="text-sm font-medium text-ink">{emp.conversionRate}%</span>
                 </div>
               </td>
-              <td className="py-3.5 pr-4">
+              <td className="py-3 pr-4">
                 <WorkloadBar value={emp.workload} />
               </td>
-              <td className="py-3.5 pr-4">
+              <td className="py-3 pr-4">
                 <span className={clsx(
                   'text-sm font-medium',
                   emp.followUpDiscipline >= 85 ? 'text-risk-low'
@@ -165,13 +165,13 @@ function KpiTab({ period }: { period: string }) {
                   {emp.followUpDiscipline}%
                 </span>
               </td>
-              <td className="py-3.5 pr-4">
+              <td className="py-3 pr-4">
                 <span className="text-sm text-ink-secondary">{emp.avgDealCycleDays} дн.</span>
               </td>
-              <td className="py-3.5 pr-4">
+              <td className="py-3 pr-4">
                 <span className="text-sm font-semibold text-ink">{formatRub(emp.totalRevenue)}</span>
               </td>
-              <td className="py-3.5">
+              <td className="py-3">
                 <QualityChip score={emp.callQualityScore} />
               </td>
             </tr>
@@ -193,7 +193,7 @@ function DynamicsTab({ period }: { period: string }) {
   const tooltipStyle = { fontSize: 12, borderRadius: 12, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <Card>
         <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest mb-4">Конверсия %</p>
         <ResponsiveContainer width="100%" height={200}>
@@ -263,11 +263,11 @@ function QualityTab({ period }: { period: string }) {
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-ink mb-1">Сравнение по критериям</h3>
         {quality?.map((emp) => (
-          <div key={emp.managerId} className="p-4 bg-surface-inner rounded-[28px] border border-white/80 shadow-panel-soft">
+          <div key={emp.managerId} className="p-4 glass-inner rounded-xl">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-ink">{emp.managerName}</span>
               <QualityChip score={emp.avgCommunicationScore} />
@@ -278,7 +278,7 @@ function QualityTab({ period }: { period: string }) {
               <ScoreBar score={emp.nextStepFixationScore}     label="Фиксация следующего шага" />
               <ScoreBar score={emp.conversationRetentionScore} label="Удержание разговора" />
             </div>
-            <p className="text-xs text-ink-muted mt-2">{emp.callsAnalyzed} звонков проанализировано</p>
+            <p className="text-[11px] text-ink-muted mt-2">{emp.callsAnalyzed} звонков проанализировано</p>
           </div>
         ))}
       </div>
@@ -321,8 +321,8 @@ function LossesTab({ period }: { period: string }) {
   const stages  = stagesQ.data ?? []
 
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <h3 className="text-sm font-semibold text-ink mb-4">Потери по стадиям воронки</h3>
           <div className="space-y-3">
@@ -331,15 +331,15 @@ function LossesTab({ period }: { period: string }) {
               return (
                 <div key={stage.stage} className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-ink-secondary">{stage.stageLabel}</span>
+                    <span className="text-[12px] text-ink-secondary">{stage.stageLabel}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-risk-high font-medium">{stage.count} сделок</span>
-                      <span className="text-xs text-ink-muted">{formatRub(stage.totalAmount)}</span>
+                      <span className="text-[12px] text-risk-high font-medium">{stage.count} сделок</span>
+                      <span className="text-[11px] text-ink-muted">{formatRub(stage.totalAmount)}</span>
                     </div>
                   </div>
-                  <div className="h-6 bg-surface-inner rounded-xl overflow-hidden">
+                  <div className="h-5 glass-inner rounded-lg overflow-hidden">
                     <div
-                      className="h-full rounded-xl flex items-center justify-end pr-2 transition-all duration-700"
+                      className="h-full rounded-lg flex items-center justify-end pr-2 transition-all duration-700"
                       style={{
                         width: `${(stage.count / maxCount) * 100}%`,
                         backgroundColor: CHART_COLORS[i] ?? '#cbd5e1',
@@ -377,8 +377,8 @@ function LossesTab({ period }: { period: string }) {
             {reasons.map((r, i) => (
               <div key={r.reason} className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
-                <span className="text-xs text-ink-secondary flex-1">{r.reason}</span>
-                <span className="text-xs font-medium text-ink">{r.count}</span>
+                <span className="text-[12px] text-ink-secondary flex-1">{r.reason}</span>
+                <span className="text-[12px] font-medium text-ink">{r.count}</span>
               </div>
             ))}
           </div>
@@ -386,11 +386,11 @@ function LossesTab({ period }: { period: string }) {
       </div>
 
       <div className="glass-panel p-5">
-        <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-3">AI Инсайты</p>
+        <p className="text-[11px] font-semibold text-accent uppercase tracking-widest mb-3">AI Инсайты</p>
         <ul className="space-y-2">
-          <li className="text-xs text-ink-secondary">· Главная причина потерь — долгий расчёт (32%). Введите KPI «расчёт за 48 часов» для снижения на ~15%</li>
-          <li className="text-xs text-ink-secondary">· Большинство потерь происходит на стадии «КП отправлено». Рекомендуется автоматический follow-up через 5 дней</li>
-          <li className="text-xs text-ink-secondary">· Павел Волков имеет самый длинный цикл ответа (180 мин) — рекомендуется коучинг по работе с входящими</li>
+          <li className="text-[12px] text-ink-secondary">· Главная причина потерь — долгий расчёт (32%). Введите KPI «расчёт за 48 часов» для снижения на ~15%</li>
+          <li className="text-[12px] text-ink-secondary">· Большинство потерь происходит на стадии «КП отправлено». Рекомендуется автоматический follow-up через 5 дней</li>
+          <li className="text-[12px] text-ink-secondary">· Павел Волков имеет самый длинный цикл ответа (180 мин) — рекомендуется коучинг по работе с входящими</li>
         </ul>
       </div>
     </div>
@@ -406,9 +406,9 @@ function OverviewStat({ label, value, color }: { label: string; value: string; c
     accent:  'text-accent',
   }
   return (
-    <div className="rounded-[24px] border border-white/82 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,250,253,0.95)_100%)] p-3 text-center shadow-panel-soft">
+    <div className="glass-panel p-3 text-center">
       <p className="text-[10px] text-ink-muted mb-0.5 truncate">{label}</p>
-      <p className={clsx('font-display text-[14px]', color ? colorStyles[color] : 'text-ink')}>
+      <p className={clsx('font-display text-sm', color ? colorStyles[color] : 'text-ink')}>
         {value}
       </p>
     </div>
@@ -427,7 +427,7 @@ function WorkloadBar({ value }: { value: number }) {
           style={{ width: `${value}%` }}
         />
       </div>
-      <span className="text-xs text-ink-secondary">{value}%</span>
+      <span className="text-[12px] text-ink-secondary">{value}%</span>
     </div>
   )
 }
@@ -438,5 +438,5 @@ function QualityChip({ score }: { score: number }) {
     : score >= 65
     ? 'bg-amber-50 text-risk-medium'
     : 'bg-red-50 text-risk-high'
-  return <span className={clsx('text-xs font-bold px-2.5 py-1 rounded-full border border-white/80 shadow-panel-soft', color)}>{score}</span>
+  return <span className={clsx('text-[12px] font-bold px-2.5 py-1 rounded-full', color)}>{score}</span>
 }

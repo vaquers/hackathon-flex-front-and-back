@@ -56,12 +56,12 @@ export function RisksPage() {
   }))
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-5 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-ink text-lg leading-tight">Риски</h1>
-          <p className="text-xs text-ink-muted mt-0.5">Зависшие сделки и клиенты в зоне риска</p>
+          <h1 className="font-display page-title">Риски</h1>
+          <p className="page-subtitle">Зависшие сделки и клиенты в зоне риска</p>
         </div>
         {risks && risks.length > 0 && (
           <div className="flex items-center gap-2 text-sm">
@@ -74,12 +74,12 @@ export function RisksPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex items-center gap-1.5 text-xs text-ink-muted">
+        <div className="flex items-center gap-1.5 text-[11px] text-ink-muted">
           <Filter size={12} />
           <span>Фильтры:</span>
         </div>
         <select
-          className="text-sm border border-white/80 rounded-full px-4 py-2.5 text-ink bg-white/92 shadow-panel-soft focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+          className="input-base rounded-full px-4 py-2"
           value={managerId}
           onChange={(e) => setManagerId(e.target.value)}
         >
@@ -89,10 +89,10 @@ export function RisksPage() {
         </select>
         <button
           className={clsx(
-            'text-sm px-4 py-2.5 rounded-full transition-colors',
+            'text-[13px] px-4 py-2 rounded-full transition-all duration-150',
             vipOnly
               ? 'bg-blue-50 text-accent font-medium'
-              : 'border border-white/80 text-ink-secondary bg-white/92 hover:bg-surface-hover shadow-panel-soft'
+              : 'input-base'
           )}
           onClick={() => setVipOnly(!vipOnly)}
         >
@@ -102,7 +102,7 @@ export function RisksPage() {
 
       {/* Table card */}
       <div className="glass-panel overflow-hidden">
-        <div className="px-6 pt-4 border-b border-edge">
+        <div className="px-5 pt-4 border-b border-edge">
           <Tabs
             tabs={tabsWithCount.map((t) => ({ id: t.id, label: t.label, count: t.count }))}
             activeTab={activeTab}
@@ -172,12 +172,12 @@ export function RisksPage() {
               </div>
             </div>
 
-            <div className="bg-red-50 rounded-[24px] p-4 shadow-panel-soft">
+            <div className="bg-red-50 rounded-xl p-4">
               <p className="text-xs font-semibold text-risk-high mb-1">Причина риска</p>
               <p className="text-sm text-red-800">{selectedRisk.riskReason}</p>
             </div>
 
-            <div className="bg-blue-50 rounded-[24px] p-4 shadow-panel-soft">
+            <div className="bg-blue-50 rounded-xl p-4">
               <div className="flex items-center gap-1.5 mb-2">
                 <Zap size={12} className="text-accent" />
                 <p className="text-xs font-semibold text-accent">AI рекомендация</p>
@@ -216,19 +216,19 @@ function RiskRow({
 }) {
   return (
     <tr className="hover:bg-surface-hover transition-colors group">
-      <td className="py-3.5 pr-4">
+      <td className="py-3 pr-4">
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="font-medium text-ink text-sm">{risk.clientName}</span>
           {risk.isVip && <VipBadge />}
         </div>
       </td>
-      <td className="py-3.5 pr-4">
+      <td className="py-3 pr-4">
         <span className="text-sm text-ink-secondary">{risk.managerName}</span>
       </td>
-      <td className="py-3.5 pr-4">
+      <td className="py-3 pr-4">
         <Badge variant="stage">{risk.dealStageLabel}</Badge>
       </td>
-      <td className="py-3.5 pr-4">
+      <td className="py-3 pr-4">
         <span className={clsx(
           'text-sm font-medium',
           risk.daysSinceActivity >= 14 ? 'text-risk-high'
@@ -238,22 +238,22 @@ function RiskRow({
           {formatDaysAgo(risk.daysSinceActivity)}
         </span>
       </td>
-      <td className="py-3.5 pr-4 max-w-[200px]">
-        <p className="text-xs text-ink-secondary line-clamp-2">{risk.riskReason}</p>
+      <td className="py-3 pr-4 max-w-[200px]">
+        <p className="text-[11px] text-ink-secondary line-clamp-2">{risk.riskReason}</p>
       </td>
-      <td className="py-3.5 pr-4">
+      <td className="py-3 pr-4">
         <RiskBadge level={risk.riskLevel} score={risk.riskScore} />
       </td>
-      <td className="py-3.5 pr-4">
+      <td className="py-3 pr-4">
         <SentimentBadge sentiment={risk.sentiment} />
       </td>
-      <td className="py-3.5 pr-4 max-w-[200px]">
+      <td className="py-3 pr-4 max-w-[200px]">
         <div className="flex items-start gap-1">
           <Zap size={10} className="text-accent flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-ink-muted line-clamp-2">{risk.aiNextAction}</p>
+          <p className="text-[11px] text-ink-muted line-clamp-2">{risk.aiNextAction}</p>
         </div>
       </td>
-      <td className="py-3.5">
+      <td className="py-3">
         <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button size="sm" variant="ghost" onClick={onPreview}>Превью</Button>
           <Button size="sm" variant="outline" onClick={onOpen} icon={<ExternalLink size={12} />}>

@@ -41,18 +41,21 @@ export function SidePanel({ open, onClose, title, children, width = 'md' }: Side
       />
       <div
         className={clsx(
-          'relative h-full flex flex-col border-l border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.985)_0%,rgba(248,251,255,0.96)_100%)] shadow-[0_30px_64px_rgba(109,130,174,0.26)]',
+          'relative h-full flex flex-col',
+          'rounded-l-2xl',
+          'border-l border-white/70',
+          'bg-[linear-gradient(180deg,rgba(255,255,255,0.985)_0%,rgba(248,251,255,0.96)_100%)]',
+          'shadow-[0_24px_56px_rgba(109,130,174,0.22)]',
           widthStyles[width],
           'animate-slide-in-right',
-          '!rounded-l-[34px] !rounded-r-none'
         )}
       >
         {title && (
-          <div className="flex items-center justify-between px-6 py-5 border-b border-[rgba(182,193,216,0.42)] flex-shrink-0">
-            <h2 className="font-display text-ink text-[15px] tracking-[-0.05em]">{title}</h2>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-edge flex-shrink-0">
+            <h2 className="font-display text-ink text-[15px] tracking-display">{title}</h2>
             <button
               onClick={onClose}
-              className="text-ink-muted hover:text-ink p-2 rounded-full border border-white/80 bg-white/80 shadow-panel-soft hover:bg-white transition-colors"
+              className="text-ink-muted hover:text-ink p-2 rounded-xl bg-white/70 border border-edge hover:bg-white transition-colors"
             >
               <X size={16} />
             </button>

@@ -53,20 +53,20 @@ export function SearchPage() {
   return (
     <div className="animate-fade-in">
       {/* Header */}
-      <div className="mb-4">
-        <h1 className="font-display text-ink text-lg leading-tight">AI Поиск</h1>
-        <p className="text-xs text-ink-muted mt-0.5">Расчёты, КП, техдокументы и прошлые заказы</p>
+      <div className="mb-5">
+        <h1 className="font-display page-title">AI Поиск</h1>
+        <p className="page-subtitle">Расчёты, КП, техдокументы и прошлые заказы</p>
       </div>
 
       {/* Search Box */}
-      <div className="glass-panel p-5 mb-4">
+      <div className="glass-panel p-5 mb-5">
         <div className="flex gap-3 items-center">
-          <div className="flex-1 flex items-center gap-2.5 bg-surface-inner border border-white/80 rounded-[28px] px-4 py-3 shadow-panel-soft">
+          <div className="flex-1 flex items-center gap-2.5 rounded-xl border border-edge bg-white/80 px-4 py-2.5 shadow-input">
             <Search size={15} className="text-ink-muted flex-shrink-0" />
             <input
               ref={inputRef}
               type="text"
-              className="flex-1 bg-transparent outline-none text-ink placeholder:text-ink-muted text-sm"
+              className="flex-1 bg-transparent outline-none text-ink placeholder:text-ink-soft text-sm"
               placeholder="Найти расчёт, КП, техданные, прошлый заказ, шаблон..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -85,16 +85,16 @@ export function SearchPage() {
           </Button>
         </div>
 
-        <div className="flex gap-2 mt-3 flex-wrap">
+        <div className="flex gap-1.5 mt-3 flex-wrap">
           {DOC_TYPE_FILTERS.map((f) => (
             <button
               key={f.id}
               onClick={() => setActiveType(f.id)}
               className={clsx(
-                'text-xs px-3 py-1.5 rounded-xl transition-colors',
+                'text-[12px] px-3 py-1.5 rounded-lg transition-all duration-150',
                 activeType === f.id
                   ? 'bg-blue-50 text-accent font-medium'
-                  : 'border border-white/80 text-ink-secondary bg-white/90 hover:bg-surface-hover shadow-panel-soft'
+                  : 'text-ink-muted hover:text-ink-secondary hover:bg-surface-hover'
               )}
             >
               {f.label}
@@ -117,7 +117,7 @@ export function SearchPage() {
                     <span className="text-ink-muted"> · {searchQ.data.processingTime}мс</span>
                   )}
                 </p>
-                <div className="flex items-center gap-1 text-xs text-ink-muted">
+                <div className="flex items-center gap-1 text-[11px] text-ink-muted">
                   <Sparkles size={10} className="text-accent" />
                   RAG обработка
                 </div>
@@ -147,21 +147,21 @@ export function SearchPage() {
 
       {/* No search yet */}
       {!committed && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="glass-panel p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="glass-panel p-5">
             <div className="flex items-center gap-2 mb-4">
               <Clock size={13} className="text-ink-muted" />
               <h2 className="font-display text-ink text-sm">Часто используемые</h2>
             </div>
             {popularQ.isLoading && <Skeleton className="h-24 w-full" />}
             {popularQ.data && (
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {popularQ.data.map((doc) => (
-                  <div key={doc.id} className="flex items-center gap-2.5 p-3 rounded-[24px] hover:bg-surface-hover cursor-pointer transition-colors">
+                  <div key={doc.id} className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-surface-hover cursor-pointer transition-colors">
                     <span className="text-ink-muted">{DOC_TYPE_ICONS[doc.type as SearchResult['type']]}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-ink truncate">{doc.name}</p>
-                      <p className="text-xs text-ink-muted">{formatDate(doc.date)}</p>
+                      <p className="text-[11px] text-ink-muted">{formatDate(doc.date)}</p>
                     </div>
                     <ExternalLink size={11} className="text-ink-faint" />
                   </div>
@@ -170,12 +170,12 @@ export function SearchPage() {
             )}
           </div>
 
-          <div className="glass-panel p-6">
+          <div className="glass-panel p-5">
             <div className="flex items-center gap-2 mb-4">
               <Sparkles size={13} className="text-accent" />
               <h2 className="font-display text-ink text-sm">Примеры запросов</h2>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {[
                 'Расчёт гофроящика B2 для ТехноПак',
                 'Прошлый заказ мешков 25кг',
@@ -185,7 +185,7 @@ export function SearchPage() {
               ].map((hint) => (
                 <button
                   key={hint}
-                  className="w-full text-left text-sm text-accent hover:bg-blue-50 px-3 py-2.5 rounded-[24px] transition-colors"
+                  className="w-full text-left text-sm text-accent hover:bg-blue-50 px-3 py-2.5 rounded-xl transition-colors"
                   onClick={() => { setQuery(hint); setCommitted(hint) }}
                 >
                   <Search size={10} className="inline mr-2 text-ink-muted" />
@@ -210,34 +210,34 @@ function SearchResultCard({ result }: { result: SearchResult }) {
   }
 
   return (
-    <div className="glass-panel p-5 hover:-translate-y-0.5 hover:shadow-card-hover transition-all cursor-pointer">
+    <div className="glass-panel p-5 hover:-translate-y-0.5 hover:shadow-card-hover transition-all duration-200 cursor-pointer">
       <div className="flex items-start gap-3">
-        <div className={clsx('w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0', typeIconBg[result.type])}>
+        <div className={clsx('w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0', typeIconBg[result.type])}>
           {DOC_TYPE_ICONS[result.type]}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-2">
             <span className="font-medium text-ink text-sm">{result.name}</span>
             <Badge variant="stage">{result.typeLabel}</Badge>
-            <span className="text-xs text-ink-muted ml-auto">{formatDate(result.date)}</span>
+            <span className="text-[11px] text-ink-muted ml-auto">{formatDate(result.date)}</span>
           </div>
 
-          <div className="bg-blue-50 rounded-[24px] p-3 mb-3 shadow-panel-soft">
+          <div className="bg-blue-50 rounded-xl p-3 mb-3">
             <div className="flex items-center gap-1 mb-1">
               <Sparkles size={10} className="text-accent" />
-              <span className="text-xs font-semibold text-accent">AI Summary</span>
-              <span className="ml-auto text-xs text-ink-muted">{result.relevanceScore}% релевантность</span>
+              <span className="text-[11px] font-semibold text-accent">AI Summary</span>
+              <span className="ml-auto text-[11px] text-ink-muted">{result.relevanceScore}% релевантность</span>
             </div>
-            <p className="text-xs text-ink-secondary leading-relaxed">{result.aiAnswer}</p>
+            <p className="text-[12px] text-ink-secondary leading-relaxed">{result.aiAnswer}</p>
           </div>
 
-          <p className="text-xs text-ink-muted italic leading-relaxed border-l-2 border-edge pl-3">
+          <p className="text-[12px] text-ink-muted italic leading-relaxed border-l-2 border-edge pl-3">
             {result.relevantFragment}
           </p>
 
           <div className="flex items-center gap-3 mt-3">
             {result.clientName && (
-              <span className="text-xs text-ink-muted">Клиент: {result.clientName}</span>
+              <span className="text-[11px] text-ink-muted">Клиент: {result.clientName}</span>
             )}
             {result.tags.map((tag) => (
               <Badge key={tag} variant="outline">#{tag}</Badge>
