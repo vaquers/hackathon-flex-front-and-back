@@ -79,6 +79,12 @@ const PIPELINE_STEPS = [
   { key: 'rank', label: 'Ранжирование', icon: '🏆' },
 ]
 
+type SyncDealsOutcome = {
+  result: BitrixDealsSyncResult
+  beforeCount: number
+  afterCount: number
+}
+
 export function LeadsPage() {
   const qc = useQueryClient()
   const navigate = useNavigate()
@@ -98,7 +104,10 @@ export function LeadsPage() {
   const clientsQ = useQuery<Client[]>({
     queryKey: ['clients-list'],
     queryFn: () => clientService.listClients(),
-    staleTime: 60_000,
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: 'always',
+    refetchOnReconnect: 'always',
   })
 
   const refreshMutation = useMutation({
@@ -109,9 +118,20 @@ export function LeadsPage() {
   })
 
   const syncDealsMutation = useMutation({
-    mutationFn: () => bitrixService.syncDeals(),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['clients-list'] })
+    mutationFn: async (): Promise<SyncDealsOutcome> => {
+      const beforeClients = qc.getQueryData<Client[]>(['clients-list']) ?? []
+      const result = await bitrixService.syncDeals()
+      const refreshedClients = await qc.fetchQuery<Client[]>({
+        queryKey: ['clients-list'],
+        queryFn: () => clientService.listClients(),
+        staleTime: 0,
+      })
+
+      return {
+        result,
+        beforeCount: beforeClients.length,
+        afterCount: refreshedClients.length,
+      }
     },
   })
 
@@ -205,7 +225,7 @@ export function LeadsPage() {
       />
 
       {syncDealsMutation.isSuccess && (
-        <SyncDealsBanner result={syncDealsMutation.data} />
+        <SyncDealsBanner outcome={syncDealsMutation.data} />
       )}
 
       {syncDealsMutation.isError && (
@@ -625,9 +645,11 @@ function CurrentClientCard({
   )
 }
 
-function SyncDealsBanner({ result }: { result: BitrixDealsSyncResult }) {
+function SyncDealsBanner({ outcome }: { outcome: SyncDealsOutcome }) {
+  const { result, beforeCount, afterCount } = outcome
   const successCount = result.deals.filter((deal) => !deal.error).length
   const errorCount = result.deals.filter((deal) => !!deal.error).length
+  const clientsDelta = afterCount - beforeCount
 
   return (
     <div className="glass-panel p-4 mb-4">
@@ -643,9 +665,18 @@ function SyncDealsBanner({ result }: { result: BitrixDealsSyncResult }) {
           </span>
         )}
       </div>
-      <p className="text-[11px] text-ink-muted">
-        Backend Антона вернул {result.deals.length} записей. Новые данные можно сразу открыть в разделе текущих клиентов.
-      </p>
+      <div className="space-y-1">
+        <p className="text-[11px] text-ink-muted">
+          Синхронизировано сделок: {result.deals.length}. После этого список текущих клиентов был принудительно обновлён.
+        </p>
+        <p className="text-[11px] text-ink-muted">
+          {clientsDelta > 0
+            ? `В базе клиентов появилось ${clientsDelta} ${clientsDelta === 1 ? 'новое совпадение' : clientsDelta < 5 ? 'новых совпадения' : 'новых совпадений'} (${beforeCount} → ${afterCount}).`
+            : clientsDelta < 0
+              ? `Количество клиентов уменьшилось (${beforeCount} → ${afterCount}) после пересборки списка из bridge backend.`
+              : `Количество текущих клиентов не изменилось (${afterCount}). Если Anton backend не создал новый contact/client-card, UI останется тем же.`}
+        </p>
+      </div>
     </div>
   )
 }
