@@ -99,14 +99,14 @@ export function TodayPage() {
       )}
 
       {/* Priority Deals */}
-      <div className="bg-surface-card rounded-2xl shadow-card">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge">
+      <div>
+        <div className="mb-2 flex items-center justify-between px-2 py-1.5">
           <h2 className="font-display text-ink text-[14px]">Приоритетные сделки</h2>
           <Button size="sm" variant="ghost" onClick={() => navigate('/risks')} icon={<ChevronRight size={13} />}>
             Все риски
           </Button>
         </div>
-        <div className="divide-y divide-edge">
+        <div className="space-y-2.5">
           {deals.map((deal) => (
             <PriorityDealRow key={deal.id} deal={deal} onClick={() => navigate(`/clients/${deal.clientId}`)} />
           ))}
@@ -114,8 +114,8 @@ export function TodayPage() {
       </div>
 
       {/* Incoming Requests */}
-      <div className="bg-surface-card rounded-2xl shadow-card">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge">
+      <div>
+        <div className="mb-2 flex items-center justify-between px-2 py-1.5">
           <div className="flex items-center gap-3">
             <h2 className="font-display text-ink text-[14px]">Входящие обращения</h2>
             {incoming.length > 0 && (
@@ -129,7 +129,7 @@ export function TodayPage() {
             AI-маршрутизация
           </div>
         </div>
-        <div className="divide-y divide-edge">
+        <div className="space-y-2.5">
           {incoming.map((req) => (
             <IncomingRequestRow
               key={req.id}
@@ -144,15 +144,15 @@ export function TodayPage() {
 
       {/* Sentiment Feed */}
       {sentimentFeed.length > 0 && (
-        <div className="bg-surface-card rounded-2xl shadow-card">
-          <div className="px-5 py-3.5 border-b border-edge">
+        <div>
+          <div className="mb-2 px-2 py-1.5">
             <h2 className="font-display text-ink text-[14px]">Изменения настроения</h2>
           </div>
-          <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-1 gap-2.5 md:grid-cols-3">
             {sentimentFeed.map((item) => (
               <div
                 key={item.clientId}
-                className="rounded-2xl border border-edge p-4 hover:bg-surface-hover cursor-pointer transition-colors"
+                className="glass-panel p-4 hover:bg-surface-hover cursor-pointer transition-colors"
                 onClick={() => navigate(`/clients/${item.clientId}`)}
               >
                 <div className="flex items-center gap-2 mb-2">
@@ -348,7 +348,7 @@ function VipClientRow({
 
 function PriorityDealRow({ deal, onClick }: { deal: PriorityDeal; onClick: () => void }) {
   return (
-    <div className="flex items-center gap-4 px-6 py-3.5 hover:bg-surface-hover transition-colors group">
+    <div className="glass-panel flex items-center gap-4 px-6 py-4 transition-colors group">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <span className="font-medium text-ink text-sm truncate">{deal.clientName}</span>
@@ -409,7 +409,7 @@ function IncomingRequestRow({
   }[request.channel]
 
   return (
-    <div className="flex items-center gap-4 px-6 py-3.5 hover:bg-surface-hover transition-colors group">
+    <div className="glass-panel flex items-center gap-4 px-6 py-4 transition-colors group">
       <div className="flex-shrink-0 text-ink-muted">{channelIcon}</div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
