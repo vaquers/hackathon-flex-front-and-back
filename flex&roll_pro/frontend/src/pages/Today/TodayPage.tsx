@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import {
-  AlertTriangle, Clock, Inbox, Star, CheckSquare,
+  AlertTriangle, Clock, Inbox, Crown,
   ChevronRight, Phone, Mail, MessageSquare, Zap, TrendingUp, TrendingDown, Minus,
-  Check, UserPlus, ExternalLink,
+  Check, UserPlus, ExternalLink, Flag,
 } from 'lucide-react'
 import { dashboardService } from '@/services/dashboardService'
-import { StatCard } from '@/components/ui/Card'
 import { Badge, RiskBadge, SentimentBadge, VipBadge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { SkeletonPage } from '@/components/ui/Skeleton'
@@ -15,12 +14,6 @@ import { ErrorState } from '@/components/ui/EmptyState'
 import { SidePanel } from '@/components/ui/SidePanel'
 import type { IncomingRequest, PriorityDeal } from '@/types'
 import { formatRub, formatDaysAgo, formatDateTime, urgencyLabel } from '@/utils/format'
-
-import exclamationIcon from '@/assets/symbols/exclamationmark.triangle.svg'
-import clockIcon from '@/assets/symbols/clock.svg'
-import trayIcon from '@/assets/symbols/tray.and.arrow.down.svg'
-import crownIcon from '@/assets/symbols/crown.svg'
-import checkIcon from '@/assets/symbols/checkmark.square.svg'
 
 export function TodayPage() {
   const navigate = useNavigate()
@@ -51,76 +44,58 @@ export function TodayPage() {
   return (
     <div className="space-y-4 animate-fade-in max-w-[1200px]">
       {/* Summary Stats */}
-      <div className="bg-surface-card rounded-2xl shadow-card p-5">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
           <StatBlock
             label="Сделки в риске"
             value={summary.dealsAtRisk}
-            icon={exclamationIcon}
-            color="red"
+            icon={<AlertTriangle size={22} strokeWidth={2.2} />}
             onClick={() => navigate('/risks')}
           />
           <StatBlock
             label="Зависшие сделки"
             value={summary.stalledDeals}
-            icon={clockIcon}
-            color="amber"
+            icon={<Clock size={22} strokeWidth={2.2} />}
             onClick={() => navigate('/risks?category=stalled')}
           />
           <StatBlock
             label="Входящих"
             value={summary.pendingIncoming}
-            icon={trayIcon}
-            color="blue"
+            icon={<Inbox size={22} strokeWidth={2.2} />}
           />
           <StatBlock
             label="VIP клиенты"
             value={summary.vipClients}
-            icon={crownIcon}
-            color="violet"
+            icon={<Crown size={22} strokeWidth={2.2} />}
           />
           <StatBlock
-            label="Follow-Up"
+            label="Follow-Up сегодня"
             value={summary.todayFollowUps}
-            icon={checkIcon}
-            color="green"
+            icon={<Clock size={22} strokeWidth={2.2} />}
           />
-        </div>
       </div>
 
       {/* VIP Clients */}
       {vipAlerts.length > 0 && (
-        <div className="bg-surface-card rounded-2xl shadow-card p-5">
-          <h2 className="font-display text-ink text-[14px] mb-3">VIP Клиенты</h2>
-          <div className="space-y-2">
+        <section
+          className="rounded-[46px] px-10 py-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.32),0_24px_48px_rgba(129,149,193,0.16)]"
+          style={{
+            background: 'linear-gradient(180deg, rgba(191,203,231,0.72) 0%, rgba(187,199,228,0.68) 100%)',
+          }}
+        >
+          <h2 className="font-display text-[28px] leading-none tracking-[-0.06em] text-[#0c1018]">VIP Клиенты</h2>
+          <div className="mt-8 space-y-9">
             {vipAlerts.map((alert) => (
-              <div
+              <VipClientRow
                 key={alert.id}
-                className="bg-surface-inner rounded-xl border border-edge px-4 py-3 flex items-center gap-3"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                    <span className="font-medium text-ink text-[13px]">{alert.clientName}</span>
-                    <RiskBadge level={alert.severity} />
-                  </div>
-                  <p className="text-xs text-ink-secondary leading-relaxed line-clamp-2">{alert.alertMessage}</p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="text-[10px] text-ink-muted">Менеджер</p>
-                  <p className="text-xs text-ink-secondary">{alert.managerName}</p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="primary"
-                  className="flex-shrink-0"
-                  onClick={() => navigate(`/clients/${alert.clientId}`)}
-                >
-                  Смотреть
-                </Button>
-              </div>
+                clientName={alert.clientName}
+                severity={alert.severity}
+                managerName={alert.managerName}
+                message={alert.alertMessage}
+                onOpen={() => navigate(`/clients/${alert.clientId}`)}
+              />
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Priority Deals */}
@@ -257,12 +232,11 @@ export function TodayPage() {
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 function StatBlock({
-  label, value, icon, color, onClick,
+  label, value, icon, onClick,
 }: {
   label: string
   value: number
-  icon: string
-  color: 'red' | 'amber' | 'blue' | 'violet' | 'green'
+  icon: React.ReactNode
   onClick?: () => void
 }) {
   return (
@@ -270,11 +244,104 @@ function StatBlock({
       className={onClick ? 'cursor-pointer group' : ''}
       onClick={onClick}
     >
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <img src={icon} alt="" className="w-3.5 h-3.5" style={{ filter: 'invert(1) brightness(0.5)' }} />
-        <span className="text-[11px] text-ink-muted font-medium">{label}</span>
+      <div
+        className="flex min-h-[114px] flex-col rounded-[30px] border border-white/85 px-7 pb-4 pt-5 shadow-[0_18px_36px_rgba(133,149,184,0.18)] transition-all duration-200"
+        style={{
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,248,250,0.96) 100%)',
+        }}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <p className="font-display text-[15px] leading-[1.15] tracking-[-0.05em] text-[#111111]">
+            {label}
+          </p>
+          <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center text-accent transition-transform duration-200 group-hover:scale-105">
+            {icon}
+          </span>
+        </div>
+
+        <div className="mt-auto flex justify-center pt-4">
+          <p className="font-display text-[34px] leading-none tracking-[-0.07em] text-[#05070b]">
+            {value}
+          </p>
+        </div>
       </div>
-      <p className="text-[28px] font-display text-ink leading-none group-hover:text-accent transition-colors">{value}</p>
+    </div>
+  )
+}
+
+function VipClientRow({
+  clientName,
+  severity,
+  managerName,
+  message,
+  onOpen,
+}: {
+  clientName: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  managerName: string
+  message: string
+  onOpen: () => void
+}) {
+  const severityConfig = {
+    low: { label: 'Низкий', color: '#10b981' },
+    medium: { label: 'Средний', color: '#ff8a1e' },
+    high: { label: 'Высокий', color: '#ff4343' },
+    critical: { label: 'Критический', color: '#d11f1f' },
+  } as const
+
+  const currentSeverity = severityConfig[severity]
+
+  return (
+    <div
+      className="rounded-[42px] border border-white/86 px-8 py-8 shadow-[0_26px_56px_rgba(122,143,187,0.18)]"
+      style={{
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.96) 100%)',
+      }}
+    >
+      <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
+        <div
+          className="min-w-0 flex-1 rounded-[30px] px-5 py-5"
+          style={{ background: 'rgba(214, 219, 225, 0.62)' }}
+        >
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_230px] xl:items-start">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="truncate font-display text-[20px] leading-tight tracking-[-0.055em] text-[#0d1018]">
+                  {clientName}
+                </p>
+                <span
+                  className="inline-flex items-center gap-1.5 text-[18px] font-medium tracking-[-0.05em]"
+                  style={{ color: currentSeverity.color }}
+                >
+                  <Flag size={15} strokeWidth={2.2} />
+                  {currentSeverity.label}
+                </span>
+              </div>
+              <div className="mt-4 h-px w-full bg-[rgba(129,139,155,0.28)]" />
+              <p className="mt-4 text-[16px] leading-[1.35] tracking-[-0.045em] text-[#7e848c]">
+                {message}
+              </p>
+            </div>
+
+            <div className="min-w-0 xl:pl-4">
+              <p className="font-display text-[20px] leading-tight tracking-[-0.05em] text-[#0d1018]">
+                Менеджер
+              </p>
+              <div className="mt-4 h-px w-full bg-[rgba(129,139,155,0.28)]" />
+              <p className="mt-4 truncate text-[16px] leading-[1.35] tracking-[-0.045em] text-[#7e848c]">
+                {managerName}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={onOpen}
+          className="flex h-[56px] min-w-[172px] items-center justify-center self-center rounded-full bg-[linear-gradient(180deg,#2471ff_0%,#0056f5_100%)] px-7 text-[17px] font-medium tracking-[-0.045em] text-white shadow-[0_16px_32px_rgba(0,86,245,0.28)] transition-transform duration-150 hover:-translate-y-0.5"
+        >
+          Смотреть
+        </button>
+      </div>
     </div>
   )
 }
