@@ -147,74 +147,50 @@ export function LeadsPage() {
   const connectedClients = clients.filter((client) => client.bridgeConnected).length
 
   return (
-    <div className="mx-auto max-w-[1220px] animate-fade-in space-y-4">
-      <div className="glass-panel px-5 py-5">
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-accent">
-                Client cockpit
-              </span>
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-medium text-ink-muted shadow-panel-soft">
-                SpaceHack workspace
-              </span>
-            </div>
-            <h1 className="mt-3 font-display text-[26px] leading-tight text-ink">
-              Лиды и текущие клиенты в одном рабочем потоке
+    <div className="animate-fade-in max-w-[960px]">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="font-display text-ink text-lg leading-tight">
+              Лиды и клиенты
             </h1>
-            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              Здесь собраны новые потенциальные компании и действующая база клиентов. Можно синхронизировать сделки, быстро найти клиента и открыть AI-инструменты без переходов между разными разделами.
-            </p>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-accent bg-blue-50 px-2 py-0.5 rounded-md">AI</span>
           </div>
-
-          <div className="flex flex-col items-stretch gap-2 sm:flex-row xl:flex-col xl:min-w-[240px]">
-            <Button
-              variant="outline"
-              size="md"
-              icon={<RefreshCw size={12} className={syncDealsMutation.isPending ? 'animate-spin' : ''} />}
-              loading={syncDealsMutation.isPending}
-              onClick={() => syncDealsMutation.mutate()}
-              className="justify-center"
-            >
-              Обновить сделки
-            </Button>
-            <Button
-              variant="primary"
-              size="md"
-              icon={<RefreshCw size={12} className={isRunning ? 'animate-spin' : ''} />}
-              loading={refreshMutation.isPending}
-              onClick={() => refreshMutation.mutate()}
-              disabled={isRunning || activeTab === 'clients'}
-              className="justify-center"
-            >
-              {isRunning ? 'Генерация...' : 'Найти лиды'}
-            </Button>
-          </div>
+          <p className="text-xs text-ink-muted mt-0.5">
+            Новые потенциальные клиенты и рабочая база текущих компаний в одном разделе
+          </p>
         </div>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          <span className="rounded-full bg-white px-3 py-2 text-[11px] text-ink-muted shadow-panel-soft">
-            Компаний в базе: <span className="font-semibold text-ink">{clients.length}</span>
-          </span>
-          <span className="rounded-full bg-white px-3 py-2 text-[11px] text-ink-muted shadow-panel-soft">
-            Связано с bridge: <span className="font-semibold text-ink">{connectedClients}</span>
-          </span>
+        <div className="flex items-center gap-2">
           {activeTab === 'prospects' && data?.generated_at && !isRunning && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2 text-[11px] text-ink-muted shadow-panel-soft">
+            <div className="flex items-center gap-1.5 text-[11px] text-ink-muted bg-surface-card rounded-lg px-2.5 py-1.5 shadow-card border border-edge">
               {data.cache_stale ? (
                 <AlertCircle size={10} className="text-risk-medium" />
               ) : (
                 <CheckCircle2 size={10} className="text-risk-low" />
               )}
-              Обновлено {formatGeneratedAt(data.generated_at)}
-            </span>
+              {formatGeneratedAt(data.generated_at)}
+            </div>
           )}
-          {activeTab === 'prospects' && isRunning && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-2 text-[11px] text-accent shadow-panel-soft">
-              <Loader2 size={10} className="animate-spin" />
-              AI-генерация в процессе
-            </span>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<RefreshCw size={12} className={syncDealsMutation.isPending ? 'animate-spin' : ''} />}
+            loading={syncDealsMutation.isPending}
+            onClick={() => syncDealsMutation.mutate()}
+          >
+            Обновить сделки
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<RefreshCw size={12} className={isRunning ? 'animate-spin' : ''} />}
+            loading={refreshMutation.isPending}
+            onClick={() => refreshMutation.mutate()}
+            disabled={isRunning || activeTab === 'clients'}
+          >
+            {isRunning ? 'Генерация...' : 'Найти лиды'}
+          </Button>
         </div>
       </div>
 
@@ -241,36 +217,22 @@ export function LeadsPage() {
 
       {activeTab === 'clients' ? (
         <div className="space-y-4">
-          <div className="glass-panel p-4">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-ink-muted">
-                  Current clients
-                </p>
-                <p className="mt-1 text-sm text-ink-secondary">
-                  Рабочая база компаний с быстрым доступом в карточку клиента и Bitrix-инструменты.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-ink-muted">
-                  <span className="rounded-full bg-surface-inner px-3 py-2 border border-edge">
+          <div className="bg-surface-card rounded-2xl shadow-card p-4 border border-edge">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-wrap gap-2 text-[11px] text-ink-muted">
+                <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
                   Компаний: {clients.length}
-                  </span>
-                  <span className="rounded-full bg-surface-inner px-3 py-2 border border-edge">
+                </span>
+                <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
                   Связано с Bitrix bridge: {connectedClients}
-                  </span>
-                </div>
+                </span>
               </div>
-
-              <div className="w-full xl:w-[420px]">
-                <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-ink-muted">
-                  Быстрый поиск
-                </label>
-                <input
-                  value={clientSearch}
-                  onChange={(event) => setClientSearch(event.target.value)}
-                  placeholder="Поиск по компании, контакту или менеджеру"
-                  className="w-full rounded-full border border-white/70 bg-white/88 px-4 py-3 text-sm text-ink placeholder:text-ink-muted shadow-panel-soft focus:outline-none focus:ring-2 focus:ring-accent/20"
-                />
-              </div>
+              <input
+                value={clientSearch}
+                onChange={(event) => setClientSearch(event.target.value)}
+                placeholder="Поиск по компании, контакту или менеджеру"
+                className="w-full md:w-[360px] rounded-2xl border border-edge bg-surface-inner px-4 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-accent/20"
+              />
             </div>
           </div>
 
@@ -442,11 +404,11 @@ function LeadCard({
   const TierIcon = tier.icon
 
   return (
-    <div className="glass-panel transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+    <div className="bg-surface-card rounded-2xl shadow-card transition-shadow duration-200 hover:shadow-card-hover">
       <div className="p-4">
         {/* Header row */}
         <div className="flex items-start gap-3 mb-2.5">
-          <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-white text-[13px] font-display text-accent shadow-panel-soft">
+          <div className="w-7 h-7 rounded-lg bg-blue-50 text-accent text-[13px] font-display flex items-center justify-center flex-shrink-0 mt-0.5">
             {rank}
           </div>
 
@@ -480,7 +442,7 @@ function LeadCard({
             </div>
           </div>
 
-          <div className="flex-shrink-0 rounded-[22px] bg-white px-3 py-2 text-right shadow-panel-soft">
+          <div className="text-right flex-shrink-0">
             <p className={clsx(
               'text-[22px] font-display leading-none',
               lead.score >= 70 ? 'text-risk-low' :
@@ -510,7 +472,7 @@ function LeadCard({
         {lead.company_summary && (
           <p className="text-[11px] text-ink-secondary leading-relaxed mb-2 line-clamp-2">{lead.company_summary}</p>
         )}
-        <div className="mb-2 rounded-[20px] border border-white/70 bg-blue-50/70 p-3 shadow-panel-soft">
+        <div className="bg-blue-50/70 rounded-lg p-2.5 mb-2">
           <div className="flex items-center gap-1 mb-0.5">
             <Sparkles size={10} className="text-accent" />
             <span className="text-[10px] font-semibold text-accent">Почему рекомендуем</span>
@@ -583,7 +545,7 @@ function LeadCard({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center gap-2 border-t border-edge/50 px-4 pb-3 pt-3">
+      <div className="px-4 pb-3 flex items-center gap-2 border-t border-edge/50 pt-2">
         <Button
           size="sm"
           variant="primary"
@@ -613,7 +575,7 @@ function CurrentClientCard({
   onOpen: () => void
 }) {
   return (
-    <div className="glass-panel transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+    <div className="bg-surface-card rounded-2xl shadow-card transition-shadow duration-200 hover:shadow-card-hover">
       <div className="p-4 flex flex-col gap-3 md:flex-row md:items-start">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
@@ -634,23 +596,23 @@ function CurrentClientCard({
             {client.name} · {client.managerName} · {client.dealStageLabel}
           </p>
           <p className="text-sm text-ink-secondary leading-relaxed">{client.riskReason}</p>
-          <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-ink-muted">
-            <span className="rounded-full bg-surface-inner px-3 py-2 border border-edge">
+          <div className="flex flex-wrap gap-2 mt-3 text-[11px] text-ink-muted">
+            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
               {formatRub(client.dealAmount)}/мес.
             </span>
-            <span className="rounded-full bg-surface-inner px-3 py-2 border border-edge">
+            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
               {client.segmentLabel}
             </span>
-            <span className="rounded-full bg-surface-inner px-3 py-2 border border-edge">
+            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
               Контакт: {formatDateTime(client.lastContactAt)}
             </span>
-            <span className="rounded-full bg-surface-inner px-3 py-2 border border-edge">
+            <span className="bg-surface-inner rounded-lg px-2.5 py-1.5 border border-edge">
               {formatDaysAgo(client.daysSinceContact)}
             </span>
           </div>
         </div>
         <div className="flex flex-row md:flex-col items-start md:items-end gap-2 md:text-right">
-          <div className="rounded-[22px] bg-white px-4 py-3 shadow-panel-soft">
+          <div>
             <p className="text-[11px] text-ink-muted">Менеджер</p>
             <p className="text-sm font-medium text-ink">{client.managerName}</p>
           </div>
@@ -668,7 +630,7 @@ function SyncDealsBanner({ result }: { result: BitrixDealsSyncResult }) {
   const errorCount = result.deals.filter((deal) => !!deal.error).length
 
   return (
-    <div className="glass-panel p-4 mb-4">
+    <div className="bg-surface-card rounded-2xl shadow-card p-4 mb-4 border border-edge">
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <CheckCircle2 size={14} className="text-risk-low" />
         <span className="text-sm font-medium text-ink">Синхронизация сделок завершена</span>

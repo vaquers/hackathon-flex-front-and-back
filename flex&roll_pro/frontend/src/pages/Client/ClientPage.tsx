@@ -194,40 +194,18 @@ export function ClientPage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1260px] animate-fade-in space-y-5">
-      <div className="glass-panel overflow-hidden">
-        <div className="flex items-center justify-between border-b border-white/70 bg-white/60 px-5 py-4 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/leads')}
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white text-ink-muted shadow-panel-soft transition-colors hover:text-ink"
-            >
-              <ArrowLeft size={16} />
-            </button>
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-ink-muted">
-                Client cockpit
-              </p>
-              <p className="mt-1 text-sm text-ink-secondary">
-                Карточка компании, AI-инструменты и контекст по сделке в одном месте.
-              </p>
-            </div>
-          </div>
-
-          <div className="hidden lg:flex items-center gap-2">
-            <span className="rounded-full bg-white px-3 py-1.5 text-[11px] text-ink-muted shadow-panel-soft">
-              Менеджер: <span className="font-medium text-ink">{client.managerName}</span>
-            </span>
-            <span className="rounded-full bg-white px-3 py-1.5 text-[11px] text-ink-muted shadow-panel-soft">
-              Стадия: <span className="font-medium text-ink">{client.dealStageLabel}</span>
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 p-5 xl:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-[26px] leading-tight text-ink">{client.company}</h1>
+    <div className="animate-fade-in -m-6">
+      <div className="sticky top-0 z-10 bg-surface-card border-b border-edge px-6 py-3.5">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/leads')}
+            className="text-ink-muted hover:text-ink p-1.5 rounded-xl hover:bg-surface-hover transition-colors flex-shrink-0"
+          >
+            <ArrowLeft size={16} />
+          </button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="font-display text-ink text-[17px] truncate">{client.company}</h1>
               {client.isVip && <VipBadge />}
               <RiskBadge level={client.riskLevel} score={client.riskScore} />
               <SentimentBadge sentiment={client.sentiment} />
@@ -240,49 +218,22 @@ export function ClientPage() {
                 <Badge variant="outline">Не связан с bridge</Badge>
               )}
             </div>
-
-            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              {client.name} ведёт эту компанию в сегменте {client.segmentLabel.toLowerCase()}.
-              {bitrixReady
-                ? ' Контекст переписки, брифы и замена менеджера доступны прямо из карточки.'
-                : ' После связки с bridge здесь автоматически заработают Bitrix-инструменты.'}
+            <p className="text-xs text-ink-muted mt-0.5">
+              {client.name} · {client.managerName} · {client.dealStageLabel} · {formatRub(client.dealAmount)}/мес.
             </p>
-
-            <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-ink-muted">
-              <span className="rounded-full bg-white px-3 py-2 shadow-panel-soft">Контакт: {client.name}</span>
-              <span className="rounded-full bg-white px-3 py-2 shadow-panel-soft">Последний контакт: {formatDateTime(client.lastContactAt)}</span>
-              <span className="rounded-full bg-white px-3 py-2 shadow-panel-soft">{client.product}</span>
-              <span className="rounded-full bg-white px-3 py-2 shadow-panel-soft">{client.expectedVolume}</span>
-            </div>
           </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1">
-            <div className="rounded-[28px] bg-white px-4 py-4 shadow-panel-soft">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-muted">Сделка</p>
-              <p className="mt-2 font-display text-[24px] leading-none text-ink">{formatRub(client.dealAmount)}</p>
-              <p className="mt-2 text-xs text-ink-muted">{client.dealStageLabel}</p>
-            </div>
-
-            <div className="rounded-[28px] bg-white px-4 py-4 shadow-panel-soft">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-muted">Связь</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {client.phone && (
-                  <Button size="sm" variant="outline" icon={<Phone size={12} />} className="flex-1">
-                    {client.phone}
-                  </Button>
-                )}
-                {client.email && (
-                  <Button size="sm" variant="outline" icon={<Mail size={12} />} className="flex-1">
-                    Email
-                  </Button>
-                )}
-              </div>
-            </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {client.phone && (
+              <Button size="sm" variant="outline" icon={<Phone size={12} />}>{client.phone}</Button>
+            )}
+            {client.email && (
+              <Button size="sm" variant="outline" icon={<Mail size={12} />}>Email</Button>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+      <div className="p-6 grid grid-cols-1 xl:grid-cols-3 gap-5">
         <div className="xl:col-span-2 space-y-4">
           <Card>
             <div className="flex items-center justify-between gap-3 mb-4">
@@ -770,18 +721,13 @@ function ToolActionButton({
       onClick={onClick}
       disabled={disabled}
       className={clsx(
-        'group rounded-[28px] border border-white/70 bg-white/82 px-4 py-4 text-left shadow-panel-soft transition-all duration-150',
-        'hover:-translate-y-0.5 hover:bg-white hover:shadow-panel disabled:opacity-50 disabled:cursor-not-allowed'
+        'rounded-2xl border border-edge px-4 py-4 text-left transition-colors',
+        'hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed'
       )}
     >
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2 text-accent">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 shadow-panel-soft">
-            {icon}
-          </span>
-          <span className="text-sm font-medium text-ink">{title}</span>
-        </div>
-        <span className="text-sm text-ink-muted transition-colors group-hover:text-accent">↗</span>
+      <div className="flex items-center gap-2 mb-2 text-accent">
+        {icon}
+        <span className="text-sm font-medium text-ink">{title}</span>
       </div>
       <p className="text-xs text-ink-muted leading-relaxed">{description}</p>
     </button>
@@ -790,16 +736,16 @@ function ToolActionButton({
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[22px] bg-white px-4 py-3 shadow-panel-soft">
-      <span className="block text-[11px] text-ink-muted">{label}</span>
-      <span className="mt-1 block text-sm font-medium text-ink">{value}</span>
+    <div className="flex items-baseline gap-2">
+      <span className="text-xs text-ink-muted flex-shrink-0 w-20">{label}</span>
+      <span className="text-xs text-ink font-medium">{value}</span>
     </div>
   )
 }
 
 function InfoMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[24px] border border-white/70 bg-white/84 px-4 py-3 shadow-panel-soft">
+    <div className="rounded-2xl border border-edge px-4 py-3">
       <p className="text-[11px] text-ink-muted mb-1">{label}</p>
       <p className="text-sm text-ink">{value}</p>
     </div>
@@ -808,7 +754,7 @@ function InfoMetric({ label, value }: { label: string; value: string }) {
 
 function PanelError({ message }: { message: string }) {
   return (
-    <Card className="bg-red-50/90 border border-red-200 shadow-panel-soft">
+    <Card className="bg-red-50 border border-red-200">
       <div className="flex items-start gap-2">
         <AlertCircle size={14} className="text-risk-high mt-0.5 flex-shrink-0" />
         <p className="text-sm text-risk-high">{message}</p>
@@ -835,10 +781,10 @@ function CommEventRow({ event }: { event: CommunicationEvent }) {
   }
 
   return (
-    <div className={clsx('flex items-start gap-3 px-6 py-4', event.isImportant && 'bg-amber-50/30')}>
+    <div className={clsx('flex items-start gap-3 px-6 py-4', event.isImportant && 'bg-amber-50/40')}>
       <div
         className={clsx(
-          'mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-2xl shadow-panel-soft',
+          'w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5',
           iconColors[event.type] ?? 'bg-slate-100 text-ink-secondary'
         )}
       >
@@ -895,7 +841,7 @@ function CallQualityCard({ comms }: { comms: CommunicationEvent[] }) {
   return (
     <Card>
       <div className="flex items-center gap-2 mb-3">
-        <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50 shadow-panel-soft">
+        <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
           <Zap size={11} className="text-accent" />
         </div>
         <p className="text-[11px] font-semibold text-ink-muted uppercase tracking-widest flex-1">AI Оценка звонка</p>
