@@ -10,15 +10,15 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 const variantStyles = {
   primary:   'btn-primary text-white',
   secondary: 'btn-secondary',
-  ghost:     'text-ink-secondary hover:bg-surface-hover hover:text-ink bg-transparent',
-  danger:    'bg-red-50 text-risk-high hover:bg-red-100 border border-red-200',
+  ghost:     'bg-white/60 text-ink-secondary hover:bg-white/80 hover:text-ink border border-transparent',
+  danger:    'bg-red-50/90 text-risk-high hover:bg-red-100 border border-red-200 shadow-panel-soft',
   outline:   'btn-secondary',
 }
 
 const sizeStyles = {
-  sm: 'text-[11px] px-3.5 py-1.5 gap-1.5',
-  md: 'text-[13px] px-5 py-2.5 gap-2',
-  lg: 'text-[13px] px-6 py-3 gap-2',
+  sm: 'text-[11px] px-3.5 py-2 gap-1.5',
+  md: 'text-[13px] px-5 py-3 gap-2',
+  lg: 'text-[13px] px-6 py-3.5 gap-2',
 }
 
 export function Button({

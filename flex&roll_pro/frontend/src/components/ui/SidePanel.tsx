@@ -36,23 +36,26 @@ export function SidePanel({ open, onClose, title, children, width = 'md' }: Side
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div
-        className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+        className="absolute inset-0 bg-[rgba(21,33,58,0.18)] backdrop-blur-sm"
         onClick={onClose}
       />
       <div
         className={clsx(
-          'relative glass-panel-soft h-full flex flex-col',
+          'relative my-3 mr-3 h-[calc(100%-24px)] overflow-hidden border border-white/70 bg-white/88 shadow-[0_26px_60px_rgba(76,97,139,0.22)] backdrop-blur-xl',
+          'flex flex-col rounded-[34px]',
           widthStyles[width],
           'animate-slide-in-right',
-          '!rounded-l-3xl !rounded-r-none'
         )}
       >
         {title && (
-          <div className="flex items-center justify-between px-6 py-5 border-b border-edge flex-shrink-0">
-            <h2 className="font-display text-ink text-sm">{title}</h2>
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-white/70 bg-white/66 px-6 py-5 backdrop-blur-xl">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-ink-muted">AI panel</p>
+              <h2 className="mt-1 font-display text-sm text-ink">{title}</h2>
+            </div>
             <button
               onClick={onClose}
-              className="text-ink-muted hover:text-ink p-1.5 rounded-xl hover:bg-surface-hover transition-colors"
+              className="rounded-full bg-white/76 p-2 text-ink-muted shadow-panel-soft transition-colors hover:text-ink"
             >
               <X size={16} />
             </button>
