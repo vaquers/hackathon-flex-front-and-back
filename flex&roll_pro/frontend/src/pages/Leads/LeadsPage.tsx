@@ -147,7 +147,7 @@ export function LeadsPage() {
   const connectedClients = clients.filter((client) => client.bridgeConnected).length
 
   return (
-    <div className="animate-fade-in max-w-[960px]">
+    <div className="animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>

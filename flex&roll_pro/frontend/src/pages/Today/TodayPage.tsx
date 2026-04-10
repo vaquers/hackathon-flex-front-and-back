@@ -43,7 +43,7 @@ export function TodayPage() {
   const sentimentFeed = sentimentQ.data ?? []
 
   return (
-    <div className="space-y-5 animate-fade-in max-w-[1200px]">
+    <div className="space-y-5 animate-fade-in">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <StatBlock
